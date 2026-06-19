@@ -1,36 +1,184 @@
-import { toast } from 'react-hot-toast'
+import { Eye } from "lucide-react";
 
 export default function WalletDepositsPage() {
+  const deposits = [
+    {
+      id: 1,
+      name: "Adaeze Okafor",
+      initials: "AO",
+      amount: "20,000.00",
+      date: "2026-05-18",
+      status: "Pending",
+    },
+    {
+      id: 2,
+      name: "Adaeze Okafor",
+      initials: "AO",
+      amount: "20,000.00",
+      date: "2026-05-19",
+      status: "Pending",
+    },
+    {
+      id: 3,
+      name: "Adaeze Okafor",
+      initials: "AO",
+      amount: "20,000.00",
+      date: "2026-05-19",
+      status: "Pending",
+    },
+    {
+      id: 4,
+      name: "Adaeze Okafor",
+      initials: "AO",
+      amount: "20,000.00",
+      date: "2026-05-19",
+      status: "Pending",
+    },
+    {
+      id: 5,
+      name: "Adaeze Okafor",
+      initials: "AO",
+      amount: "20,000.00",
+      date: "2026-05-19",
+      status: "Paid",
+    },
+    {
+      id: 6,
+      name: "Adaeze Okafor",
+      initials: "AO",
+      amount: "20,000.00",
+      date: "2026-05-19",
+      status: "Paid",
+    },
+    {
+      id: 7,
+      name: "Adaeze Okafor",
+      initials: "AO",
+      amount: "20,000.00",
+      date: "2026-05-19",
+      status: "Paid",
+    },
+    {
+      id: 8,
+      name: "Adaeze Okafor",
+      initials: "AO",
+      amount: "20,000.00",
+      date: "2026-05-19",
+      status: "Paid",
+    },
+    {
+      id: 9,
+      name: "Adaeze Okafor",
+      initials: "AO",
+      amount: "20,000.00",
+      date: "2026-05-19",
+      status: "Paid",
+    },
+  ];
+
   return (
-    <section className="space-y-6">
-      <header className="rounded-3xl border border-slate-800 bg-slate-900/90 p-6 shadow-soft">
-        <h2 className="text-2xl font-semibold text-white">Wallet Deposits</h2>
-        <p className="mt-2 text-slate-400">Track and manage wallet deposits, funding requests, and balance updates from users.</p>
-      </header>
+    <section className="space-y-8">
+      {/* Header */}
+      <div>
+        <h1 className="text-[40px] font-bold text-slate-900">
+          Wallet Deposits
+        </h1>
+        <p className="mt-1 text-lg text-slate-500">
+          Review payments
+        </p>
+      </div>
 
-      <div className="grid gap-5 lg:grid-cols-2">
-        <article className="rounded-3xl border border-slate-800 bg-slate-900/90 p-6 shadow-soft">
-          <h3 className="text-xl font-semibold text-white">Recent deposits</h3>
-          <p className="mt-3 text-slate-300">View the latest wallet funding transactions and deposit requests.</p>
-          <button
-            type="button"
-            onClick={() => toast.success('Deposit list loaded')}
-            className="mt-6 inline-flex items-center justify-center rounded-3xl bg-brand-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-400"
-          >
-            View deposits
-          </button>
-        </article>
+      {/* Table Card */}
+      <div className="overflow-hidden rounded-[32px] border border-slate-200 bg-white">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-slate-200">
+                <th className="px-8 py-6 text-left text-sm font-semibold uppercase tracking-wide text-slate-400">
+                  User
+                </th>
+                <th className="px-8 py-6 text-left text-sm font-semibold uppercase tracking-wide text-slate-400">
+                  Amount
+                </th>
+                <th className="px-8 py-6 text-left text-sm font-semibold uppercase tracking-wide text-slate-400">
+                  Submitted
+                </th>
+                <th className="px-8 py-6 text-left text-sm font-semibold uppercase tracking-wide text-slate-400">
+                  Status
+                </th>
+                <th className="px-8 py-6 text-center text-sm font-semibold uppercase tracking-wide text-slate-400">
+                  Actions
+                </th>
+              </tr>
+            </thead>
 
-        <article className="rounded-3xl border border-slate-800 bg-slate-900/90 p-6 shadow-soft">
-          <h3 className="text-xl font-semibold text-white">Deposit statistics</h3>
-          <p className="mt-3 text-slate-300">Monitor deposit activity and wallet balance trends.</p>
-          <ul className="mt-6 space-y-3 text-sm text-slate-400">
-            <li>Total deposits: $1.8M</li>
-            <li>This month: $342.5k</li>
-            <li>Avg deposit: $2,450</li>
-          </ul>
-        </article>
+            <tbody>
+              {deposits.map((deposit) => (
+                <tr
+                  key={deposit.id}
+                  className="border-b border-slate-100 last:border-none"
+                >
+                  {/* User */}
+                  <td className="px-8 py-6">
+                    <div className="flex items-center gap-4">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-100 text-sm font-semibold text-slate-700">
+                        {deposit.initials}
+                      </div>
+
+                      <span className="font-medium text-slate-700">
+                        {deposit.name}
+                      </span>
+                    </div>
+                  </td>
+
+                  {/* Amount */}
+                  <td className="px-8 py-6 text-lg text-slate-600">
+                    {deposit.amount}
+                  </td>
+
+                  {/* Date */}
+                  <td className="px-8 py-6 text-lg text-slate-600">
+                    {deposit.date}
+                  </td>
+
+                  {/* Status */}
+                  <td className="px-8 py-6">
+                    {deposit.status === "Pending" ? (
+                      <span className="inline-flex items-center gap-2 rounded-full bg-amber-100 px-4 py-2 text-sm font-medium text-amber-700">
+                        <span className="h-2 w-2 rounded-full bg-amber-500" />
+                        Pending
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-4 py-2 text-sm font-medium text-sky-700">
+                        <span className="h-2 w-2 rounded-full bg-sky-600" />
+                        Paid
+                      </span>
+                    )}
+                  </td>
+
+                  {/* Actions */}
+                  <td className="px-8 py-6">
+                    <div className="flex items-center justify-center gap-3">
+                      <button className="flex items-center gap-2 text-slate-600 hover:text-slate-900">
+                        <Eye size={18} />
+                        <span>Proof</span>
+                      </button>
+
+                      <button className="rounded-full border border-slate-300 px-6 py-2 font-medium text-slate-700 transition hover:bg-slate-50">
+                        Reject
+                      </button>
+
+                      <button className="rounded-full bg-[#0F4C75] px-6 py-2 font-medium text-white transition hover:opacity-90">
+                        Approve
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </section>
-  )
+  );
 }

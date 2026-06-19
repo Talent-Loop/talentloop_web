@@ -1,6 +1,13 @@
 import { NavLink } from 'react-router-dom'
-import { FiBarChart2, FiFileText, FiHome, FiUsers, FiCheckCircle, FiDollarSign, FiList, FiCheck } from 'react-icons/fi'
-
+import {
+  FiBarChart2,
+  FiFileText,
+  FiHome,
+  FiUsers,
+  FiCheckCircle,
+  FiDollarSign,
+  FiList,
+} from 'react-icons/fi'
 const links = [
   { label: 'Overview', to: '/', icon: FiHome },
   { label: 'User', to: '/users', icon: FiUsers },
@@ -13,43 +20,64 @@ const links = [
 
 export default function Sidebar() {
   return (
-    <aside className="hidden w-64 flex-col border-r border-slate-700/40 bg-gradient-to-b from-slate-900 to-slate-950 px-6 py-8 text-slate-300 md:flex">
-      <div className="mb-12 flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-white font-semibold text-sm">
-          <FiCheck className="h-6 w-6" />
-        </div>
-        <div>
-          <h2 className="text-base font-bold text-white leading-none">Admin</h2>
-          <p className="text-xs uppercase tracking-widest text-slate-500 mt-1">Talent Loop Management</p>
-        </div>
-      </div>
+    <aside className="hidden w-56 flex-col border-r border-white/10 bg-[#10344D] text-white md:flex">
+    
+     
+<div className="px-6 py-6">
+  <div className="flex items-center gap-3">
+    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#1B4866]">
+      <FiCheckCircle className="h-6 w-6 text-white" />
+    </div>
 
-      <nav className="space-y-2 text-sm font-medium flex-1">
-        {links.map(({ label, to, icon: Icon }) => (
-          <NavLink
-            key={to}
-            to={to}
-            end={to === '/'}
-            className={({ isActive }) =>
-              isActive
-                ? 'flex items-center gap-3 rounded-lg px-4 py-2.5 bg-white text-slate-900 font-medium shadow-md transition'
-                : 'flex items-center gap-3 rounded-lg px-4 py-2.5 text-slate-400 hover:text-slate-200 transition'
-            }
-          >
-            <Icon className="h-5 w-5 flex-shrink-0" />
-            <span>{label}</span>
-          </NavLink>
-        ))}
+    <div>
+      <h2 className="text-base font-bold text-white leading-none">
+        Admin
+      </h2>
+
+      <p className="mt-1 text-[10px] font-medium uppercase tracking-[0.15em] text-slate-300">
+        Talent Loop Management
+      </p>
+    </div>
+  </div>
+</div>
+      <div className="border-t border-white/10" />
+
+    
+      <nav className="flex-1 px-4 py-8">
+        <div className="space-y-2">
+          {links.map(({ label, to, icon: Icon }) => (
+            <NavLink
+              key={to}
+              to={to}
+              end={to === '/'}
+              className={({ isActive }) =>
+                isActive
+                  ? 'flex items-center gap-3 rounded-full bg-white px-4 py-3 text-sm font-semibold text-slate-900 shadow-sm transition-all duration-200'
+                  : 'flex items-center gap-3 rounded-full px-4 py-3 text-sm font-medium text-slate-100 transition-all duration-200 hover:bg-white/10 hover:text-white'
+              }
+            >
+              <Icon className="h-5 w-5 flex-shrink-0" />
+              <span>{label}</span>
+            </NavLink>
+          ))}
+        </div>
       </nav>
 
-      <div className="mt-auto border-t border-slate-700/40 pt-6">
+    
+      <div className="border-t border-white/10 p-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-700 text-white font-semibold text-xs flex-shrink-0">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#2563EB] text-xs font-semibold text-white shadow-md">
             AO
           </div>
+
           <div className="min-w-0">
-            <p className="text-sm font-semibold text-white truncate">Admin Operator</p>
-            <p className="text-xs text-slate-500 truncate">admin@servo.io</p>
+            <p className="truncate text-sm font-semibold text-white">
+              Admin Operator
+            </p>
+
+            <p className="truncate text-xs text-slate-300">
+              admin@servo.io
+            </p>
           </div>
         </div>
       </div>

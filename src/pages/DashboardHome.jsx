@@ -1,77 +1,271 @@
-import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import {
+  Area,
+  AreaChart,
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts'
 
-const metrics = [
-  { title: 'Active users', value: '18.2k' },
-  { title: 'Revenue', value: '$124.6k' },
-  { title: 'Projects', value: '84' },
-  { title: 'New tickets', value: '23' },
+import {
+  FiUsers,
+  FiUserCheck,
+  FiUserX,
+  FiDollarSign,
+  FiCheckCircle,
+  FiBriefcase,
+  FiCreditCard,
+  FiTrendingUp,
+} from 'react-icons/fi'
+
+import StatCard from '../components/StatCard'
+import ChartPanel from '../components/ChartPanel'
+
+const stats = [
+  {
+    title: 'Total Users',
+    value: '1,247',
+    label: '+82 this week',
+    Icon: FiUsers,
+  },
+  {
+    title: 'Active Users',
+    value: '1,108',
+    label: '88.8% active',
+    Icon: FiUserCheck,
+  },
+  {
+    title: 'Banned Users',
+    value: '23',
+    label: '',
+    Icon: FiUserX,
+  },
+  {
+    title: 'Total Commission',
+    value: '₦4,582,500',
+    label: 'Lifetime',
+    Icon: FiDollarSign,
+  },
+  {
+    title: 'Pending Verifications',
+    value: '4',
+    label: '',
+    Icon: FiCheckCircle,
+  },
+  {
+    title: 'Pending Agents',
+    value: '3',
+    label: '',
+    Icon: FiBriefcase,
+  },
+  {
+    title: 'Pending Deposits',
+    value: '3',
+    label: '',
+    Icon: FiCreditCard,
+  },
+  {
+    title: 'Approval Rate',
+    value: '86.9%',
+    label: 'Last 30 days',
+    Icon: FiTrendingUp,
+  },
 ]
 
-const chartData = [
-  { day: 'Mon', value: 48 },
-  { day: 'Tue', value: 65 },
-  { day: 'Wed', value: 78 },
-  { day: 'Thu', value: 55 },
-  { day: 'Fri', value: 93 },
-  { day: 'Sat', value: 82 },
-  { day: 'Sun', value: 68 },
+const growthData = [
+  { month: 'Nov', users: 180 },
+  { month: 'Dec', users: 280 },
+  { month: 'Jan', users: 380 },
+  { month: 'Feb', users: 480 },
+  { month: 'Mar', users: 620 },
+  { month: 'Apr', users: 760 },
+  { month: 'May', users: 860 },
+]
+
+const approvalData = [
+  { name: 'Approved', value: 87 },
+  { name: 'Rejected', value: 13 },
+]
+
+const volumeData = [
+  { month: 'Jan', volume: 0.5 },
+  { month: 'Feb', volume: 1.0 },
+  { month: 'Mar', volume: 1.5 },
+  { month: 'Apr', volume: 2.5 },
+  { month: 'May', volume: 3.5 },
+  { month: 'Jun', volume: 5.5 },
+  { month: 'Jul', volume: 7.0 },
+  { month: 'Aug', volume: 8.5 },
+  { month: 'Sep', volume: 10.0 },
+  { month: 'Oct', volume: 11.5 },
 ]
 
 export default function DashboardHome() {
   return (
+    
     <section className="space-y-6">
-      <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
-        {metrics.map((item) => (
-          <article key={item.title} className="rounded-3xl border border-slate-800 bg-slate-900/90 p-5 shadow-soft">
-            <p className="text-sm uppercase tracking-[0.3em] text-slate-500">{item.title}</p>
-            <p className="mt-4 text-3xl font-semibold text-white">{item.value}</p>
-          </article>
+      <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+        {stats.map((item) => (
+          <StatCard
+            key={item.title}
+            title={item.title}
+            value={item.value}
+            label={item.label}
+            Icon={item.Icon}
+          />
         ))}
       </div>
 
-      <div className="grid gap-5 xl:grid-cols-[1.6fr_1fr]">
-        <section className="rounded-3xl border border-slate-800 bg-slate-900/90 p-6 shadow-soft">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm uppercase tracking-[0.3em] text-slate-500">Weekly activity</p>
-              <h2 className="mt-2 text-2xl font-semibold text-white">Performance overview</h2>
-            </div>
-            <span className="rounded-full bg-brand-500 px-3 py-1 text-sm font-semibold text-white">+12.5%</span>
-          </div>
+      <div className="grid gap-5 xl:grid-cols-[1.9fr_0.9fr]">
+        <ChartPanel
+          label="Analytics"
+          title="User growth"
+        >
+          <p className="mb-6 text-sm text-slate-500">
+            Cumulative platform sign-ups, last 7 months
+          </p>
 
-          <div className="mt-8 h-72 w-full">
+          <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+              <AreaChart data={growthData}>
                 <defs>
-                  <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#818cf8" stopOpacity={0.4} />
-                    <stop offset="100%" stopColor="#818cf8" stopOpacity={0.05} />
+                  <linearGradient
+                    id="growthGradient"
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="1"
+                  >
+                    <stop
+                      offset="0%"
+                      stopColor="#0D3553"
+                      stopOpacity={0.18}
+                    />
+                    <stop
+                      offset="100%"
+                      stopColor="#0D3553"
+                      stopOpacity={0}
+                    />
                   </linearGradient>
                 </defs>
-                <CartesianGrid stroke="#1e293b" vertical={false} />
-                <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8' }} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#94a3b8' }} />
-                <Tooltip contentStyle={{ backgroundColor: '#0f172a', borderColor: '#1e293b' }} />
-                <Area type="monotone" dataKey="value" stroke="#818cf8" fill="url(#chartGradient)" strokeWidth={3} />
+
+                <CartesianGrid
+                  stroke="#E5E7EB"
+                  vertical={false}
+                />
+
+                <XAxis
+                  dataKey="month"
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: '#94A3B8' }}
+                />
+
+                <YAxis
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: '#94A3B8' }}
+                />
+
+                <Tooltip />
+
+                <Area
+                  type="monotone"
+                  dataKey="users"
+                  stroke="#0D3553"
+                  fill="url(#growthGradient)"
+                  strokeWidth={3}
+                />
               </AreaChart>
             </ResponsiveContainer>
           </div>
-        </section>
+        </ChartPanel>
 
-        <section className="grid gap-5">
-          <article className="rounded-3xl border border-slate-800 bg-slate-900/90 p-6 shadow-soft">
-            <p className="text-sm uppercase tracking-[0.3em] text-slate-500">Today’s goals</p>
-            <h2 className="mt-3 text-xl font-semibold text-white">Focus on customer retention</h2>
-            <p className="mt-4 text-sm leading-6 text-slate-300">Set up a quick review cycle with the product team and work through the top support issues from the last 24 hours.</p>
-          </article>
+        <ChartPanel
+          label="Performance"
+          title="Approval split"
+        >
+          <p className="mb-6 text-sm text-slate-500">
+            Last 30 days
+          </p>
 
-          <article className="rounded-3xl border border-slate-800 bg-slate-900/90 p-6 shadow-soft">
-            <p className="text-sm uppercase tracking-[0.3em] text-slate-500">Upcoming launch</p>
-            <h2 className="mt-3 text-xl font-semibold text-white">Mobile onboarding campaign</h2>
-            <p className="mt-4 text-sm leading-6 text-slate-300">Review the campaign performance and finalize creative assets for the next sprint.</p>
-          </article>
-        </section>
+          <div className="flex h-72 items-center justify-center">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={approvalData}
+                  dataKey="value"
+                  innerRadius={60}
+                  outerRadius={90}
+                  paddingAngle={4}
+                >
+                  <Cell fill="#0D3553" />
+                  <Cell fill="#F04D4D" />
+                </Pie>
+
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+
+          <div className="mt-2 flex justify-center gap-6 text-sm text-slate-500">
+            <div className="flex items-center gap-2">
+              <span className="h-3 w-3 rounded-full bg-[#0D3553]" />
+              Approved
+            </div>
+
+            <div className="flex items-center gap-2">
+              <span className="h-3 w-3 rounded-full bg-[#F04D4D]" />
+              Rejected
+            </div>
+          </div>
+        </ChartPanel>
       </div>
+
+      <ChartPanel
+        label="Finance"
+        title="Transaction volume"
+      >
+        <p className="mb-6 text-sm text-slate-500">
+          Monthly GMV in ₦ millions
+        </p>
+
+        <div className="h-72">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={volumeData}>
+              <CartesianGrid
+                stroke="#E5E7EB"
+                vertical={false}
+              />
+
+              <XAxis
+                dataKey="month"
+                axisLine={false}
+                tickLine={false}
+              />
+
+              <YAxis
+                axisLine={false}
+                tickLine={false}
+              />
+
+              <Tooltip />
+
+              <Bar
+                dataKey="volume"
+                fill="#062B45"
+                radius={[4, 4, 0, 0]}
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </ChartPanel>
     </section>
   )
 }

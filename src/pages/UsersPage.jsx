@@ -1,36 +1,346 @@
-import { toast } from 'react-hot-toast'
+import { useState } from 'react'
+import { FiSearch } from 'react-icons/fi'
+
+const users = [
+  {
+    initials: 'AO',
+    name: 'Adaeze Okafor',
+    email: 'adaeze@example.com',
+    phone: '+234 803 111 2222',
+    role: 'User',
+    status: 'Active',
+    joined: '2025-08-12',
+  },
+  {
+    initials: 'TB',
+    name: 'Tunde Balogun',
+    email: 'tunde@example.com',
+    phone: '+234 802 333 4444',
+    role: 'Agent',
+    status: 'Active',
+    joined: '2025-07-03',
+  },
+  {
+    initials: 'CE',
+    name: 'Chiamaka Eze',
+    email: 'chiamaka@example.com',
+    phone: '+234 805 555 6666',
+    role: 'User',
+    status: 'Banned',
+    joined: '2025-06-19',
+  },
+  {
+    initials: 'IM',
+    name: 'Ibrahim Musa',
+    email: 'ibrahim@example.com',
+    phone: '+234 806 777 8888',
+    role: 'Agent',
+    status: 'Active',
+    joined: '2025-09-22',
+  },
+  {
+    initials: 'FA',
+    name: 'Funke Adeyemi',
+    email: 'funke@example.com',
+    phone: '+234 807 999 0000',
+    role: 'User',
+    status: 'Active',
+    joined: '2025-10-01',
+  },
+  {
+    initials: 'KN',
+    name: 'Kelechi Nwosu',
+    email: 'kelechi@example.com',
+    phone: '+234 809 111 2233',
+    role: 'User',
+    status: 'Active',
+    joined: '2025-11-14',
+  },
+  {
+    initials: 'JF',
+    name: 'Jonah Fish',
+    email: 'jonah@example.com',
+    phone: '+234 810 444 5566',
+    role: 'Agent',
+    status: 'Banned',
+    joined: '2025-05-08',
+  },
+  {
+    initials: 'SS',
+    name: 'Seleb Solomon',
+    email: 'seleb@example.com',
+    phone: '+234 811 777 8899',
+    role: 'User',
+    status: 'Active',
+    joined: '2026-01-30',
+  },
+  {
+    initials: 'AH',
+    name: 'Ahmad Hamza',
+    email: 'ahmad@example.com',
+    phone: '+234 812 555 3322',
+    role: 'Agent',
+    status: 'Active',
+    joined: '2025-12-20',
+  },
+  {
+    initials: 'IU',
+    name: 'Ifiok Udoh',
+    email: 'ifiok@example.com',
+    phone: '+234 813 222 1188',
+    role: 'User',
+    status: 'Active',
+    joined: '2025-10-08',
+  },
+]
+
+const avatarColors = [
+  'bg-emerald-100 text-emerald-700',
+  'bg-blue-100 text-blue-700',
+  'bg-purple-100 text-purple-700',
+  'bg-amber-100 text-amber-700',
+  'bg-pink-100 text-pink-700',
+]
 
 export default function UsersPage() {
+  const [search, setSearch] = useState('')
+  const [selectedUser, setSelectedUser] = useState(null)
+  const [showBanModal, setShowBanModal] = useState(false)
+  const [showUserModal, setShowUserModal] = useState(false)
+
   return (
     <section className="space-y-6">
-      <header className="rounded-3xl border border-slate-800 bg-slate-900/90 p-6 shadow-soft">
-        <h2 className="text-2xl font-semibold text-white">Users</h2>
-        <p className="mt-2 text-slate-400">Manage admin users, review profiles, and monitor login activity.</p>
-      </header>
+      <section className="overflow-hidden rounded-[36px] border border-slate-200 bg-white shadow-sm">
+        {/* Filters */}
+        <div className="flex flex-col gap-4 border-b border-slate-200 p-5 lg:flex-row lg:items-center lg:justify-between">
+          <div className="relative flex-1">
+            <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
 
-      <div className="grid gap-5 lg:grid-cols-2">
-        <article className="rounded-3xl border border-slate-800 bg-slate-900/90 p-6 shadow-soft">
-          <h3 className="text-xl font-semibold text-white">Team overview</h3>
-          <p className="mt-3 text-slate-300">Track current team capacity and recently onboarded members.</p>
-          <button
-            type="button"
-            onClick={() => toast.success('User list refreshed')}
-            className="mt-6 inline-flex items-center justify-center rounded-3xl bg-brand-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-400"
-          >
-            Refresh users
-          </button>
-        </article>
+            <input
+              type="text"
+              placeholder="Search name or email"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="h-14 w-full rounded-full border border-slate-300 bg-white pl-14 pr-4 text-[#24364B] placeholder:text-slate-400 outline-none transition focus:border-slate-400"
+            />
+          </div>
 
-        <article className="rounded-3xl border border-slate-800 bg-slate-900/90 p-6 shadow-soft">
-          <h3 className="text-xl font-semibold text-white">Recent sign-ins</h3>
-          <p className="mt-3 text-slate-300">Review the last login activity across the platform.</p>
-          <ul className="mt-6 space-y-3 text-slate-400">
-            <li>Rachel Adams — 12 minutes ago</li>
-            <li>Dev team — 40 minutes ago</li>
-            <li>Brand operations — 1 hour ago</li>
-          </ul>
-        </article>
+          <div className="flex gap-3">
+            <select className="h-12 rounded-full border border-slate-300 px-4 text-slate-700">
+              <option>All roles</option>
+              <option>User</option>
+              <option>Agent</option>
+            </select>
+
+            <select className="h-12 rounded-full border border-slate-300 px-4 text-slate-700">
+              <option>All status</option>
+              <option>Active</option>
+              <option>Banned</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Table */}
+        <div className="overflow-x-auto">
+          <table className="min-w-full">
+            <thead>
+              <tr className="border-b border-slate-200 text-left text-xs uppercase tracking-wider text-slate-400">
+                <th className="px-6 py-6">User</th>
+                <th className="px-6 py-6">Contact</th>
+                <th className="px-6 py-6">Role</th>
+                <th className="px-6 py-6">Status</th>
+                <th className="px-6 py-6">Joined</th>
+                <th className="px-6 py-6 text-right">Actions</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {users.map((user, index) => (
+                <tr
+                  key={user.email}
+                  className="border-b border-slate-100"
+                >
+                  <td className="px-6 py-7">
+                    <div className="flex items-center gap-3">
+                      <div
+                        className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-semibold ${
+                          avatarColors[index % avatarColors.length]
+                        }`}
+                      >
+                        {user.initials}
+                      </div>
+
+                      <span className="font-medium text-slate-800">
+                        {user.name}
+                      </span>
+                    </div>
+                  </td>
+
+                  <td className="px-6 py-7">
+                    <p className="text-slate-700">{user.email}</p>
+                    <p className="text-sm text-slate-400">{user.phone}</p>
+                  </td>
+
+                  <td className="px-6 py-7 text-slate-700">
+                    {user.role}
+                  </td>
+
+                  <td className="px-6 py-7">
+                    <span
+                      className={`inline-flex items-center rounded-full px-4 py-1 text-sm font-medium ${
+                        user.status === 'Active'
+                          ? 'bg-emerald-100 text-emerald-700'
+                          : 'bg-red-100 text-red-700'
+                      }`}
+                    >
+                      • {user.status}
+                    </span>
+                  </td>
+
+                  <td className="px-6 py-7 text-slate-600">
+                    {user.joined}
+                  </td>
+
+                  <td className="px-6 py-7">
+                    <div className="flex justify-end gap-3">
+                      <button
+  onClick={() => {
+    setSelectedUser(user)
+    setShowUserModal(true)
+  }}
+  className="font-medium text-slate-700 hover:text-slate-900"
+>
+  View
+</button>
+
+                      {user.status === 'Active' ? (
+                        <button
+                          onClick={() => {
+                            setSelectedUser(user)
+                            setShowBanModal(true)
+                          }}
+                          className="rounded-xl bg-red-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-red-700"
+                        >
+                          Ban
+                        </button>
+                      ) : (
+                        <button className="rounded-2xl border border-slate-300 px-5 py-2.5 text-sm font-medium text-slate-700">
+                          Unban
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      {/* Ban User Modal */}
+      {showBanModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-[2px]">
+          <div className="w-full max-w-[750px] rounded-[32px] bg-white p-10 shadow-xl">
+            <h2 className="text-[48px] font-bold text-black">
+              Ban User
+            </h2>
+
+            <p className="mt-4 text-[20px] text-slate-600">
+              {selectedUser?.name} will lose access immediately.
+              This action can be reversed.
+            </p>
+
+            <div className="mt-10 flex justify-end gap-5">
+              <button
+                onClick={() => setShowBanModal(false)}
+                className="h-[64px] rounded-2xl border border-slate-300 px-10 text-[18px] font-medium text-slate-700"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={() => setShowBanModal(false)}
+                className="h-[64px] rounded-2xl bg-[#0D4A73] px-10 text-[18px] font-medium text-white hover:bg-[#083A5A]"
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* User Info Modal */}
+{showUserModal && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-[2px]">
+    <div className="relative w-full max-w-[560px] rounded-[32px] bg-white px-10 py-8 shadow-xl">
+
+      <button
+        onClick={() => setShowUserModal(false)}
+        className="absolute right-8 top-8 text-5xl leading-none text-slate-400 hover:text-slate-700"
+      >
+        ×
+      </button>
+
+      <h2 className="text-center text-[28px] font-bold text-[#24364B]">
+        User Info
+      </h2>
+
+      <div className="mt-8 flex flex-col items-center">
+        <div className="flex h-32 w-32 items-center justify-center rounded-full bg-slate-200 text-3xl font-bold text-slate-700">
+          {selectedUser?.initials}
+        </div>
+
+        <h3 className="mt-6 text-[36px] font-bold text-[#24364B]">
+          {selectedUser?.name}
+        </h3>
+
+        <div className="mt-8 text-center">
+          <p className="text-xs font-semibold tracking-[0.2em] text-slate-400 uppercase">
+            Email Address
+          </p>
+
+          <p className="mt-2 text-lg text-slate-700">
+            {selectedUser?.email}
+          </p>
+        </div>
+
+        <div className="mt-8 text-center">
+          <p className="text-xs font-semibold tracking-[0.2em] text-slate-400 uppercase">
+            Phone Number
+          </p>
+
+          <p className="mt-2 text-lg text-slate-700">
+            {selectedUser?.phone}
+          </p>
+        </div>
       </div>
+
+      <div className="mt-10 border-t border-slate-200 pt-8">
+        <div className="grid grid-cols-2 text-center">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+              Role
+            </p>
+
+            <p className="mt-2 text-2xl font-semibold text-[#24364B]">
+              {selectedUser?.role}
+            </p>
+          </div>
+
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+              Status
+            </p>
+
+            <p className="mt-2 text-2xl font-semibold text-[#24364B]">
+              {selectedUser?.status}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
     </section>
   )
 }
