@@ -11,7 +11,7 @@ import {
 const links = [
   { label: 'Overview', to: '/', icon: FiHome },
   { label: 'User', to: '/users', icon: FiUsers },
-  { label: 'Verification', to: '/verification', icon: FiCheckCircle },
+ 
   { label: 'Agent Application', to: '/agent-applications', icon: FiFileText },
   { label: 'Transactions', to: '/transactions', icon: FiBarChart2 },
   { label: 'Wallet Deposits', to: '/wallet-deposits', icon: FiDollarSign },

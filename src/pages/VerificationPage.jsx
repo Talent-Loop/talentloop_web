@@ -292,7 +292,65 @@ const [rejectReason, setRejectReason] = useState('')
               <div>
                 <p className="text-xs uppercase tracking-[3px] text-slate-400">
                   ID Card
-                </p>
+                </p>[11:07 PM] marvel@:[/talentloop_web/src] |mavy-dev
+$ tree .
+.
+├── App.css
+├── App.jsx
+├── assets
+│   ├── hero.png
+│   ├── react.svg
+│   └── vite.svg
+├── components
+│   ├── ChartPanel.jsx
+│   ├── Sidebar.jsx
+│   ├── StatCard.jsx
+│   └── Topbar.jsx
+├── config
+│   └── env.js
+├── index.css
+├── layout
+│   └── DashboardLayout.jsx
+├── main.jsx
+├── pages
+│   ├── AgentApplicationsPage.jsx
+│   ├── AnalyticsPage.jsx
+│   ├── CategoriesPage.jsx
+│   ├── DashboardHome.jsx
+│   ├── NotFoundPage.jsx
+│   ├── OverviewPage.jsx
+│   ├── ReportsPage.jsx
+│   ├── SettingsPage.jsx
+│   ├── SupportPage.jsx
+│   ├── TransactionsPage.jsx
+│   ├── UsersPage.jsx
+│   ├── VerificationPage.jsx
+│   └── WalletDepositsPage.jsx
+└── services
+    ├── agents.js
+    ├── api.js
+    ├── auth.js
+    ├── categories.js
+    ├── design
+    │   ├── Confirm Ban-1.png
+    │   ├── Confirm Ban-2.png
+    │   ├── Confirm Ban.png
+    │   ├── Home.png
+    │   ├── requirements.md
+    │   ├── User-1.png
+    │   ├── User-2.png
+    │   ├── User-3.png
+    │   ├── User.png
+    │   ├── Verification-1.png
+    │   ├── Verification-2.png
+    │   ├── Verification-3.png
+    │   └── Verification.png
+    ├── transactions.js
+    ├── users.js
+    └── wallet.js
+
+7 directories, 46 files
+
 
                 <button className="mt-3 rounded-full border border-slate-300 px-8 py-2 font-medium text-slate-700">
                   View
