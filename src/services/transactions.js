@@ -1,6 +1,6 @@
 import api from "./api";
 
 export const getTransactions = async () => {
-  const res = await api.get("/transactions");
-  return res.data;
+  const response = await api.get("/transactions");
+  return response.data;
 };
