@@ -1,4 +1,6 @@
-import { NavLink } from 'react-router-dom'
+import { NavLink } from "react-router-dom";
+import { FiClipboard } from "react-icons/fi";
+import { FiGift } from "react-icons/fi";
 import {
   FiBarChart2,
   FiFileText,
@@ -7,15 +9,39 @@ import {
   FiCheckCircle,
   FiDollarSign,
   FiList,
+  FiCreditCard,
+  FiRotateCcw,
+  
 } from 'react-icons/fi'
 const links = [
   { label: 'Overview', to: '/', icon: FiHome },
   { label: 'User', to: '/users', icon: FiUsers },
-  { label: 'Verification', to: '/verification', icon: FiCheckCircle },
   { label: 'Agent Application', to: '/agent-applications', icon: FiFileText },
   { label: 'Transactions', to: '/transactions', icon: FiBarChart2 },
   { label: 'Wallet Deposits', to: '/wallet-deposits', icon: FiDollarSign },
+  {
+  label: 'Withdrawal Request',
+  to: '/withdrawal-request',
+  icon: FiCreditCard,
+},
   { label: 'Categories', to: '/categories', icon: FiList },
+
+  {
+  label: "Withdrawal History",
+  to: "/withdrawal-history",
+  icon: FiRotateCcw,
+},
+
+{
+  label: "Agent Earnings Report",
+  to: "/agent-earnings-report",
+  icon: FiClipboard,
+},
+{
+  label: "Bonus Management",
+  to: "/bonus-management",
+  icon: FiGift,
+},
 ]
 
 export default function Sidebar() {

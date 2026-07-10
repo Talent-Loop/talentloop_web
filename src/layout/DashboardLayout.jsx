@@ -5,10 +5,11 @@ import Topbar from '../components/Topbar.jsx'
 const routeTitles = {
   '/': 'Overview',
   '/users': 'User',
-  '/verification': 'Verification',
+  
   '/agent-applications': 'Agent Applications',
   '/transactions': 'Transactions',
   '/wallet-deposits': 'Wallet Deposits',
+  '/agent-earnings-report': 'Agent Earnings Report',
   '/categories': 'Categories',
 }
 
