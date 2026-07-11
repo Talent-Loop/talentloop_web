@@ -1,54 +1,142 @@
 import { useEffect, useState } from "react";
-import { FiSearch } from 'react-icons/fi'
+import { FiSearch } from "react-icons/fi";
 import { getUsers, banUser } from "../services/users";
 import toast from "react-hot-toast";
 
-
-
 const avatarColors = [
-  'bg-emerald-100 text-emerald-700',
-  'bg-blue-100 text-blue-700',
-  'bg-purple-100 text-purple-700',
-  'bg-amber-100 text-amber-700',
-  'bg-pink-100 text-pink-700',
-]
+  "bg-emerald-100 text-emerald-700",
+  "bg-blue-100 text-blue-700",
+  "bg-purple-100 text-purple-700",
+  "bg-amber-100 text-amber-700",
+  "bg-pink-100 text-pink-700",
+];
+
+const users = [
+  {
+    initials: "AO",
+    name: "Adaeze Okafor",
+    email: "adaeze@example.com",
+    phone: "+234 803 111 2222",
+    role: "User",
+    status: "Active",
+    joined: "2025-08-12",
+  },
+  {
+    initials: "TB",
+    name: "Tunde Balogun",
+    email: "tunde@example.com",
+    phone: "+234 802 333 4444",
+    role: "Agent",
+    status: "Active",
+    joined: "2025-07-03",
+  },
+  {
+    initials: "CE",
+    name: "Chiamaka Eze",
+    email: "chiamaka@example.com",
+    phone: "+234 805 555 6666",
+    role: "User",
+    status: "Banned",
+    joined: "2025-06-19",
+  },
+  {
+    initials: "IM",
+    name: "Ibrahim Musa",
+    email: "ibrahim@example.com",
+    phone: "+234 806 777 8888",
+    role: "Agent",
+    status: "Active",
+    joined: "2025-09-22",
+  },
+  {
+    initials: "FA",
+    name: "Funke Adeyemi",
+    email: "funke@example.com",
+    phone: "+234 807 999 0000",
+    role: "User",
+    status: "Active",
+    joined: "2025-10-01",
+  },
+  {
+    initials: "KN",
+    name: "Kelechi Nwosu",
+    email: "kelechi@example.com",
+    phone: "+234 809 111 2233",
+    role: "User",
+    status: "Active",
+    joined: "2025-11-14",
+  },
+  {
+    initials: "JF",
+    name: "Jonah Fish",
+    email: "jonah@example.com",
+    phone: "+234 810 444 5566",
+    role: "Agent",
+    status: "Banned",
+    joined: "2025-05-08",
+  },
+  {
+    initials: "SS",
+    name: "Seleb Solomon",
+    email: "seleb@example.com",
+    phone: "+234 811 777 8899",
+    role: "User",
+    status: "Active",
+    joined: "2026-01-30",
+  },
+  {
+    initials: "AH",
+    name: "Ahmad Hamza",
+    email: "ahmad@example.com",
+    phone: "+234 812 555 3322",
+    role: "Agent",
+    status: "Active",
+    joined: "2025-12-20",
+  },
+  {
+    initials: "IU",
+    name: "Ifiok Udoh",
+    email: "ifiok@example.com",
+    phone: "+234 813 222 1188",
+    role: "User",
+    status: "Active",
+    joined: "2025-10-08",
+  },
+];
 
 export default function UsersPage() {
- const [users, setUsers] = useState([]);
-const [search, setSearch] = useState("");
-const [selectedUser, setSelectedUser] = useState(null);
-const [showBanModal, setShowBanModal] = useState(false);
-const [showUserModal, setShowUserModal] = useState(false);
+  const [users, setUsers] = useState([]);
+  const [search, setSearch] = useState("");
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [showBanModal, setShowBanModal] = useState(false);
+  const [showUserModal, setShowUserModal] = useState(false);
 
-const fetchUsers = async () => {
-  try {
-    const response = await getUsers();
-    setUsers(response.data.users);
-  } catch (error) {
-    console.error("Failed to fetch users:", error);
-  }
-};
+  const fetchUsers = async () => {
+    try {
+      const response = await getUsers();
+      setUsers(response.data.users);
+    } catch (error) {
+      console.error("Failed to fetch users:", error);
+    }
+  };
 
-useEffect(() => {
-  fetchUsers();
-}, []);
-
-const handleBanUser = async () => {
-  try {
-    await banUser(selectedUser._id);
-
-    toast.success("User banned successfully!");
-    setShowBanModal(false);
-
+  useEffect(() => {
     fetchUsers();
-  } catch (error) {
-    console.error(error);
-    toast.error(
-  error.response?.data?.message || "Failed to ban user."
-);
-  }
-};
+  }, []);
 
+  const handleBanUser = async () => {
+    try {
+      await banUser(selectedUser._id);
+
+      toast.success("User banned successfully!");
+      setShowBanModal(false);
+
+      fetchUsers();
+    } catch (error) {
+      console.error(error);
+      toast.error(error.response?.data?.message || "Failed to ban user.");
+    }
+  };
 
   return (
     <section className="space-y-6">
@@ -98,10 +186,7 @@ const handleBanUser = async () => {
 
             <tbody>
               {users.map((user, index) => (
-                <tr
-                  key={user.email}
-                  className="border-b border-slate-100"
-                >
+                <tr key={user.email} className="border-b border-slate-100">
                   <td className="px-6 py-7">
                     <div className="flex items-center gap-3">
                       <div
@@ -123,16 +208,14 @@ const handleBanUser = async () => {
                     <p className="text-sm text-slate-400">{user.phone}</p>
                   </td>
 
-                  <td className="px-6 py-7 text-slate-700">
-                   {user.roleName}
-                  </td>
+                  <td className="px-6 py-7 text-slate-700">{user.roleName}</td>
 
                   <td className="px-6 py-7">
                     <span
                       className={`inline-flex items-center rounded-full px-4 py-1 text-sm font-medium ${
                         !user.banned
-                          ? 'bg-emerald-100 text-emerald-700'
-                          : 'bg-red-100 text-red-700'
+                          ? "bg-emerald-100 text-emerald-700"
+                          : "bg-red-100 text-red-700"
                       }`}
                     >
                       • {user.banned ? "Banned" : "Active"}
@@ -146,27 +229,27 @@ const handleBanUser = async () => {
                   <td className="px-6 py-7">
                     <div className="flex justify-end gap-3">
                       <button
-  onClick={() => {
-    setSelectedUser(user)
-    setShowUserModal(true)
-  }}
-  className="font-medium text-slate-700 hover:text-slate-900"
->
-  View
-</button>
+                        onClick={() => {
+                          setSelectedUser(user);
+                          setShowUserModal(true);
+                        }}
+                        className="font-medium text-slate-700 hover:text-slate-900"
+                      >
+                        View
+                      </button>
 
                       {!user.banned ? (
                         <button
                           onClick={() => {
-                            setSelectedUser(user)
-                            setShowBanModal(true)
+                            setSelectedUser(user);
+                            setShowBanModal(true);
                           }}
-                          className="rounded-xl bg-red-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-red-700"
+                          className="rounded-xl bg-red-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-red-700 cursor-pointer"
                         >
                           Ban
                         </button>
                       ) : (
-                        <button className="rounded-2xl border border-slate-300 px-5 py-2.5 text-sm font-medium text-slate-700">
+                        <button className="rounded-2xl border border-slate-300 px-5 py-2.5 text-sm font-medium text-slate-700 cursor-pointer">
                           Unban
                         </button>
                       )}
@@ -183,14 +266,12 @@ const handleBanUser = async () => {
       {showBanModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-[2px]">
           <div className="w-full max-w-[750px] rounded-[32px] bg-white p-10 shadow-xl">
-            <h2 className="text-[48px] font-bold text-black">
-              Ban User
-            </h2>
+            <h2 className="text-[48px] font-bold text-black">Ban User</h2>
 
             <p className="mt-4 text-[20px] text-slate-600">
-  {selectedUser?.firstName} {selectedUser?.lastName} will lose access immediately.
-  This action can be reversed.
-</p>
+              {selectedUser?.firstName} {selectedUser?.lastName} will lose
+              access immediately. This action can be reversed.
+            </p>
 
             <div className="mt-10 flex justify-end gap-5">
               <button
@@ -201,8 +282,7 @@ const handleBanUser = async () => {
               </button>
 
               <button
-               
-               onClick={handleBanUser}
+                onClick={handleBanUser}
                 className="h-[64px] rounded-2xl bg-[#0D4A73] px-10 text-[18px] font-medium text-white hover:bg-[#083A5A]"
               >
                 Confirm
@@ -213,77 +293,76 @@ const handleBanUser = async () => {
       )}
 
       {/* User Info Modal */}
-{showUserModal && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-[2px]">
-    <div className="relative w-full max-w-[560px] rounded-[32px] bg-white px-10 py-8 shadow-xl">
+      {showUserModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-[2px]">
+          <div className="relative w-full max-w-[560px] rounded-[32px] bg-white px-10 py-8 shadow-xl">
+            <button
+              onClick={() => setShowUserModal(false)}
+              className="absolute right-8 top-8 text-5xl leading-none text-slate-400 hover:text-slate-700"
+            >
+              ×
+            </button>
 
-      <button
-        onClick={() => setShowUserModal(false)}
-        className="absolute right-8 top-8 text-5xl leading-none text-slate-400 hover:text-slate-700"
-      >
-        ×
-      </button>
+            <h2 className="text-center text-[28px] font-bold text-[#24364B]">
+              User Info
+            </h2>
 
-      <h2 className="text-center text-[28px] font-bold text-[#24364B]">
-        User Info
-      </h2>
+            <div className="mt-8 flex flex-col items-center">
+              <div className="flex h-32 w-32 items-center justify-center rounded-full bg-slate-200 text-3xl font-bold text-slate-700">
+                {`${selectedUser?.firstName?.[0] || ""}${selectedUser?.lastName?.[0] || ""}`}
+              </div>
 
-      <div className="mt-8 flex flex-col items-center">
-        <div className="flex h-32 w-32 items-center justify-center rounded-full bg-slate-200 text-3xl font-bold text-slate-700">
-          {`${selectedUser?.firstName?.[0] || ""}${selectedUser?.lastName?.[0] || ""}`}
-        </div>
+              <h3 className="mt-6 text-[36px] font-bold text-[#24364B]">
+                {selectedUser?.firstName} {selectedUser?.lastName}
+              </h3>
 
-        <h3 className="mt-6 text-[36px] font-bold text-[#24364B]">
-          {selectedUser?.firstName} {selectedUser?.lastName}
-        </h3>
+              <div className="mt-8 text-center">
+                <p className="text-xs font-semibold tracking-[0.2em] text-slate-400 uppercase">
+                  Email Address
+                </p>
 
-        <div className="mt-8 text-center">
-          <p className="text-xs font-semibold tracking-[0.2em] text-slate-400 uppercase">
-            Email Address
-          </p>
+                <p className="mt-2 text-lg text-slate-700">
+                  {selectedUser?.email}
+                </p>
+              </div>
 
-          <p className="mt-2 text-lg text-slate-700">
-            {selectedUser?.email}
-          </p>
-        </div>
+              <div className="mt-8 text-center">
+                <p className="text-xs font-semibold tracking-[0.2em] text-slate-400 uppercase">
+                  Phone Number
+                </p>
 
-        <div className="mt-8 text-center">
-          <p className="text-xs font-semibold tracking-[0.2em] text-slate-400 uppercase">
-            Phone Number
-          </p>
+                <p className="mt-2 text-lg text-slate-700">
+                  {selectedUser?.phone}
+                </p>
+              </div>
+            </div>
 
-          <p className="mt-2 text-lg text-slate-700">
-            {selectedUser?.phone}
-          </p>
-        </div>
-      </div>
+            <div className="mt-10 border-t border-slate-200 pt-8">
+              <div className="grid grid-cols-2 text-center">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+                    Role
+                  </p>
 
-      <div className="mt-10 border-t border-slate-200 pt-8">
-        <div className="grid grid-cols-2 text-center">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-              Role
-            </p>
+                  <p className="mt-2 text-2xl font-semibold text-[#24364B]">
+                    {selectedUser?.roleName}
+                  </p>
+                </div>
 
-            <p className="mt-2 text-2xl font-semibold text-[#24364B]">
-              {selectedUser?.roleName}
-            </p>
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+                    Status
+                  </p>
+
+                  <p className="mt-2 text-2xl font-semibold text-[#24364B]">
+                    {selectedUser?.banned ? "Banned" : "Active"}
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
-
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-              Status
-            </p>
-
-            <p className="mt-2 text-2xl font-semibold text-[#24364B]">
-              {selectedUser?.banned ? "Banned" : "Active"}
-            </p>
-          </div>
         </div>
-      </div>
-    </div>
-  </div>
-)}
+      )}
     </section>
-  )
+  );
 }
