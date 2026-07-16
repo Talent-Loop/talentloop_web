@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
+import type { ReactNode } from "react";
 
 import DashboardLayout from "./layout/DashboardLayout.jsx";
 
@@ -15,7 +16,7 @@ import WithdrawalRequestPage from "./pages/WithdrawalRequestPage.jsx";
 import WithdrawalHistoryPage from "./pages/WithdrawalHistoryPage";
 import AgentEarningsReportPage from "./pages/AgentEarningsReportPage";
 import BonusManagementPage from "./pages/BonusManagementPage";
-function ProtectedRoute({ children }) {
+function ProtectedRoute({ children }: { children: ReactNode }) {
   const token = localStorage.getItem("token");
 
   if (!token) {

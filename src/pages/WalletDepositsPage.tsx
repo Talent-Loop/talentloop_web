@@ -1,7 +1,17 @@
 import { Eye } from "lucide-react";
+import type { WalletDeposit } from "../types/wallet";
+
+interface Deposit {
+  id: number;
+  name: string;
+  initials: string;
+  amount: string;
+  date: string;
+  status: "Pending" | "Paid";
+}
 
 export default function WalletDepositsPage() {
-  const deposits = [
+  const deposits: Deposit[] = [
     {
       id: 1,
       name: "Adaeze Okafor",
@@ -83,12 +93,13 @@ export default function WalletDepositsPage() {
         <h1 className="text-[40px] font-bold text-slate-900">
           Wallet Deposits
         </h1>
+
         <p className="mt-1 text-lg text-slate-500">
           Review payments
         </p>
       </div>
 
-      {/* Table Card */}
+      {/* Table */}
       <div className="overflow-hidden rounded-[32px] border border-slate-200 bg-white">
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -97,15 +108,19 @@ export default function WalletDepositsPage() {
                 <th className="px-8 py-6 text-left text-sm font-semibold uppercase tracking-wide text-slate-400">
                   User
                 </th>
+
                 <th className="px-8 py-6 text-left text-sm font-semibold uppercase tracking-wide text-slate-400">
                   Amount
                 </th>
+
                 <th className="px-8 py-6 text-left text-sm font-semibold uppercase tracking-wide text-slate-400">
                   Submitted
                 </th>
+
                 <th className="px-8 py-6 text-left text-sm font-semibold uppercase tracking-wide text-slate-400">
                   Status
                 </th>
+
                 <th className="px-8 py-6 text-center text-sm font-semibold uppercase tracking-wide text-slate-400">
                   Actions
                 </th>
@@ -118,7 +133,6 @@ export default function WalletDepositsPage() {
                   key={deposit.id}
                   className="border-b border-slate-100 last:border-none"
                 >
-                  {/* User */}
                   <td className="px-8 py-6">
                     <div className="flex items-center gap-4">
                       <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-100 text-sm font-semibold text-slate-700">
@@ -131,17 +145,14 @@ export default function WalletDepositsPage() {
                     </div>
                   </td>
 
-                  {/* Amount */}
                   <td className="px-8 py-6 text-lg text-slate-600">
                     {deposit.amount}
                   </td>
 
-                  {/* Date */}
                   <td className="px-8 py-6 text-lg text-slate-600">
                     {deposit.date}
                   </td>
 
-                  {/* Status */}
                   <td className="px-8 py-6">
                     {deposit.status === "Pending" ? (
                       <span className="inline-flex items-center gap-2 rounded-full bg-amber-100 px-4 py-2 text-sm font-medium text-amber-700">
@@ -156,7 +167,6 @@ export default function WalletDepositsPage() {
                     )}
                   </td>
 
-                  {/* Actions */}
                   <td className="px-8 py-6">
                     <div className="flex items-center justify-center gap-3">
                       <button className="flex items-center gap-2 text-slate-600 hover:text-slate-900">

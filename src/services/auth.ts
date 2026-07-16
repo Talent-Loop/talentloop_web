@@ -1,6 +1,10 @@
 import api from "./api";
+import type {
+  LoginData,
+  ResetPasswordData,
+} from "../types/auth";
 
-export const loginUser = async (data) => {
+export const loginUser = async (data: LoginData) => {
   const response = await api.post("/auth/login", data);
   return response.data;
 };
@@ -15,14 +19,21 @@ export const logoutUser = async () => {
   return response.data;
 };
 
-export const forgotPassword = async (email) => {
+export const forgotPassword = async (email: string) => {
   const response = await api.post("/auth/forgot-password", {
     email,
   });
+
   return response.data;
 };
 
-export const resetPassword = async (data) => {
-  const response = await api.patch("/auth/reset-password", data);
+export const resetPassword = async (
+  data: ResetPasswordData
+) => {
+  const response = await api.patch(
+    "/auth/reset-password",
+    data
+  );
+
   return response.data;
 };
