@@ -1,5 +1,26 @@
+type TransactionStatus = "Paid" | "Pending";
+
+interface Transaction {
+  id: string;
+  user: string;
+  service: string;
+  amount: string;
+  commission: string;
+  status: TransactionStatus;
+}
+
+interface StatCardProps {
+  title: string;
+  value: string;
+  blue?: boolean;
+}
+
+interface StatusBadgeProps {
+  status: TransactionStatus;
+}
+
 export default function TransactionsPage() {
-  const transactions = [
+  const transactions: Transaction[] = [
     {
       id: "TX-1042",
       user: "Tunde Balogun",
@@ -40,9 +61,9 @@ export default function TransactionsPage() {
       commission: "₦7,500",
       status: "Paid",
     },
-  ]
+  ];
 
-  const StatCard = ({ title, value, blue }) => (
+  const StatCard = ({ title, value, blue = false }: StatCardProps) => (
     <article className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm">
       <p className="text-xs uppercase tracking-[0.18em] text-slate-400">
         {title}
@@ -56,16 +77,16 @@ export default function TransactionsPage() {
         {value}
       </p>
     </article>
-  )
+  );
 
-  const StatusBadge = ({ status }) => {
+  const StatusBadge = ({ status }: StatusBadgeProps) => {
     if (status === "Paid") {
       return (
         <span className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-4 py-1.5 text-sm font-medium text-[#1E5A85]">
           <span className="h-2 w-2 rounded-full bg-[#1E5A85]" />
           Paid
         </span>
-      )
+      );
     }
 
     return (
@@ -73,13 +94,12 @@ export default function TransactionsPage() {
         <span className="h-2 w-2 rounded-full bg-[#C78317]" />
         Pending
       </span>
-    )
-  }
+    );
+  };
 
   return (
     <section className="space-y-5">
       {/* Heading */}
-
       <div>
         <h1 className="text-[48px] font-bold text-[#24364B]">
           Transactions & Commission
@@ -91,7 +111,6 @@ export default function TransactionsPage() {
       </div>
 
       {/* Stats Cards */}
-
       <div className="grid gap-6 lg:grid-cols-3">
         <StatCard title="TOTAL COMMISSION" value="₦16,200" />
         <StatCard title="PENDING PAYOUTS" value="₦4,000" />
@@ -102,19 +121,14 @@ export default function TransactionsPage() {
         />
       </div>
 
-      {/* Table Container */}
-
+      {/* Table */}
       <section className="overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-sm">
-
-        {/* Search + Filters */}
-
         <div className="flex flex-col gap-4 border-b border-slate-100 p-5 lg:flex-row lg:items-center lg:justify-between">
-
           <div className="flex flex-1">
             <input
               type="text"
-                placeholder="Search by ID or service"
-  className="h-14 w-full rounded-full border border-slate-300 px-6 text-[16px] text-black outline-none focus:border-slate-400 placeholder:text-slate-400"
+              placeholder="Search by ID or service"
+              className="h-14 w-full rounded-full border border-slate-300 px-6 text-[16px] text-black outline-none focus:border-slate-400 placeholder:text-slate-400"
             />
           </div>
 
@@ -129,11 +143,8 @@ export default function TransactionsPage() {
           </div>
         </div>
 
-        {/* Table */}
-
         <div className="overflow-x-auto">
           <table className="w-full">
-
             <thead>
               <tr className="border-b border-slate-100 text-left text-xs uppercase tracking-wider text-slate-400">
                 <th className="px-8 py-6">Transaction</th>
@@ -184,10 +195,9 @@ export default function TransactionsPage() {
                 </tr>
               ))}
             </tbody>
-
           </table>
         </div>
       </section>
     </section>
-  )
+  );
 }

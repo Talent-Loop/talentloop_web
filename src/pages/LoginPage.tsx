@@ -1,28 +1,44 @@
-import { useState } from "react";
+import { useState, type ChangeEvent, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import { FiMail, FiLock, FiEye, FiEyeOff, FiArrowRight } from "react-icons/fi";
+import {
+  FiMail,
+  FiLock,
+  FiEye,
+  FiEyeOff,
+  FiArrowRight,
+} from "react-icons/fi";
+
 import { loginUser } from "../services/auth";
 import toast from "react-hot-toast";
+
+interface LoginForm {
+  email: string;
+  password: string;
+}
 
 export default function LoginPage() {
   const navigate = useNavigate();
 
-  const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<LoginForm>({
     email: "",
     password: "",
   });
 
-  const handleChange = (e) => {
-    setForm({
-      ...form,
+  const handleChange = (
+    e: ChangeEvent<HTMLInputElement>
+  ): void => {
+    setForm((prev) => ({
+      ...prev,
       [e.target.name]: e.target.value,
-    });
+    }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (
+    e: FormEvent<HTMLFormElement>
+  ): Promise<void> => {
     e.preventDefault();
 
     try {
@@ -47,11 +63,11 @@ export default function LoginPage() {
       toast.success("Login successful");
 
       navigate("/");
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
 
       toast.error(
-        error?.response?.data?.message ||
+        error?.response?.data?.message ??
           "Invalid email or password"
       );
     } finally {
@@ -59,7 +75,7 @@ export default function LoginPage() {
     }
   };
 
-  return (
+    return (
     <div className="min-h-screen flex">
       {/* Left Side */}
       <div className="hidden lg:flex w-1/2 bg-[#17364C] relative overflow-hidden">
@@ -115,6 +131,8 @@ export default function LoginPage() {
                   onChange={handleChange}
                   placeholder="admin@example.com"
                   className="w-full bg-transparent px-4 py-5 text-black outline-none"
+                  autoComplete="email"
+                  required
                 />
               </div>
             </div>
@@ -143,13 +161,13 @@ export default function LoginPage() {
                   onChange={handleChange}
                   placeholder="Password"
                   className="w-full bg-transparent px-4 py-5 text-black outline-none"
+                  autoComplete="current-password"
+                  required
                 />
 
                 <button
                   type="button"
-                  onClick={() =>
-                    setShowPassword(!showPassword)
-                  }
+                  onClick={() => setShowPassword((prev) => !prev)}
                 >
                   {showPassword ? (
                     <FiEyeOff className="text-slate-400" />
@@ -163,9 +181,10 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="flex w-full items-center justify-center gap-3 rounded-2xl bg-[#17364C] py-5 text-lg font-semibold text-white transition hover:bg-[#102a3c]"
+              className="flex w-full items-center justify-center gap-3 rounded-2xl bg-[#17364C] py-5 text-lg font-semibold text-white transition hover:bg-[#102a3c] disabled:cursor-not-allowed disabled:opacity-70"
             >
               {loading ? "Signing in..." : "Sign in to dashboard"}
+
               {!loading && <FiArrowRight />}
             </button>
           </form>
