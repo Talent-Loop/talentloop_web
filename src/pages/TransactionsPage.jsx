@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { toast } from "react-hot-toast"; // ✅ Imported toast tool
 import { 
   getAllTransactions, 
   getTransactionsSummary, 
@@ -78,7 +79,6 @@ export default function TransactionsPage() {
   const handleReview = async (transaction) => {
     const recordId = transaction._id || transaction.id;
     
-    // Example interactive handling for testing pending vs paid states via Review button
     if (transaction.status === "Pending") {
       const confirmAction = window.confirm(`Reviewing Transaction ${transaction.id || recordId}.\n\nClick OK to Mark as Paid, or Cancel to Waive.`);
       
@@ -88,13 +88,12 @@ export default function TransactionsPage() {
           setTransactions((prev) =>
             prev.map((item) => ((item._id || item.id) === recordId ? { ...item, status: "Paid" } : item))
           );
-          alert("Transaction marked as Paid!");
+          toast.success("Transaction marked as Paid!"); // ✅ Toast replacement
         } catch (err) {
-          // Local fallback
           setTransactions((prev) =>
             prev.map((item) => ((item._id || item.id) === recordId ? { ...item, status: "Paid" } : item))
           );
-          alert("Processed locally (Mock Fallback Active: Paid).");
+          toast.success("Processed locally (Mock Fallback Active: Paid)."); // ✅ Toast replacement
         }
       } else {
         try {
@@ -102,17 +101,16 @@ export default function TransactionsPage() {
           setTransactions((prev) =>
             prev.map((item) => ((item._id || item.id) === recordId ? { ...item, status: "Waived", commission: "₦0" } : item))
           );
-          alert("Commission fee waived!");
+          toast.success("Commission fee waived!"); // ✅ Toast replacement
         } catch (err) {
-          // Local fallback
           setTransactions((prev) =>
             prev.map((item) => ((item._id || item.id) === recordId ? { ...item, status: "Waived", commission: "₦0" } : item))
           );
-          alert("Processed locally (Mock Fallback Active: Waived).");
+          toast.success("Processed locally (Mock Fallback Active: Waived)."); // ✅ Toast replacement
         }
       }
     } else {
-      alert(`Viewing completed transaction details for: ${transaction.id || recordId}`);
+      toast.error(`Transaction ${transaction.id || recordId} is already completed.`); // ✅ Toast replacement
     }
   };
 

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { FiEye, FiX } from 'react-icons/fi'
+import { toast } from 'react-hot-toast' // ✅ Imported toast tool
 import { 
   getAgentApplications, 
   approveAgentApplication, 
@@ -7,32 +8,6 @@ import {
 } from '../services/agents'
 
 const fallbackVerifications = [
-  {
-    id: 'mock-1',
-    initials: 'AO',
-    name: 'Adaeze Okafor',
-    idType: 'NIN',
-    submitted: '2026-05-18',
-    status: 'Pending',
-    email: 'adaeze@gmail.com',
-    location: 'Lagos, Nigeria',
-    category: 'Plumber',
-    workTime: '07:00AM - 05:00PM',
-    workDays: 'Mon - Fri',
-  },
-  {
-    id: 'mock-2',
-    initials: 'KN',
-    name: 'Kelechi Nwosu',
-    idType: 'Passport',
-    submitted: '2026-05-22',
-    status: 'Pending',
-    email: 'kelechi@gmail.com',
-    location: 'Abuja, Nigeria',
-    category: 'Electrician',
-    workTime: '08:00AM - 04:00PM',
-    workDays: 'Mon - Sat',
-  },
   {
     id: 'mock-3',
     initials: 'AH',
@@ -75,7 +50,6 @@ export default function AgentApplicationsPage() {
         const res = await getAgentApplications();
         console.log("👉 RAW BACKEND RESPONSE:", res);
 
-        // Standardize whatever structure the backend sends back
         let liveList = [];
         if (Array.isArray(res)) {
           liveList = res;
@@ -86,7 +60,6 @@ export default function AgentApplicationsPage() {
         }
 
         if (liveList && liveList.length > 0) {
-          // Normalize backend structure fields to match UI keys if necessary
           const normalized = liveList.map(item => ({
             id: item._id || item.id,
             name: item.name || (item.user ? `${item.user.firstName} ${item.user.lastName}` : 'Unknown User'),
@@ -117,25 +90,31 @@ export default function AgentApplicationsPage() {
 
   const handleApprove = async (id) => {
     if (String(id).startsWith('mock')) {
-      alert("[Mock Mode] Application approved successfully!");
+      toast.success("[Mock Mode] Application approved successfully!"); // ✅ Mock success toast
       setApplications(prev => prev.map(app => app.id === id ? { ...app, status: 'Approved' } : app));
       return;
     }
 
     try {
       await approveAgentApplication(id);
-      alert("Application approved successfully on Server!");
+      toast.success("Application approved successfully on Server!"); // ✅ Real success toast
       setApplications(prev => prev.map(app => app.id === id ? { ...app, status: 'Approved' } : app));
     } catch (error) {
-      alert("Failed to approve application on the live backend.");
+      const errorMsg = error.response?.data?.message || "Failed to approve application on the live backend.";
+      toast.error(errorMsg); // ✅ Error toast
     }
   };
 
   const handleConfirmReject = async () => {
     const targetId = selectedVerification.id;
 
+    if (!rejectReason.trim()) {
+      toast.error("Please provide a reason for rejection.");
+      return;
+    }
+
     if (String(targetId).startsWith('mock')) {
-      alert(`[Mock Mode] Application rejected. Reason: ${rejectReason}`);
+      toast.success(`[Mock Mode] Application rejected.`); // ✅ Mock reject toast
       setApplications(prev => prev.map(app => app.id === targetId ? { ...app, status: 'Rejected' } : app));
       setShowRejectModal(false);
       setRejectReason('');
@@ -144,12 +123,13 @@ export default function AgentApplicationsPage() {
 
     try {
       await rejectAgentApplication(targetId, rejectReason);
-      alert("Application has been rejected on Server.");
+      toast.success("Application has been rejected on Server."); // ✅ Real reject toast
       setApplications(prev => prev.map(app => app.id === targetId ? { ...app, status: 'Rejected' } : app));
       setShowRejectModal(false);
       setRejectReason('');
     } catch (error) {
-      alert("Failed to reject application on the live backend.");
+      const errorMsg = error.response?.data?.message || "Failed to reject application on the live backend.";
+      toast.error(errorMsg); // ✅ Error toast
     }
   };
 

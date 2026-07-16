@@ -55,3 +55,9 @@ export const waiveTransaction = async (id) => {
     throw error;
   }
 };
+
+/* export const getTransactions = async () => {
+  const response = await api.get("/transactions");
+  return response.data;
+}
+*/

@@ -1,98 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useState } from "react";
 import { FiSearch } from 'react-icons/fi'
+import { getUsers, banUser } from "../services/users";
+import toast from "react-hot-toast";
 
-const users = [
-  {
-    initials: 'AO',
-    name: 'Adaeze Okafor',
-    email: 'adaeze@example.com',
-    phone: '+234 803 111 2222',
-    role: 'User',
-    status: 'Active',
-    joined: '2025-08-12',
-  },
-  {
-    initials: 'TB',
-    name: 'Tunde Balogun',
-    email: 'tunde@example.com',
-    phone: '+234 802 333 4444',
-    role: 'Agent',
-    status: 'Active',
-    joined: '2025-07-03',
-  },
-  {
-    initials: 'CE',
-    name: 'Chiamaka Eze',
-    email: 'chiamaka@example.com',
-    phone: '+234 805 555 6666',
-    role: 'User',
-    status: 'Banned',
-    joined: '2025-06-19',
-  },
-  {
-    initials: 'IM',
-    name: 'Ibrahim Musa',
-    email: 'ibrahim@example.com',
-    phone: '+234 806 777 8888',
-    role: 'Agent',
-    status: 'Active',
-    joined: '2025-09-22',
-  },
-  {
-    initials: 'FA',
-    name: 'Funke Adeyemi',
-    email: 'funke@example.com',
-    phone: '+234 807 999 0000',
-    role: 'User',
-    status: 'Active',
-    joined: '2025-10-01',
-  },
-  {
-    initials: 'KN',
-    name: 'Kelechi Nwosu',
-    email: 'kelechi@example.com',
-    phone: '+234 809 111 2233',
-    role: 'User',
-    status: 'Active',
-    joined: '2025-11-14',
-  },
-  {
-    initials: 'JF',
-    name: 'Jonah Fish',
-    email: 'jonah@example.com',
-    phone: '+234 810 444 5566',
-    role: 'Agent',
-    status: 'Banned',
-    joined: '2025-05-08',
-  },
-  {
-    initials: 'SS',
-    name: 'Seleb Solomon',
-    email: 'seleb@example.com',
-    phone: '+234 811 777 8899',
-    role: 'User',
-    status: 'Active',
-    joined: '2026-01-30',
-  },
-  {
-    initials: 'AH',
-    name: 'Ahmad Hamza',
-    email: 'ahmad@example.com',
-    phone: '+234 812 555 3322',
-    role: 'Agent',
-    status: 'Active',
-    joined: '2025-12-20',
-  },
-  {
-    initials: 'IU',
-    name: 'Ifiok Udoh',
-    email: 'ifiok@example.com',
-    phone: '+234 813 222 1188',
-    role: 'User',
-    status: 'Active',
-    joined: '2025-10-08',
-  },
-]
+
 
 const avatarColors = [
   'bg-emerald-100 text-emerald-700',
@@ -103,10 +14,41 @@ const avatarColors = [
 ]
 
 export default function UsersPage() {
-  const [search, setSearch] = useState('')
-  const [selectedUser, setSelectedUser] = useState(null)
-  const [showBanModal, setShowBanModal] = useState(false)
-  const [showUserModal, setShowUserModal] = useState(false)
+ const [users, setUsers] = useState([]);
+const [search, setSearch] = useState("");
+const [selectedUser, setSelectedUser] = useState(null);
+const [showBanModal, setShowBanModal] = useState(false);
+const [showUserModal, setShowUserModal] = useState(false);
+
+const fetchUsers = async () => {
+  try {
+    const response = await getUsers();
+    setUsers(response.data.users);
+  } catch (error) {
+    console.error("Failed to fetch users:", error);
+  }
+};
+
+useEffect(() => {
+  fetchUsers();
+}, []);
+
+const handleBanUser = async () => {
+  try {
+    await banUser(selectedUser._id);
+
+    toast.success("User banned successfully!");
+    setShowBanModal(false);
+
+    fetchUsers();
+  } catch (error) {
+    console.error(error);
+    toast.error(
+  error.response?.data?.message || "Failed to ban user."
+);
+  }
+};
+
 
   return (
     <section className="space-y-6">
@@ -167,11 +109,11 @@ export default function UsersPage() {
                           avatarColors[index % avatarColors.length]
                         }`}
                       >
-                        {user.initials}
+                        {`${user.firstName?.[0] || ""}${user.lastName?.[0] || ""}`}
                       </div>
 
                       <span className="font-medium text-slate-800">
-                        {user.name}
+                        {user.firstName} {user.lastName}
                       </span>
                     </div>
                   </td>
@@ -182,23 +124,23 @@ export default function UsersPage() {
                   </td>
 
                   <td className="px-6 py-7 text-slate-700">
-                    {user.role}
+                   {user.roleName}
                   </td>
 
                   <td className="px-6 py-7">
                     <span
                       className={`inline-flex items-center rounded-full px-4 py-1 text-sm font-medium ${
-                        user.status === 'Active'
+                        !user.banned
                           ? 'bg-emerald-100 text-emerald-700'
                           : 'bg-red-100 text-red-700'
                       }`}
                     >
-                      • {user.status}
+                      • {user.banned ? "Banned" : "Active"}
                     </span>
                   </td>
 
                   <td className="px-6 py-7 text-slate-600">
-                    {user.joined}
+                    {new Date(user.createdAt).toLocaleDateString()}
                   </td>
 
                   <td className="px-6 py-7">
@@ -213,7 +155,7 @@ export default function UsersPage() {
   View
 </button>
 
-                      {user.status === 'Active' ? (
+                      {!user.banned ? (
                         <button
                           onClick={() => {
                             setSelectedUser(user)
@@ -246,9 +188,9 @@ export default function UsersPage() {
             </h2>
 
             <p className="mt-4 text-[20px] text-slate-600">
-              {selectedUser?.name} will lose access immediately.
-              This action can be reversed.
-            </p>
+  {selectedUser?.firstName} {selectedUser?.lastName} will lose access immediately.
+  This action can be reversed.
+</p>
 
             <div className="mt-10 flex justify-end gap-5">
               <button
@@ -259,7 +201,8 @@ export default function UsersPage() {
               </button>
 
               <button
-                onClick={() => setShowBanModal(false)}
+               
+               onClick={handleBanUser}
                 className="h-[64px] rounded-2xl bg-[#0D4A73] px-10 text-[18px] font-medium text-white hover:bg-[#083A5A]"
               >
                 Confirm
@@ -287,11 +230,11 @@ export default function UsersPage() {
 
       <div className="mt-8 flex flex-col items-center">
         <div className="flex h-32 w-32 items-center justify-center rounded-full bg-slate-200 text-3xl font-bold text-slate-700">
-          {selectedUser?.initials}
+          {`${selectedUser?.firstName?.[0] || ""}${selectedUser?.lastName?.[0] || ""}`}
         </div>
 
         <h3 className="mt-6 text-[36px] font-bold text-[#24364B]">
-          {selectedUser?.name}
+          {selectedUser?.firstName} {selectedUser?.lastName}
         </h3>
 
         <div className="mt-8 text-center">
@@ -323,7 +266,7 @@ export default function UsersPage() {
             </p>
 
             <p className="mt-2 text-2xl font-semibold text-[#24364B]">
-              {selectedUser?.role}
+              {selectedUser?.roleName}
             </p>
           </div>
 
@@ -333,7 +276,7 @@ export default function UsersPage() {
             </p>
 
             <p className="mt-2 text-2xl font-semibold text-[#24364B]">
-              {selectedUser?.status}
+              {selectedUser?.banned ? "Banned" : "Active"}
             </p>
           </div>
         </div>

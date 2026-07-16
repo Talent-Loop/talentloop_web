@@ -5,6 +5,7 @@ import api from "./api.js";
  * GET /admin/wallet/deposits
  */
 export const getWalletDeposits = async () => {
+HEAD
   try {
     const response = await api.get("/admin/wallet/deposits");
     return response.data;
@@ -40,4 +41,8 @@ export const rejectDeposit = async (depositId) => {
     console.error("Error rejecting deposit:", error);
     throw error;
   }
+
+  const response = await api.get("/wallet/deposits");
+  return response.data;
+
 };

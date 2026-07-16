@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { Eye } from "lucide-react";
+import { toast } from "react-hot-toast"; // ✅ Imported toast tool
 import { getWalletDeposits, approveDeposit, rejectDeposit } from "../services/wallet.js";
 
 // Hardcoded fallback data for seamless button testing
 const MOCK_DEPOSITS = [
   {
-    _id: "6a1d9962f6632766690bc4cf", // Matches the backend format
+    _id: "6a1d9962f6632766690bc4cf", 
     name: "Adaeze Okafor (Mock)",
     initials: "AO",
     amount: "20,000.00",
@@ -39,7 +40,6 @@ export default function WalletDepositsPage() {
           fetchedData = res.data.deposits || res.data;
         }
 
-        // If backend responds successfully but the array is empty, use Mock Data
         if (Array.isArray(fetchedData) && fetchedData.length > 0) {
           setDeposits(fetchedData);
         } else {
@@ -56,54 +56,51 @@ export default function WalletDepositsPage() {
     fetchDeposits();
   }, []);
 
-// 2. Action handler for Approval
-const handleApprove = async (id) => {
-  try {
-    await approveDeposit(id);
-    
-    // Update the specific record's status instead of deleting it
-    setDeposits((prev) =>
-      prev.map((item) =>
-        (item.id || item._id) === id ? { ...item, status: "Paid" } : item
-      )
-    );
-    alert("Deposit approved successfully!");
-  } catch (err) {
-    console.error(err);
-    
-    // Local fallback update for testing buttons
-    setDeposits((prev) =>
-      prev.map((item) =>
-        (item.id || item._id) === id ? { ...item, status: "Paid" } : item
-      )
-    );
-    alert("Note: Request processed locally (Mock Action changed status to Paid).");
-  }
-};
+  // 2. Action handler for Approval
+  const handleApprove = async (id) => {
+    try {
+      await approveDeposit(id);
+      
+      setDeposits((prev) =>
+        prev.map((item) =>
+          (item.id || item._id) === id ? { ...item, status: "Paid" } : item
+        )
+      );
+      toast.success("Deposit approved successfully!"); // ✅ Toast replacement
+    } catch (err) {
+      console.error(err);
+      
+      setDeposits((prev) =>
+        prev.map((item) =>
+          (item.id || item._id) === id ? { ...item, status: "Paid" } : item
+        )
+      );
+      toast.success("Processed locally (Mock Fallback Active: Paid)."); // ✅ Toast replacement
+    }
+  };
 
-// 3. Action handler for Rejection
-const handleReject = async (id) => {
-  try {
-    await rejectDeposit(id);
-    
-    setDeposits((prev) =>
-      prev.map((item) =>
-        (item.id || item._id) === id ? { ...item, status: "Rejected" } : item
-      )
-    );
-    alert("Deposit rejected successfully!");
-  } catch (err) {
-    console.error(err);
-    
-    // Local fallback update for testing buttons
-    setDeposits((prev) =>
-      prev.map((item) =>
-        (item.id || item._id) === id ? { ...item, status: "Rejected" } : item
-      )
-    );
-    alert("Note: Request processed locally (Mock Action changed status to Rejected).");
-  }
-};
+  // 3. Action handler for Rejection
+  const handleReject = async (id) => {
+    try {
+      await rejectDeposit(id);
+      
+      setDeposits((prev) =>
+        prev.map((item) =>
+          (item.id || item._id) === id ? { ...item, status: "Rejected" } : item
+        )
+      );
+      toast.success("Deposit rejected successfully!"); // ✅ Toast replacement
+    } catch (err) {
+      console.error(err);
+      
+      setDeposits((prev) =>
+        prev.map((item) =>
+          (item.id || item._id) === id ? { ...item, status: "Rejected" } : item
+        )
+      );
+      toast.success("Processed locally (Mock Fallback Active: Rejected)."); // ✅ Toast replacement
+    }
+  };
 
   return (
     <section className="space-y-8">
@@ -191,6 +188,11 @@ const handleReject = async (id) => {
                           <span className="inline-flex items-center gap-2 rounded-full bg-amber-100 px-4 py-2 text-sm font-medium text-amber-700">
                             <span className="h-2 w-2 rounded-full bg-amber-500" />
                             Pending
+                          </span>
+                        ) : deposit.status === "Rejected" ? (
+                          <span className="inline-flex items-center gap-2 rounded-full bg-rose-100 px-4 py-2 text-sm font-medium text-rose-700">
+                            <span className="h-2 w-2 rounded-full bg-rose-500" />
+                            Rejected
                           </span>
                         ) : (
                           <span className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-4 py-2 text-sm font-medium text-sky-700">
