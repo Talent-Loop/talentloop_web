@@ -11,7 +11,7 @@ import {
   Tooltip,
   XAxis,
   YAxis,
-} from 'recharts'
+} from "recharts";
 
 import {
   FiUsers,
@@ -22,93 +22,116 @@ import {
   FiBriefcase,
   FiCreditCard,
   FiTrendingUp,
-} from 'react-icons/fi'
+} from "react-icons/fi";
 
-import StatCard from '../components/StatCard'
-import ChartPanel from '../components/ChartPanel'
+import type { IconType } from "react-icons";
 
-const stats = [
+import StatCard from "../components/StatCard";
+import ChartPanel from "../components/ChartPanel";
+
+interface StatItem {
+  title: string;
+  value: string;
+  label: string;
+  Icon: IconType;
+  color?: string;
+}
+
+interface GrowthData {
+  month: string;
+  users: number;
+}
+
+interface ApprovalData {
+  name: string;
+  value: number;
+}
+
+interface VolumeData {
+  month: string;
+  volume: number;
+}
+
+const stats: StatItem[] = [
   {
-    title: 'Total Users',
-    value: '1,247',
-    label: '+82 this week',
+    title: "Total Users",
+    value: "1,247",
+    label: "+82 this week",
     Icon: FiUsers,
+    color: "text-blue-600",
   },
   {
-    title: 'Active Users',
-    value: '1,108',
-    label: '88.8% active',
+    title: "Active Users",
+    value: "1,108",
+    label: "88.9% active rate",
     Icon: FiUserCheck,
   },
   {
-    title: 'Banned Users',
-    value: '23',
-    label: '',
+    title: "Banned Users",
+    value: "23",
+    label: "Requires review",
     Icon: FiUserX,
+    color: "text-red-600",
   },
   {
-    title: 'Total Commission',
-    value: '₦4,582,500',
-    label: 'Lifetime',
+    title: "Total Commission",
+    value: "₦4,582,500",
+    label: "Lifetime",
     Icon: FiDollarSign,
   },
   {
-    title: 'Pending Verifications',
-    value: '4',
-    label: '',
+    title: "Pending Verifications",
+    value: "4",
+    label: "Awaiting review",
     Icon: FiCheckCircle,
   },
   {
-    title: 'Pending Agents',
-    value: '3',
-    label: '',
+    title: "Pending Agents",
+    value: "3",
+    label: "Application queue",
     Icon: FiBriefcase,
   },
   {
-    title: 'Pending Deposits',
-    value: '3',
-    label: '',
+    title: "Pending Deposits",
+    value: "3",
+    label: "Needs approval",
     Icon: FiCreditCard,
   },
   {
-    title: 'Approval Rate',
-    value: '86.9%',
-    label: 'Last 30 days',
+    title: "Approval Rate",
+    value: "86.9%",
+    label: "Last 30 days",
     Icon: FiTrendingUp,
   },
-]
+];
 
-const growthData = [
-  { month: 'Nov', users: 180 },
-  { month: 'Dec', users: 280 },
-  { month: 'Jan', users: 380 },
-  { month: 'Feb', users: 480 },
-  { month: 'Mar', users: 620 },
-  { month: 'Apr', users: 760 },
-  { month: 'May', users: 860 },
-]
+const growthData: GrowthData[] = [
+  { month: "Nov", users: 180 },
+  { month: "Dec", users: 320 },
+  { month: "Jan", users: 520 },
+  { month: "Feb", users: 740 },
+  { month: "Mar", users: 930 },
+  { month: "Apr", users: 1120 },
+  { month: "May", users: 1247 },
+];
 
-const approvalData = [
-  { name: 'Approved', value: 87 },
-  { name: 'Rejected', value: 13 },
-]
+const approvalData: ApprovalData[] = [
+  { name: "Approved", value: 87 },
+  { name: "Rejected", value: 13 },
+];
 
-const volumeData = [
-  { month: 'Jan', volume: 0.5 },
-  { month: 'Feb', volume: 1.0 },
-  { month: 'Mar', volume: 1.5 },
-  { month: 'Apr', volume: 2.5 },
-  { month: 'May', volume: 3.5 },
-  { month: 'Jun', volume: 5.5 },
-  { month: 'Jul', volume: 7.0 },
-  { month: 'Aug', volume: 8.5 },
-  { month: 'Sep', volume: 10.0 },
-  { month: 'Oct', volume: 11.5 },
-]
+const volumeData: VolumeData[] = [
+  { month: "Jan", volume: 12 },
+  { month: "Feb", volume: 18 },
+  { month: "Mar", volume: 22 },
+  { month: "Apr", volume: 28 },
+  { month: "May", volume: 24 },
+  { month: "Jun", volume: 30 },
+  { month: "Jul", volume: 35 },
+];
 
-export default function DashboardHome() {
+export default function OverviewPage() {
   return (
-    
     <section className="space-y-6">
       <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
         {stats.map((item) => (
@@ -122,7 +145,7 @@ export default function DashboardHome() {
         ))}
       </div>
 
-      <div className="grid gap-5 xl:grid-cols-[1.9fr_0.9fr]">
+      <div className="grid gap-5 xl:grid-cols-[1.6fr_1fr]">
         <ChartPanel
           label="Analytics"
           title="User growth"
@@ -131,7 +154,7 @@ export default function DashboardHome() {
             Cumulative platform sign-ups, last 7 months
           </p>
 
-          <div className="h-72">
+          <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={growthData}>
                 <defs>
@@ -144,12 +167,12 @@ export default function DashboardHome() {
                   >
                     <stop
                       offset="0%"
-                      stopColor="#0D3553"
-                      stopOpacity={0.18}
+                      stopColor="#24364B"
+                      stopOpacity={0.25}
                     />
                     <stop
                       offset="100%"
-                      stopColor="#0D3553"
+                      stopColor="#24364B"
                       stopOpacity={0}
                     />
                   </linearGradient>
@@ -164,13 +187,11 @@ export default function DashboardHome() {
                   dataKey="month"
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fill: '#94A3B8' }}
                 />
 
                 <YAxis
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fill: '#94A3B8' }}
                 />
 
                 <Tooltip />
@@ -178,7 +199,7 @@ export default function DashboardHome() {
                 <Area
                   type="monotone"
                   dataKey="users"
-                  stroke="#0D3553"
+                  stroke="#24364B"
                   fill="url(#growthGradient)"
                   strokeWidth={3}
                 />
@@ -195,18 +216,17 @@ export default function DashboardHome() {
             Last 30 days
           </p>
 
-          <div className="flex h-72 items-center justify-center">
+          <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
                   data={approvalData}
+                  innerRadius={70}
+                  outerRadius={100}
                   dataKey="value"
-                  innerRadius={60}
-                  outerRadius={90}
-                  paddingAngle={4}
                 >
-                  <Cell fill="#0D3553" />
-                  <Cell fill="#F04D4D" />
+                  <Cell fill="#24364B" />
+                  <Cell fill="#EF4444" />
                 </Pie>
 
                 <Tooltip />
@@ -214,15 +234,15 @@ export default function DashboardHome() {
             </ResponsiveContainer>
           </div>
 
-          <div className="mt-2 flex justify-center gap-6 text-sm text-slate-500">
+          <div className="flex justify-center gap-8 text-sm font-semibold text-slate-700">
             <div className="flex items-center gap-2">
-              <span className="h-3 w-3 rounded-full bg-[#0D3553]" />
-              Approved
+              <span className="h-3 w-3 rounded-full bg-green-500" />
+              <span>Approved</span>
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="h-3 w-3 rounded-full bg-[#F04D4D]" />
-              Rejected
+              <span className="h-3 w-3 rounded-full bg-red-500" />
+              <span>Rejected</span>
             </div>
           </div>
         </ChartPanel>
@@ -236,7 +256,7 @@ export default function DashboardHome() {
           Monthly GMV in ₦ millions
         </p>
 
-        <div className="h-72">
+        <div className="h-80">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={volumeData}>
               <CartesianGrid
@@ -259,13 +279,13 @@ export default function DashboardHome() {
 
               <Bar
                 dataKey="volume"
-                fill="#062B45"
-                radius={[4, 4, 0, 0]}
+                fill="#24364B"
+                radius={[8, 8, 0, 0]}
               />
             </BarChart>
           </ResponsiveContainer>
         </div>
       </ChartPanel>
     </section>
-  )
+  );
 }

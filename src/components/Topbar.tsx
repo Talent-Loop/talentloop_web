@@ -1,42 +1,46 @@
 import { useEffect, useState } from "react";
 import { FiBell, FiSearch } from "react-icons/fi";
 import { getCurrentUser } from "../services/auth";
+import type { User } from "../types/users";
+import axios from "axios";
 
 export default function Topbar() {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    const fetchUser = async () => {
+    const fetchUser = async (): Promise<void> => {
       try {
         const response = await getCurrentUser();
 
         console.log("CURRENT USER:", response);
 
         setUser(response.data);
-      } catch (error) {
-        console.error("Failed to fetch user:", error);
+     } catch (error: unknown) {
+  console.error("Failed to fetch user:", error);
 
-        if (error?.response?.status === 401) {
-          localStorage.removeItem("token");
-          window.location.href = "/login";
-        }
-      }
+  if (axios.isAxiosError(error) && error.response?.status === 401) {
+    localStorage.removeItem("token");
+    window.location.href = "/login";
+  }
+}
     };
 
     fetchUser();
   }, []);
 
-  const handleLogout = () => {
+  const handleLogout = (): void => {
     localStorage.removeItem("token");
     window.location.href = "/login";
   };
 
-  const initials =
-    user?.name
-      ?.split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase() || "AD";
+ const fullName = user?.name ?? "";
+
+const initials =
+  fullName
+    .split(" ")
+    .map((part) => part.charAt(0))
+    .join("")
+    .toUpperCase() || "AD";
 
   return (
     <div className="mb-6">
@@ -76,7 +80,7 @@ export default function Topbar() {
 
             <div>
               <p className="text-sm font-semibold text-slate-700">
-                {user?.name || "Loading..."}
+                {fullName || "Loading..."}
               </p>
 
               <p className="text-xs text-slate-500">
