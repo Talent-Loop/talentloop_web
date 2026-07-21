@@ -1,4 +1,5 @@
 import { useState } from "react";
+import * as XLSX from "xlsx";
 import {
   FiChevronDown,
   FiDownload,
@@ -134,6 +135,42 @@ export default function AgentEarningsReportPage() {
   const [month, setMonth] = useState<string>("May");
   const [agent, setAgent] = useState<string>("All Agent");
 
+  const handleExport = () => {
+    const exportData = recentActivities.map((item) => ({
+      Rank: item.rank,
+      Agent: item.name,
+      Earnings: item.earnings,
+      Workers: item.workers,
+      Growth: item.growth,
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+
+    worksheet["!cols"] = [
+      { wch: 10 },
+      { wch: 30 },
+      { wch: 18 },
+      { wch: 15 },
+      { wch: 15 },
+    ];
+
+    const workbook = XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(
+      workbook,
+      worksheet,
+      "Top Performing Agents"
+    );
+
+    XLSX.writeFile(
+      workbook,
+      `Agent_Earnings_Report_${
+        new Date().toISOString().split("T")[0]
+      }.xlsx`
+    );
+  };
+
+
   return (
     <section className="space-y-8">
       <h1 className="text-[42px] font-bold text-[#22324A]">
@@ -173,10 +210,13 @@ export default function AgentEarningsReportPage() {
           </div>
         </div>
 
-        <button className="flex h-11 items-center gap-2 rounded-full border border-[#D9E2EC] bg-white px-6 text-sm font-semibold text-[#22324A] shadow-sm hover:bg-slate-50">
-          <FiDownload />
-          Export
-        </button>
+       <button
+  onClick={handleExport}
+  className="flex h-11 items-center gap-2 rounded-full bg-[#0D3553] px-6 text-sm font-semibold text-white shadow-sm transition hover:bg-[#0B2C45]"
+>
+  <FiDownload />
+  Export
+</button>
       </div>
 
       <div className="grid max-w-3xl gap-5 md:grid-cols-2">

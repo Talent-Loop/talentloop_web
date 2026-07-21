@@ -105,23 +105,23 @@ export default function BonusManagementPage() {
 
       <div className="flex items-center justify-between">
         <div className="flex gap-5">
-          {[
-            "All Bonuses",
-            "Active Bonuses",
-            "Completed Bonuses",
-          ].map((item) => (
-            <button
-              key={item}
-              onClick={() => setTab(item)}
-              className={`rounded-full px-10 py-3 text-sm font-medium transition ${
-                tab === item
-                  ? "bg-[#DCE3E8] text-[#22324A]"
-                  : "border border-slate-300 bg-white text-[#22324A]"
-              }`}
-            >
-              {item}
-            </button>
-          ))}
+        {[
+  "All Bonuses",
+  "Active Bonuses",
+  "Completed Bonuses",
+].map((item) => (
+  <button
+    key={item}
+    onClick={() => setTab(item)}
+    className={`rounded-full px-10 py-3 text-sm font-semibold !text-black transition ${
+      tab === item
+        ? "bg-[#DCE3E8]"
+        : "border border-slate-300 bg-white hover:bg-slate-50"
+    }`}
+  >
+    {item}
+  </button>
+))}
         </div>
 
         <button
@@ -273,12 +273,12 @@ export default function BonusManagementPage() {
               />
 
               <div className="flex justify-end gap-4">
-                <button
-                  onClick={() => setShowAssignModal(false)}
-                  className="rounded-xl border px-8 py-3"
-                >
-                  Cancel
-                </button>
+               <button
+  onClick={() => setShowAssignModal(false)}
+  className="rounded-xl border px-8 py-3 !text-[#22324A]"
+>
+  Cancel
+</button>
 
                 <button
                   onClick={handleAssignBonus}

@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import * as XLSX from "xlsx";
 import type { IconType } from "react-icons";
 import {
   FiCreditCard,
@@ -18,6 +19,7 @@ interface Stat {
   label: string;
   Icon: IconType;
 }
+
 interface WithdrawalRequest {
   id: number;
   agent: string;
@@ -30,6 +32,7 @@ interface WithdrawalRequest {
 export default function WithdrawalRequestPage() {
   const [agent, setAgent] = useState<string>("All Agents");
   const [method, setMethod] = useState<string>("All Payment Method");
+  const [showFilters, setShowFilters] = useState(false);
 
   const stats: Stat[] = [
     {
@@ -125,6 +128,41 @@ export default function WithdrawalRequestPage() {
     },
   ];
 
+  const handleExport = () => {
+  const exportData = requests.map((item) => ({
+    Agent: item.agent,
+    Amount: item.amount,
+    "Request Date": item.date,
+    "Payment Method": item.method,
+    Status: item.status,
+  }));
+
+  const worksheet = XLSX.utils.json_to_sheet(exportData);
+
+  // Make columns wider
+  worksheet["!cols"] = [
+    { wch: 20 },
+    { wch: 15 },
+    { wch: 28 },
+    { wch: 20 },
+    { wch: 15 },
+  ];
+
+  const workbook = XLSX.utils.book_new();
+
+  XLSX.utils.book_append_sheet(
+    workbook,
+    worksheet,
+    "Withdrawal Requests"
+  );
+
+  const fileName = `Withdrawal_Requests_${
+    new Date().toISOString().split("T")[0]
+  }.xlsx`;
+
+  XLSX.writeFile(workbook, fileName);
+};
+
   return (
     <section className="space-y-7">
       <h1 className="text-[42px] font-bold text-[#22324A]">
@@ -180,17 +218,72 @@ export default function WithdrawalRequestPage() {
         </div>
 
         <div className="flex gap-3">
-          <button className="flex h-11 items-center gap-2 rounded-full border border-[#D9E2EC] bg-white px-6 text-sm font-semibold text-[#22324A] shadow-sm transition hover:bg-slate-50">
-            <FiFilter className="text-base text-[#22324A]" />
-            Filter
-          </button>
+          <button
+  onClick={() => setShowFilters(!showFilters)}
+  className="flex h-11 items-center gap-2 rounded-full border border-[#D9E2EC] bg-white px-6 text-sm font-semibold text-[#22324A] shadow-sm transition hover:bg-slate-50"
+>
+  <FiFilter />
+  Filter
+</button>
 
-          <button className="flex h-11 items-center gap-2 rounded-full bg-[#0D3553] px-6 text-sm font-semibold text-white shadow-sm transition hover:bg-[#0B2C45]">
+          <button
+  onClick={handleExport}
+  className="flex h-11 items-center gap-2 rounded-full bg-[#0D3553] px-6 text-sm font-semibold text-white shadow-sm transition hover:bg-[#0B2C45]"
+>
             <FiDownload className="text-base" />
             Export
           </button>
         </div>
       </div>
+
+      {showFilters && (
+  <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-lg">
+    <h3 className="mb-5 text-lg font-semibold text-[#22324A]">
+      Filter Requests
+    </h3>
+
+    <div className="grid gap-5 md:grid-cols-2">
+      <div>
+        <label className="mb-2 block text-sm font-medium">
+          Status
+        </label>
+
+        <select className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-black">
+          <option className="text-black">All</option>
+<option className="text-black">Pending</option>
+<option className="text-black">Approved</option>
+<option className="text-black">Rejected</option>
+        </select>
+      </div>
+
+      <div>
+        <label className="mb-2 block text-sm font-medium">
+          Date
+        </label>
+
+        <input
+  type="date"
+  className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-black"
+/>
+      </div>
+    </div>
+
+    <div className="mt-6 flex justify-end gap-3">
+      <button
+        onClick={() => setShowFilters(false)}
+        className="rounded-xl border px-5 py-2"
+      >
+        Cancel
+      </button>
+
+      <button
+        className="rounded-xl bg-[#0D3553] px-5 py-2 text-white"
+      >
+        Apply Filter
+      </button>
+    </div>
+  </div>
+)}
 
       <div className="overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-sm">
         <div className="overflow-x-auto">

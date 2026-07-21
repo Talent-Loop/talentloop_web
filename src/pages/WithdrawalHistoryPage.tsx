@@ -1,4 +1,5 @@
 import { useState } from "react";
+import * as XLSX from "xlsx";
 import {
   FiFilter,
   FiDownload,
@@ -17,11 +18,6 @@ interface WithdrawalHistory {
 }
 
 export default function WithdrawalHistoryPage() {
-  const [agent, setAgent] = useState<string>("All Agents");
-  const [dateRange, setDateRange] = useState<string>(
-    "1 May - 31 May 2026"
-  );
-
   const history: WithdrawalHistory[] = [
     {
       id: 1,
@@ -89,7 +85,72 @@ export default function WithdrawalHistoryPage() {
     },
   ];
 
-  return (
+  const [agent, setAgent] = useState<string>("All Agents");
+
+  const [dateRange, setDateRange] = useState<string>(
+    "1 May - 31 May 2026"
+  );
+
+  const [filteredHistory, setFilteredHistory] =
+    useState<WithdrawalHistory[]>(history);
+
+  const handleExport = () => {
+    const exportData = filteredHistory.map((item) => ({
+      Agent: item.agent,
+      Amount: item.amount,
+      "Request Date": item.date,
+      Reference: item.reference,
+      Status: item.status,
+    }));
+
+    const worksheet =
+      XLSX.utils.json_to_sheet(exportData);
+
+    worksheet["!cols"] = [
+      { wch: 20 },
+      { wch: 15 },
+      { wch: 28 },
+      { wch: 22 },
+      { wch: 15 },
+    ];
+
+    const workbook = XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(
+      workbook,
+      worksheet,
+      "Withdrawal History"
+    );
+
+    XLSX.writeFile(
+      workbook,
+      `Withdrawal_History_${
+        new Date().toISOString().split("T")[0]
+      }.xlsx`
+    );
+  };
+
+ const handleFilter = () => {
+  let filtered = history;
+
+  // Agent filter
+  if (agent !== "All Agents") {
+    filtered = filtered.filter(
+      (item) => item.agent === agent
+    );
+  }
+
+  // Date filter
+  if (dateRange !== "1 May - 31 May 2026") {
+    filtered = filtered.filter((item) =>
+      item.date.startsWith(dateRange)
+    );
+  }
+
+  setFilteredHistory(filtered);
+};
+
+    return (
     <section className="space-y-8">
       <h1 className="text-[42px] font-bold text-[#22324A]">
         Withdrawal History
@@ -97,32 +158,41 @@ export default function WithdrawalHistoryPage() {
 
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex flex-col gap-4 md:flex-row">
+          {/* Date Filter */}
           <div className="relative">
             <select
               value={dateRange}
               onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
                 setDateRange(e.target.value)
               }
-              className="appearance-none rounded-full border border-[#DCE3EA] bg-white px-6 py-3 pr-12 text-sm font-medium text-[#22324A] shadow-sm"
+              className="appearance-none rounded-full border border-[#DCE3EA] bg-white px-6 py-3 pr-12 text-sm font-medium text-black shadow-sm"
             >
               <option>1 May - 31 May 2026</option>
+              <option>17 May 2026</option>
+              <option>18 May 2026</option>
             </select>
 
             <FiChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-500" />
           </div>
 
+          {/* Agent Filter */}
           <div className="relative">
             <select
               value={agent}
               onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
                 setAgent(e.target.value)
               }
-              className="appearance-none rounded-full border border-[#DCE3EA] bg-white px-6 py-3 pr-12 text-sm font-medium text-[#22324A] shadow-sm"
+              className="appearance-none rounded-full border border-[#DCE3EA] bg-white px-6 py-3 pr-12 text-sm font-medium text-black shadow-sm"
             >
               <option>All Agents</option>
               <option>Agent Ola</option>
               <option>Agent James</option>
               <option>Agent Kelvin</option>
+              <option>Agent Jane</option>
+              <option>Agent Ben</option>
+              <option>Agent Kate</option>
+              <option>Agent Ken</option>
+              <option>Agent Chinda</option>
             </select>
 
             <FiChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-500" />
@@ -130,12 +200,18 @@ export default function WithdrawalHistoryPage() {
         </div>
 
         <div className="flex gap-3">
-          <button className="flex items-center gap-2 rounded-full border border-[#DCE3EA] bg-white px-6 py-3 text-sm font-semibold text-[#22324A] shadow-sm hover:bg-slate-50">
+          <button
+            onClick={handleFilter}
+            className="flex items-center gap-2 rounded-full border border-[#DCE3EA] bg-white px-6 py-3 text-sm font-semibold text-[#22324A] shadow-sm hover:bg-slate-50"
+          >
             <FiFilter />
-            Filter
+            Apply Filters
           </button>
 
-          <button className="flex items-center gap-2 rounded-full border border-[#DCE3EA] bg-white px-6 py-3 text-sm font-semibold text-[#22324A] shadow-sm hover:bg-slate-50">
+          <button
+            onClick={handleExport}
+            className="flex items-center gap-2 rounded-full bg-[#0D3553] px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#0B2C45]"
+          >
             <FiDownload />
             Export
           </button>
@@ -162,7 +238,7 @@ export default function WithdrawalHistoryPage() {
             </thead>
 
             <tbody>
-              {history.map((item) => (
+              {filteredHistory.map((item) => (
                 <tr
                   key={item.id}
                   className="border-b border-[#EEF2F6] last:border-0"
@@ -190,6 +266,17 @@ export default function WithdrawalHistoryPage() {
                   </td>
                 </tr>
               ))}
+
+              {filteredHistory.length === 0 && (
+                <tr>
+                  <td
+                    colSpan={5}
+                    className="py-10 text-center text-slate-500"
+                  >
+                    No records found.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
@@ -197,7 +284,8 @@ export default function WithdrawalHistoryPage() {
 
       <div className="flex flex-col gap-4 rounded-2xl border border-[#E5EAF0] bg-white px-6 py-4 md:flex-row md:items-center md:justify-between">
         <p className="text-sm font-medium text-[#4B5563]">
-          Showing 1 to 8 of 24 results
+          Showing {filteredHistory.length} result
+          {filteredHistory.length !== 1 && "s"}
         </p>
 
         <div className="flex items-center gap-2">
@@ -207,14 +295,6 @@ export default function WithdrawalHistoryPage() {
 
           <button className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#0D3553] bg-[#0D3553] text-white">
             1
-          </button>
-
-          <button className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#DCE3EA] text-[#22324A] hover:bg-slate-100">
-            2
-          </button>
-
-          <button className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#DCE3EA] text-[#22324A] hover:bg-slate-100">
-            3
           </button>
 
           <button className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#DCE3EA] text-[#64748B] hover:bg-slate-100">
