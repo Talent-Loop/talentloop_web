@@ -31,17 +31,12 @@ body {
   min-height: 100vh;
 }
 
-/* Keep font inheritance */
+/* Keep font inheritance only */
 button,
 input,
 textarea,
 select {
   font: inherit;
-}
-
-/* Buttons should use their Tailwind text colors */
-button {
-  color: inherit;
 }
 
 /* Inputs should always have dark text */
