@@ -34,3 +34,11 @@ export const banUser = async (userId: string) => {
 
   return response.data;
 };
+
+export const unbanUser = async (userId: string) => {
+  const response = await api.patch(
+    `/admin/users/${userId}/unban`
+  );
+
+  return response.data;
+};

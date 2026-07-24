@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { FiSearch } from "react-icons/fi";
-import { getUsers, banUser } from "../services/users";
+import { getUsers, banUser, unbanUser } from "../services/users";
 import toast from "react-hot-toast";
 import type { User } from "../types/users";
 
@@ -56,6 +56,22 @@ export default function UsersPage() {
     }
   };
 
+  const handleUnbanUser = async (user: User) => {
+  try {
+    await unbanUser(user._id);
+
+    toast.success("User unbanned successfully!");
+
+    fetchUsers();
+  } catch (error: any) {
+    console.error(error.response?.data);
+
+    toast.error(
+      error?.response?.data?.message ||
+      "Failed to unban user."
+    );
+  }
+};
   return (
     <section className="space-y-6">
       <section className="overflow-hidden rounded-[36px] border border-slate-200 bg-white shadow-sm">
@@ -186,9 +202,12 @@ export default function UsersPage() {
                           Ban
                         </button>
                       ) : (
-                        <button className="rounded-2xl border border-slate-300 px-5 py-2.5 text-sm font-medium text-slate-700">
-                          Unban
-                        </button>
+                      <button
+  onClick={() => handleUnbanUser(user)}
+  className="rounded-2xl border border-slate-300 px-5 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-100"
+>
+  Unban
+</button>
                       )}
                     </div>
                   </td>
