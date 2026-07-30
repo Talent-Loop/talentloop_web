@@ -16,6 +16,23 @@ export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [search, setSearch] = useState("");
 
+  const filteredUsers = users.filter((user) => {
+  const term = search.toLowerCase();
+
+  return (
+    `${user.firstName} ${user.lastName}`
+      .toLowerCase()
+      .includes(term) ||
+
+    user.email
+      .toLowerCase()
+      .includes(term) ||
+
+    user.phone
+      ?.toLowerCase()
+      .includes(term)
+  );
+});
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
   const [showBanModal, setShowBanModal] = useState(false);
@@ -124,8 +141,10 @@ export default function UsersPage() {
             </thead>
 
             <tbody>
-              {users.map((user, index) => (
+  {filteredUsers.map((user, index) => (
                 <tr
+
+                
                   key={user._id}
                   className="border-b border-slate-100"
                 >
@@ -213,6 +232,17 @@ export default function UsersPage() {
                   </td>
                 </tr>
               ))}
+
+              {filteredUsers.length === 0 && (
+  <tr>
+    <td
+      colSpan={6}
+      className="py-14 text-center text-slate-500"
+    >
+      No users found.
+    </td>
+  </tr>
+)}
             </tbody>
           </table>
         </div>

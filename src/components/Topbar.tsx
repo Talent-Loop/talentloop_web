@@ -6,6 +6,7 @@ import axios from "axios";
 
 export default function Topbar() {
   const [user, setUser] = useState<User | null>(null);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     const fetchUser = async (): Promise<void> => {
@@ -15,14 +16,17 @@ export default function Topbar() {
         console.log("CURRENT USER:", response);
 
         setUser(response.data);
-     } catch (error: unknown) {
-  console.error("Failed to fetch user:", error);
+      } catch (error: unknown) {
+        console.error("Failed to fetch user:", error);
 
-  if (axios.isAxiosError(error) && error.response?.status === 401) {
-    localStorage.removeItem("token");
-    window.location.href = "/login";
-  }
-}
+        if (
+          axios.isAxiosError(error) &&
+          error.response?.status === 401
+        ) {
+          localStorage.removeItem("token");
+          window.location.href = "/login";
+        }
+      }
     };
 
     fetchUser();
@@ -33,14 +37,15 @@ export default function Topbar() {
     window.location.href = "/login";
   };
 
- const fullName = user?.name ?? "";
+  const fullName =
+    user ? `${user.firstName} ${user.lastName}` : "";
 
-const initials =
-  fullName
-    .split(" ")
-    .map((part) => part.charAt(0))
-    .join("")
-    .toUpperCase() || "AD";
+  const initials =
+    fullName
+      .split(" ")
+      .map((part: string) => part.charAt(0))
+      .join("")
+      .toUpperCase() || "AD";
 
   return (
     <div className="mb-6">
@@ -51,6 +56,8 @@ const initials =
 
             <input
               type="search"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
               placeholder="Search name or email"
               className="h-14 w-full rounded-full border border-slate-200 bg-white pl-14 pr-5 text-sm text-slate-700 outline-none transition focus:border-slate-300 focus:ring-2 focus:ring-slate-200"
             />

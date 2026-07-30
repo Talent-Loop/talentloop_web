@@ -1,7 +1,11 @@
 import api from "./api";
-import type { Transaction } from "../types/transactions";
 
-export const getTransactions = async (): Promise<Transaction[]> => {
-  const response = await api.get("/transactions");
+export const getTransactions = async () => {
+  const response = await api.get("/admin/transactions");
+  return response.data;
+};
+
+export const getTransactionSummary = async () => {
+  const response = await api.get("/admin/transactions/summary");
   return response.data;
 };

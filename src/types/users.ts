@@ -1,10 +1,14 @@
 export interface User {
-  id: string;
-  name: string;
+  _id: string;
+  firstName: string;
+  lastName: string;
   email: string;
   phone: string;
-  role: string;
+  roleName: string;
+  banned: boolean;
+  createdAt: string;
 }
+
 export interface UserQueryParams {
   page?: number;
   limit?: number;
