@@ -11,7 +11,8 @@ import type { WalletDeposit } from "../types/walletDeposits";
 
 export default function WalletDepositsPage() {
   const [deposits, setDeposits] = useState<WalletDeposit[]>([]);
-  const [search, setSearch] = useState("");
+const [loading, setLoading] = useState(true);
+const [search, setSearch] = useState("");
 
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [showProofModal, setShowProofModal] = useState(false);
@@ -24,24 +25,40 @@ export default function WalletDepositsPage() {
     useState("");
 
   const fetchDeposits = async () => {
-    try {
-      const response = await getWalletDeposits();
+  try {
+    setLoading(true);
 
-      console.log(response);
+    const response = await getWalletDeposits();
 
-     const deposits = response.data.data.deposits;
+    console.log(response);
 
-setDeposits(deposits);
+    const deposits = response.data.data.deposits;
 
-    } catch (error) {
-      console.error("Failed to fetch deposits:", error);
-    }
-  };
+    setDeposits(deposits);
+
+  } catch (error) {
+    console.error("Failed to fetch deposits:", error);
+  } finally {
+    setLoading(false);
+  }
+};
 
   useEffect(() => {
     fetchDeposits();
   }, []);
+if (loading) {
+  return (
+    <div className="flex h-[75vh] items-center justify-center">
+      <div className="text-center">
+        <div className="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-[#17324D] border-t-transparent"></div>
 
+        <p className="mt-5 text-lg text-slate-500">
+          Loading wallet deposits...
+        </p>
+      </div>
+    </div>
+  );
+}
   const handleApprove = async (id: string) => {
     try {
       await approveWalletDeposit(id);

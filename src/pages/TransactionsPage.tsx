@@ -29,6 +29,7 @@ interface StatusBadgeProps {
 
 export default function TransactionsPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [loading, setLoading] = useState(true);
   const [summary, setSummary] =
     useState<TransactionSummary | null>(null);
 
@@ -61,30 +62,47 @@ const [showRoleDropdown, setShowRoleDropdown] =
 const [showDateDropdown, setShowDateDropdown] =
   useState(false);
 
-  const loadTransactions = async () => {
-    try {
-      const [transactionsResponse, summaryResponse] =
-        await Promise.all([
-          getTransactions(),
-          getTransactionSummary(),
-        ]);
+ const loadTransactions = async () => {
+  try {
+    setLoading(true);
 
-      console.log("Transactions:", transactionsResponse);
-      console.log("Summary:", summaryResponse);
+    const [transactionsResponse, summaryResponse] =
+      await Promise.all([
+        getTransactions(),
+        getTransactionSummary(),
+      ]);
 
-      setTransactions(
-        transactionsResponse.data.transactions
-      );
+    console.log("Transactions:", transactionsResponse);
+    console.log("Summary:", summaryResponse);
 
-      setSummary(summaryResponse.data);
-    } catch (error) {
-      console.error("Failed to fetch transactions", error);
-    }
-  };
+    setTransactions(
+      transactionsResponse.data.transactions
+    );
+
+    setSummary(summaryResponse.data);
+  } catch (error) {
+    console.error("Failed to fetch transactions", error);
+  } finally {
+    setLoading(false);
+  }
+};
 
   useEffect(() => {
     loadTransactions();
   }, []);
+  if (loading) {
+  return (
+    <div className="flex h-[75vh] items-center justify-center">
+      <div className="text-center">
+        <div className="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-[#17324D] border-t-transparent"></div>
+
+        <p className="mt-5 text-lg text-slate-500">
+          Loading transactions...
+        </p>
+      </div>
+    </div>
+  );
+}
 
   const StatCard = ({
     title,

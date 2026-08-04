@@ -14,7 +14,8 @@ const avatarColors = [
 
 export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([]);
-  const [search, setSearch] = useState("");
+const [loading, setLoading] = useState(true);
+const [search, setSearch] = useState("");
 
   const filteredUsers = users.filter((user) => {
   const term = search.toLowerCase();
@@ -38,15 +39,19 @@ export default function UsersPage() {
   const [showBanModal, setShowBanModal] = useState(false);
   const [showUserModal, setShowUserModal] = useState(false);
 
-  const fetchUsers = async () => {
-    try {
-      const response = await getUsers();
+ const fetchUsers = async () => {
+  try {
+    setLoading(true);
 
-      setUsers(response.data.users);
-    } catch (error) {
-      console.error("Failed to fetch users:", error);
-    }
-  };
+    const response = await getUsers();
+
+    setUsers(response.data.users);
+  } catch (error) {
+    console.error("Failed to fetch users:", error);
+  } finally {
+    setLoading(false);
+  }
+};
 
   useEffect(() => {
     fetchUsers();
@@ -89,6 +94,21 @@ export default function UsersPage() {
     );
   }
 };
+
+if (loading) {
+  return (
+    <div className="flex h-[75vh] items-center justify-center">
+      <div className="text-center">
+        <div className="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-[#17324D] border-t-transparent"></div>
+
+        <p className="mt-5 text-lg text-slate-500">
+          Loading users...
+        </p>
+      </div>
+    </div>
+  );
+}
+
   return (
     <section className="space-y-6">
       <section className="overflow-hidden rounded-[36px] border border-slate-200 bg-white shadow-sm">

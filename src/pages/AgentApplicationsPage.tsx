@@ -13,6 +13,7 @@ import type {
 
 export default function AgentApplicationPage() {
   const [applications, setApplications] = useState<AgentApplication[]>([]);
+const [loading, setLoading] = useState(true);
 const [search, setSearch] = useState("");
   const [selectedUser, setSelectedUser] =
     useState<AgentApplication | null>(null);
@@ -28,6 +29,8 @@ const [search, setSearch] = useState("");
 
   const fetchApplications = async () => {
   try {
+    setLoading(true);
+
     const response = await getAgentApplications();
 
     console.log("APPLICATIONS:", response);
@@ -35,6 +38,8 @@ const [search, setSearch] = useState("");
     setApplications(response.data.applications);
   } catch (error) {
     console.error("Failed to fetch applications", error);
+  } finally {
+    setLoading(false);
   }
 };
 
@@ -63,6 +68,21 @@ const filteredApplications = applications.filter((application) => {
       .includes(term)
   );
 });
+
+
+if (loading) {
+  return (
+    <div className="flex h-[75vh] items-center justify-center">
+      <div className="text-center">
+        <div className="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-[#17324D] border-t-transparent"></div>
+
+        <p className="mt-5 text-lg text-slate-500">
+          Loading applications...
+        </p>
+      </div>
+    </div>
+  );
+}
 
 return (
   <>

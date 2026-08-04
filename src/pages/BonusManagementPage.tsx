@@ -4,43 +4,36 @@ import {
   FiDollarSign,
   FiCreditCard,
   FiPlus,
-  FiChevronDown,
   FiX,
 } from "react-icons/fi";
 
 import StatCard from "../components/StatCard";
 
-// import {
-//   getBonuses,
-//   assignBonus,
-// } from "../services/bonuses";
+import {
+  getBonusStats,
+  getAllBonuses,
+  getAgents,
+  assignBonus,
+} from "../services/bonus";
 
-const stats = [
-  {
-    title: "Total Bonuses Issued",
-    value: "₦2,450,500",
-    Icon: FiGift,
-  },
-  {
-    title: "Active Bonuses",
-    value: "5",
-    Icon: FiCreditCard,
-  },
-  {
-    title: "Monthly Bonus Spend",
-    value: "₦450,500",
-    Icon: FiDollarSign,
-  },
-];
+import type { BonusStats } from "../types/bonus";
 
 export default function BonusManagementPage() {
   const [tab, setTab] = useState("All Bonuses");
 
-  const [bonuses, setBonuses] = useState([]);
+  const [bonuses, setBonuses] = useState<any[]>([]);
+  const [error, setError] = useState("");
 
   const [loading, setLoading] = useState(false);
 
-  const [showAssignModal, setShowAssignModal] = useState(false);
+  const [showAssignModal, setShowAssignModal] =
+    useState(false);
+const [agents, setAgents] = useState<any[]>([]);
+  const [stats, setStats] = useState<BonusStats>({
+    totalBonusesIssued: 0,
+    activeBonuses: 0,
+    monthlyBonusSpend: 0,
+  });
 
   const [form, setForm] = useState({
     agent: "",
@@ -50,26 +43,72 @@ export default function BonusManagementPage() {
   });
 
   useEffect(() => {
-    fetchBonuses();
-  }, []);
+  fetchBonuses();
+  fetchBonusStats();
+  fetchAgents();
+}, []);
+if (loading) {
+  return (
+    <div className="flex h-[75vh] items-center justify-center">
+      <div className="text-center">
+        <div className="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-[#17324D] border-t-transparent"></div>
 
-  const fetchBonuses = async () => {
+        <p className="mt-5 text-lg text-slate-500">
+          Loading bonuses...
+        </p>
+      </div>
+    </div>
+  );
+}
+
+  const fetchBonusStats = async () => {
     try {
-      setLoading(true);
+      const response = await getBonusStats();
 
-      // const response = await getBonuses();
-      // setBonuses(response.data.bonuses);
-
+      setStats(response.data);
     } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
+      console.error(error);
     }
   };
+  const fetchAgents = async () => {
+  try {
+    const response = await getAgents();
+
+    setAgents(response.data.users || []);
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+  const fetchBonuses = async (status?: string) => {
+  try {
+    setLoading(true);
+    setError("");
+
+    const response = await getAllBonuses(
+      1,
+      20,
+      status
+    );
+
+    setBonuses(response.data.bonuses || []);
+  } catch (error) {
+    console.error(error);
+    setError("Failed to load bonuses.");
+    setBonuses([]);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleAssignBonus = async () => {
     try {
-      // await assignBonus(form);
+      await assignBonus({
+        userId: form.agent,
+        type: form.type,
+        amount: Number(form.amount),
+        note: form.note,
+      });
 
       setShowAssignModal(false);
 
@@ -81,10 +120,38 @@ export default function BonusManagementPage() {
       });
 
       fetchBonuses();
+      fetchBonusStats();
     } catch (error) {
       console.log(error);
     }
   };
+
+  const statCards = [
+    {
+      title: "Total Bonuses Issued",
+      value: `₦${stats.totalBonusesIssued.toLocaleString()}`,
+      Icon: FiGift,
+    },
+    {
+      title: "Active Bonuses",
+      value: stats.activeBonuses.toString(),
+      Icon: FiCreditCard,
+    },
+    {
+      title: "Monthly Bonus Spend",
+      value: `₦${stats.monthlyBonusSpend.toLocaleString()}`,
+      Icon: FiDollarSign,
+    },
+  ];
+
+  const formatBonusType = (
+    type: string
+  ) =>
+    type
+      .replace(/_/g, " ")
+      .replace(/\b\w/g, (c) =>
+        c.toUpperCase()
+      );
 
   return (
     <section className="space-y-8">
@@ -92,16 +159,16 @@ export default function BonusManagementPage() {
         Bonus Management
       </h1>
 
-      <div className="grid gap-5 lg:grid-cols-3">
-        {stats.map((item) => (
-          <StatCard
-            key={item.title}
-            title={item.title}
-            value={item.value}
-            Icon={item.Icon}
-          />
-        ))}
-      </div>
+     <div className="grid gap-5 lg:grid-cols-3">
+  {statCards.map((item) => (
+    <StatCard
+      key={item.title}
+      title={item.title}
+      value={item.value}
+      Icon={item.Icon}
+    />
+  ))}
+</div>
 
       <div className="flex items-center justify-between">
         <div className="flex gap-5">
@@ -112,7 +179,17 @@ export default function BonusManagementPage() {
 ].map((item) => (
   <button
     key={item}
-    onClick={() => setTab(item)}
+    onClick={() => {
+      setTab(item);
+
+      if (item === "All Bonuses") {
+        fetchBonuses();
+      } else if (item === "Active Bonuses") {
+        fetchBonuses("pending");
+      } else {
+        fetchBonuses("paid");
+      }
+    }}
     className={`rounded-full px-10 py-3 text-sm font-semibold !text-black transition ${
       tab === item
         ? "bg-[#DCE3E8]"
@@ -151,57 +228,88 @@ export default function BonusManagementPage() {
               </tr>
             </thead>
 
-            <tbody>
-              {loading ? (
-                <tr>
-                  <td
-                    colSpan={6}
-                    className="py-10 text-center text-slate-400"
-                  >
-                    Loading...
-                  </td>
-                </tr>
-              ) : (
-                bonuses.map((item: any) => (
-                  <tr
-                    key={item._id}
-                    className="border-t border-slate-100"
-                  >
-                    <td className="py-5">
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#123552] font-semibold text-white">
-                          {item.agent?.firstName?.[0]}
-                        </div>
+       <tbody>
+  {error ? (
+    <tr>
+      <td
+        colSpan={6}
+        className="py-12 text-center text-red-500"
+      >
+        {error}
+      </td>
+    </tr>
+  ) : bonuses.length === 0 ? (
+    <tr>
+      <td
+        colSpan={6}
+        className="py-12 text-center text-slate-500"
+      >
+        No bonuses found.
+      </td>
+    </tr>
+  ) : (
+    bonuses.map((item: any) => {
+      const agentName =
+        item.userId?.firstName && item.userId?.lastName
+          ? `${item.userId.firstName} ${item.userId.lastName}`
+          : item.userId?.email || "Unknown Agent";
 
-                        <span className="font-medium text-[#22324A]">
-                          {item.agent?.firstName} {item.agent?.lastName}
-                        </span>
-                      </div>
-                    </td>
+      const initials = agentName
+        .split(" ")
+        .map((n: string) => n[0])
+        .join("")
+        .substring(0, 2)
+        .toUpperCase();
 
-                    <td>{item.type}</td>
+      return (
+        <tr
+          key={item._id}
+          className="border-t border-slate-100"
+        >
+          <td className="py-5">
+            <div className="flex items-center gap-3">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#123552] font-semibold text-white">
+                {initials}
+              </div>
 
-                    <td>{item.amount}</td>
+              <span className="font-medium text-[#22324A]">
+                {agentName}
+              </span>
+            </div>
+          </td>
 
-                    <td>
-                      {new Date(item.createdAt).toLocaleDateString()}
-                    </td>
+          <td>{formatBonusType(item.type)}</td>
 
-                    <td>
-                      <span className="rounded-full bg-[#DCFCE7] px-4 py-1 text-sm font-medium text-[#16A34A]">
-                        {item.status}
-                      </span>
-                    </td>
+          <td>₦{item.amount.toLocaleString()}</td>
 
-                    <td className="text-right">
-                      <button className="text-2xl font-bold text-slate-500">
-                        ⋮
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
+          <td>
+            {new Date(item.createdAt).toLocaleDateString()}
+          </td>
+
+          <td>
+            <span
+              className={`rounded-full px-4 py-1 text-sm font-medium ${
+                item.status === "paid"
+                  ? "bg-[#DCFCE7] text-[#16A34A]"
+                  : "bg-[#FEF3C7] text-[#D97706]"
+              }`}
+            >
+              {item.status === "paid"
+                ? "Completed"
+                : "Pending"}
+            </span>
+          </td>
+
+          <td className="text-right">
+            <button className="text-2xl font-bold text-slate-500">
+              ⋮
+            </button>
+          </td>
+        </tr>
+      );
+    })
+  )}
+</tbody>
           </table>
         </div>
       </div>
@@ -222,72 +330,141 @@ export default function BonusManagementPage() {
               </button>
             </div>
 
-            <div className="grid gap-6">
-              <input
-                placeholder="Agent ID"
-                value={form.agent}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    agent: e.target.value,
-                  })
-                }
-                className="rounded-xl border p-4"
-              />
+           <div className="grid grid-cols-2 gap-6">
 
-              <input
-                placeholder="Bonus Type"
-                value={form.type}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    type: e.target.value,
-                  })
-                }
-                className="rounded-xl border p-4"
-              />
+  {/* Agent */}
+  <div>
+    <label className="mb-2 block text-sm font-medium text-[#22324A]">
+      Agent
+    </label>
 
-              <input
-                placeholder="Amount"
-                value={form.amount}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    amount: e.target.value,
-                  })
-                }
-                className="rounded-xl border p-4"
-              />
+    <select
+      value={form.agent}
+      onChange={(e) =>
+        setForm({
+          ...form,
+          agent: e.target.value,
+        })
+      }
+      className="h-12 w-full rounded-xl border border-[#D7DEE5] bg-white px-4"
+    >
+      <option value="">
+        Select Agent
+      </option>
 
-              <textarea
-                rows={4}
-                placeholder="Reason"
-                value={form.note}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    note: e.target.value,
-                  })
-                }
-                className="rounded-xl border p-4"
-              />
+      {agents.map((agent: any) => (
+        <option
+          key={agent._id}
+          value={agent._id}
+        >
+          {agent.firstName && agent.lastName
+            ? `${agent.firstName} ${agent.lastName}`
+            : agent.email}
+        </option>
+      ))}
+    </select>
+  </div>
 
-              <div className="flex justify-end gap-4">
-               <button
-  onClick={() => setShowAssignModal(false)}
-  className="rounded-xl border px-8 py-3 !text-[#22324A]"
->
-  Cancel
-</button>
+  {/* Bonus Type */}
+  <div>
+    <label className="mb-2 block text-sm font-medium text-[#22324A]">
+      Bonus
+    </label>
 
-                <button
-                  onClick={handleAssignBonus}
-                  className="rounded-xl bg-[#17324D] px-8 py-3 text-white"
-                >
-                  Assign Bonus
-                </button>
-              </div>
-            </div>
+    <select
+      value={form.type}
+      onChange={(e) =>
+        setForm({
+          ...form,
+          type: e.target.value,
+        })
+      }
+      className="h-12 w-full rounded-xl border border-[#D7DEE5] bg-white px-4"
+    >
+      <option value="">
+        Select Bonus Type
+      </option>
+
+      <option value="agent_provider_approved">
+        Agent Provider Approved
+      </option>
+
+      <option value="agent_provider_first_job">
+        Agent Provider First Job
+      </option>
+
+      <option value="agent_commission_share">
+        Agent Commission Share
+      </option>
+
+      <option value="client_referral">
+        Client Referral
+      </option>
+
+      <option value="provider_free_commission">
+        Provider Free Commission
+      </option>
+    </select>
+  </div>
+
+  {/* Amount */}
+  <div>
+    <label className="mb-2 block text-sm font-medium text-[#22324A]">
+      Enter Amount
+    </label>
+
+    <input
+      type="number"
+      placeholder="Enter Amount"
+      value={form.amount}
+      onChange={(e) =>
+        setForm({
+          ...form,
+          amount: e.target.value,
+        })
+      }
+      className="h-12 w-full rounded-xl border border-[#D7DEE5] px-4"
+    />
+  </div>
+
+  {/* Reason */}
+  <div>
+    <label className="mb-2 block text-sm font-medium text-[#22324A]">
+      Reason
+    </label>
+
+    <input
+      placeholder="Enter reason for bonus"
+      value={form.note}
+      onChange={(e) =>
+        setForm({
+          ...form,
+          note: e.target.value,
+        })
+      }
+      className="h-12 w-full rounded-xl border border-[#D7DEE5] px-4"
+    />
+  </div>
+
+  <div className="col-span-2 mt-4 flex justify-end gap-4">
+
+    <button
+      onClick={() => setShowAssignModal(false)}
+      className="rounded-xl border px-8 py-3 text-[#22324A]"
+    >
+      Cancel
+    </button>
+
+    <button
+      onClick={handleAssignBonus}
+      className="rounded-xl bg-[#17324D] px-8 py-3 text-white"
+    >
+      Assign Bonus
+    </button>
+
+  </div>
+
+</div>
 
           </div>
         </div>
