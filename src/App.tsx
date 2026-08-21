@@ -2,41 +2,59 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import type { ReactNode } from "react";
 
-import DashboardLayout from "./layout/DashboardLayout.jsx";
+import DashboardLayout from "./layout/DashboardLayout";
 
-import LoginPage from "./pages/LoginPage.jsx";
-import OverviewPage from "./pages/OverviewPage.jsx";
-import UsersPage from "./pages/UsersPage.jsx";
-import AgentApplicationsPage from "./pages/AgentApplicationsPage.jsx";
-import TransactionsPage from "./pages/TransactionsPage.jsx";
-import WalletDepositsPage from "./pages/WalletDepositsPage.jsx";
-import CategoriesPage from "./pages/CategoriesPage.jsx";
-import NotFoundPage from "./pages/NotFoundPage.jsx";
-import WithdrawalRequestPage from "./pages/WithdrawalRequestPage.jsx";
+import LandingPage from "./pages/LandingPage";
+import LoginPage from "./pages/LoginPage";
+import AdminLoginPage from "./pages/AdminLoginPage";
+import RegisterUserPage from "./pages/RegisterUserPage";
+import RegisterProfessionalPage from "./pages/RegisterProfessionalPage";
+
+import OverviewPage from "./pages/OverviewPage";
+import UsersPage from "./pages/UsersPage";
+import AgentApplicationsPage from "./pages/AgentApplicationsPage";
+import TransactionsPage from "./pages/TransactionsPage";
+import WalletDepositsPage from "./pages/WalletDepositsPage";
+import CategoriesPage from "./pages/CategoriesPage";
+import WithdrawalRequestPage from "./pages/WithdrawalRequestPage";
 import WithdrawalHistoryPage from "./pages/WithdrawalHistoryPage";
 import AgentEarningsReportPage from "./pages/AgentEarningsReportPage";
 import BonusManagementPage from "./pages/BonusManagementPage";
+import NotFoundPage from "./pages/NotFoundPage";
+
 function ProtectedRoute({ children }: { children: ReactNode }) {
   const token = localStorage.getItem("token");
 
   if (!token) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/admin/login" replace />;
   }
 
-  return children;
+  return <>{children}</>;
 }
 
-function App() {
+export default function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* ================= USER ================= */}
 
-        {/* Login */}
+        <Route path="/" element={<LandingPage />} />
+
         <Route path="/login" element={<LoginPage />} />
 
-        {/* Protected Dashboard */}
+        <Route path="/register" element={<RegisterUserPage />} />
+
         <Route
-          path="/"
+          path="/register/professional"
+          element={<RegisterProfessionalPage />}
+        />
+
+        {/* ================= ADMIN ================= */}
+
+        <Route path="/admin/login" element={<AdminLoginPage />} />
+
+        <Route
+          path="/admin"
           element={
             <ProtectedRoute>
               <DashboardLayout />
@@ -44,35 +62,51 @@ function App() {
           }
         >
           <Route index element={<OverviewPage />} />
+
           <Route path="users" element={<UsersPage />} />
-          
+
           <Route
             path="agent-applications"
             element={<AgentApplicationsPage />}
           />
-          <Route path="transactions" element={<TransactionsPage />} />
-          <Route path="wallet-deposits" element={<WalletDepositsPage />} />
+
           <Route
-  path="withdrawal-request"
-  element={<WithdrawalRequestPage />}
-/>
+            path="transactions"
+            element={<TransactionsPage />}
+          />
 
-<Route
-  path="withdrawal-history"
-  element={<WithdrawalHistoryPage />}
-/>
+          <Route
+            path="wallet-deposits"
+            element={<WalletDepositsPage />}
+          />
 
-<Route
-  path="agent-earnings-report"
-  element={<AgentEarningsReportPage />}
-/>
+          <Route
+            path="withdrawal-request"
+            element={<WithdrawalRequestPage />}
+          />
 
-<Route
-  path="/bonus-management"
-  element={<BonusManagementPage />}
-/>
-          <Route path="categories" element={<CategoriesPage />} />
+          <Route
+            path="withdrawal-history"
+            element={<WithdrawalHistoryPage />}
+          />
+
+          <Route
+            path="agent-earnings-report"
+            element={<AgentEarningsReportPage />}
+          />
+
+          <Route
+            path="bonus-management"
+            element={<BonusManagementPage />}
+          />
+
+          <Route
+            path="categories"
+            element={<CategoriesPage />}
+          />
         </Route>
+
+        {/* ================= 404 ================= */}
 
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
@@ -84,5 +118,3 @@ function App() {
     </BrowserRouter>
   );
 }
-
-export default App;
