@@ -53,14 +53,56 @@ function NotificationIcon({
 export default function UserNotificationsPage() {
   const navigate = useNavigate();
 
-  /*
-   * Replace this with the response from the real
-   * notifications endpoint once the service method
-   * is connected.
-   *
-   * Do not keep this as frontend mock data in production.
-   */
-  const notifications: NotificationItem[] = [];
+const notifications: NotificationItem[] = [
+  {
+    id: "1",
+    type: "bid",
+    title: "New bid received",
+    message: "You received a new bid for your Fix kitchen sink job.",
+    time: "2 min ago",
+    unread: true,
+  },
+  {
+    id: "2",
+    type: "completed",
+    title: "Job completed",
+    message: "Your AC repair job has been marked as completed.",
+    time: "1 hour ago",
+    unread: true,
+  },
+  {
+    id: "3",
+    type: "bid",
+    title: "New bid received",
+    message: "A professional has submitted a bid for your Plumbing job.",
+    time: "3 hours ago",
+    unread: true,
+  },
+  {
+    id: "4",
+    type: "profile",
+    title: "Complete your profile",
+    message: "Add more information to your profile to help professionals know you better.",
+    time: "Yesterday",
+    unread: false,
+  },
+  {
+    id: "5",
+    type: "completed",
+    title: "Payment confirmed",
+    message: "Your payment for the completed job has been confirmed.",
+    time: "Yesterday",
+    unread: false,
+  },
+  {
+    id: "6",
+    type: "bid",
+    title: "New bid received",
+    message: "You received a new bid for your Home cleaning job.",
+    time: "2 days ago",
+    unread: false,
+  },
+];
 
   return (
     <section className="px-0 pb-12 pt-[22px]">
