@@ -263,6 +263,8 @@ return (
                 <div className="flex items-center gap-[39px]">
                   <button
                     type="button"
+              onClick={() =>
+                navigate(`/dashboard/messages/:id/profile`)}
                     className="
                       flex
                       h-[32px]

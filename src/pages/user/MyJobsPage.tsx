@@ -243,7 +243,7 @@ export default function MyJobsPage() {
                     EJ
                   </div>
 
-                  <span className="font-['Montserrat'] text-[11px] font-medium text-[#5F6368]">
+                  <span className="font-['Montserrat'] text-[11px] font-medium text-[#j5F6368]">
                     {job.worker}
                   </span>
 

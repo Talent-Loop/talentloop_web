@@ -4,6 +4,7 @@ import {
   ShieldCheck,
   X,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface Job {
   id: number;
@@ -23,6 +24,7 @@ export default function JobProgressModal({
   job,
   onClose,
 }: JobProgressModalProps) {
+  const navigate = useNavigate();
   return (
     <div
       className="
@@ -267,6 +269,8 @@ export default function JobProgressModal({
 
           <button
             type="button"
+              onClick={() =>
+                navigate(`/dashboard/messages/:id`)}
             className="
               flex
               h-[58px]

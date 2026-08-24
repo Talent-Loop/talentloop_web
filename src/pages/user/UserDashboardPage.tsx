@@ -68,6 +68,8 @@ export default function UserDashboardPage() {
         {/* Plus button */}
         <button
           type="button"
+              onClick={() =>
+                navigate(`/dashboard/post`)}
           className="absolute bottom-[28px] right-[28px] z-10 flex h-[62px] w-[62px] items-center justify-center rounded-full border-[3px] border-[#17364A] bg-white text-[#17364A] shadow-sm"
         >
           <FiPlus className="h-7 w-7" strokeWidth={2.5} />
@@ -115,6 +117,8 @@ export default function UserDashboardPage() {
 
             <button
               type="button"
+              onClick={() =>
+                navigate(`/dashboard/jobs`)}
               className="font-['Montserrat'] text-[14px] font-normal leading-[27px] text-[#23658B]"
             >
               view all

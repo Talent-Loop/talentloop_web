@@ -33,6 +33,8 @@ import UserProfilePage from "./pages/user/UserProfilePage";
 import UserEditProfilePage from "./pages/user/UserEditProfilePage";
 import UserSecuritySettingsPage from "./pages/user/UserSecuritySettingsPage";
 import UserNotificationsPage from "./pages/user/UserNotificationsPage";
+import WorkerProfilePage from "./pages/user/WorkerProfilePage";
+import RecentActivities from "./pages/user/RecentActivities";
 
 function ProtectedRoute({ children }: { children: ReactNode }) {
   const token = localStorage.getItem("token");
@@ -132,15 +134,13 @@ export default function App() {
 
           <Route path="profile/edit" element={<UserEditProfilePage />} />
 
-          <Route
-            path="profile/security"
-            element={<UserSecuritySettingsPage />}
-          />
+          <Route path="profile/security" element={<UserSecuritySettingsPage />} />
 
-          <Route
-            path="notifications"
-            element={<UserNotificationsPage />}
-          />
+          <Route path="notifications" element={<UserNotificationsPage />} />
+
+          <Route path="messages/:id/profile" element={<WorkerProfilePage />}/>
+
+          <Route path="messages/:id/recent-activities" element={<RecentActivities />}/>
         </Route>
 
         {/* ================= 404 ================= */}
