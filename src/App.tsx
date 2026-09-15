@@ -20,6 +20,18 @@ import WithdrawalRequestPage from "./pages/WithdrawalRequestPage";
 import WithdrawalHistoryPage from "./pages/WithdrawalHistoryPage";
 import AgentEarningsReportPage from "./pages/AgentEarningsReportPage";
 import BonusManagementPage from "./pages/BonusManagementPage";
+import ArtisanDashboardPage from "./pages/artisan/ArtisanDashboardPage";
+import PlaceBidPage from "./pages/artisan/PlaceBidPage";
+import MyJobsPage from "./pages/artisan/MyJobsPage";
+import JobProgressPage from "./pages/artisan/JobProgressPage";
+import UpdateJobStatusPage from "./pages/artisan/UpdateJobStatusPage";
+import MessagesPage from "./pages/artisan/MessagesPage";
+import ChatPage from "./pages/artisan/ChatPage";
+import CommissionPage from "./pages/artisan/CommissionPage";
+import ProfilePage from "./pages/artisan/ProfilePage";
+import WorkerProfilePage from "./pages/artisan/WorkerProfilePage";
+import EditProfilePage from "./pages/artisan/EditProfilePage";
+import NotificationPage from "./pages/artisan/NotificationPage";
 import NotFoundPage from "./pages/NotFoundPage";
 
 function ProtectedRoute({ children }: { children: ReactNode }) {
@@ -47,8 +59,27 @@ export default function App() {
         <Route
           path="/register/professional"
           element={<RegisterProfessionalPage />}
+
         />
 
+        <Route
+  path="/artisan"
+  element={<ArtisanDashboardPage />}
+/>
+<Route path="/artisan/my-jobs" element={<MyJobsPage />} />
+<Route path="/my-jobs/:jobId" element={<JobProgressPage />} />
+<Route path="/artisan/place-bid" element={<PlaceBidPage />} />
+<Route
+  path="/my-jobs/update-status"
+  element={<UpdateJobStatusPage />}
+/>
+<Route path="/messages" element={<MessagesPage />} />
+<Route path="/messages/chat" element={<ChatPage />} />
+<Route path="/commission" element={<CommissionPage />} />
+<Route path="/profile" element={<ProfilePage />} />
+<Route path="/profile/view" element={<WorkerProfilePage />} />
+<Route path="/profile/edit" element={<EditProfilePage />} />
+<Route path="/notification" element={<NotificationPage />} />
         {/* ================= ADMIN ================= */}
 
         <Route path="/admin/login" element={<AdminLoginPage />} />
@@ -105,6 +136,8 @@ export default function App() {
             element={<CategoriesPage />}
           />
         </Route>
+
+        
 
         {/* ================= 404 ================= */}
 
