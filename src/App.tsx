@@ -1,3 +1,4 @@
+
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import type { ReactNode } from "react";
@@ -21,6 +22,9 @@ import WithdrawalRequestPage from "./pages/WithdrawalRequestPage";
 import WithdrawalHistoryPage from "./pages/WithdrawalHistoryPage";
 import AgentEarningsReportPage from "./pages/AgentEarningsReportPage";
 import BonusManagementPage from "./pages/BonusManagementPage";
+
+// ================= ARTISAN =================
+
 import ArtisanDashboardPage from "./pages/artisan/ArtisanDashboardPage";
 import PlaceBidPage from "./pages/artisan/PlaceBidPage";
 import MyJobsPage from "./pages/artisan/MyJobsPage";
@@ -33,19 +37,24 @@ import ProfilePage from "./pages/artisan/ProfilePage";
 import WorkerProfilePage from "./pages/artisan/WorkerProfilePage";
 import EditProfilePage from "./pages/artisan/EditProfilePage";
 import NotificationPage from "./pages/artisan/NotificationPage";
+
+// ================= GENERAL =================
+
 import NotFoundPage from "./pages/NotFoundPage";
+
+// ================= USER DASHBOARD =================
 
 import UserDashboardPage from "./pages/user/UserDashboardPage";
 import PostJobPage from "./pages/user/PostJobPage";
-import MyJobsPage from "./pages/user/MyJobsPage";
+import UserMyJobsPage from "./pages/user/MyJobsPage";
 import ViewBidsPage from "./pages/user/ViewBidsPage";
-import MessagesPage from "./pages/user/MessagesPage";
+import UserMessagesPage from "./pages/user/MessagesPage";
 import UserChatPage from "./pages/user/UserChatPage";
 import UserProfilePage from "./pages/user/UserProfilePage";
 import UserEditProfilePage from "./pages/user/UserEditProfilePage";
 import UserSecuritySettingsPage from "./pages/user/UserSecuritySettingsPage";
 import UserNotificationsPage from "./pages/user/UserNotificationsPage";
-import WorkerProfilePage from "./pages/user/WorkerProfilePage";
+import UserWorkerProfilePage from "./pages/user/WorkerProfilePage";
 import RecentActivities from "./pages/user/RecentActivities";
 
 function ProtectedRoute({ children }: { children: ReactNode }) {
@@ -62,7 +71,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* ================= USER ================= */}
+        {/* ================= USER / PUBLIC ================= */}
 
         <Route path="/" element={<LandingPage />} />
 
@@ -73,27 +82,37 @@ export default function App() {
         <Route
           path="/register/professional"
           element={<RegisterProfessionalPage />}
-
         />
 
+        {/* ================= ARTISAN ================= */}
+
+        <Route path="/artisan" element={<ArtisanDashboardPage />} />
+
+        <Route path="/artisan/my-jobs" element={<MyJobsPage />} />
+
+        <Route path="/my-jobs/:jobId" element={<JobProgressPage />} />
+
+        <Route path="/artisan/place-bid" element={<PlaceBidPage />} />
+
         <Route
-  path="/artisan"
-  element={<ArtisanDashboardPage />}
-/>
-<Route path="/artisan/my-jobs" element={<MyJobsPage />} />
-<Route path="/my-jobs/:jobId" element={<JobProgressPage />} />
-<Route path="/artisan/place-bid" element={<PlaceBidPage />} />
-<Route
-  path="/my-jobs/update-status"
-  element={<UpdateJobStatusPage />}
-/>
-<Route path="/messages" element={<MessagesPage />} />
-<Route path="/messages/chat" element={<ChatPage />} />
-<Route path="/commission" element={<CommissionPage />} />
-<Route path="/profile" element={<ProfilePage />} />
-<Route path="/profile/view" element={<WorkerProfilePage />} />
-<Route path="/profile/edit" element={<EditProfilePage />} />
-<Route path="/notification" element={<NotificationPage />} />
+          path="/my-jobs/update-status"
+          element={<UpdateJobStatusPage />}
+        />
+
+        <Route path="/messages" element={<MessagesPage />} />
+
+        <Route path="/messages/chat" element={<ChatPage />} />
+
+        <Route path="/commission" element={<CommissionPage />} />
+
+        <Route path="/profile" element={<ProfilePage />} />
+
+        <Route path="/profile/view" element={<WorkerProfilePage />} />
+
+        <Route path="/profile/edit" element={<EditProfilePage />} />
+
+        <Route path="/notification" element={<NotificationPage />} />
+
         {/* ================= ADMIN ================= */}
 
         <Route path="/admin/login" element={<AdminLoginPage />} />
@@ -151,13 +170,13 @@ export default function App() {
         >
           <Route index element={<UserDashboardPage />} />
 
-          <Route path="jobs" element={<MyJobsPage />} />
+          <Route path="jobs" element={<UserMyJobsPage />} />
 
           <Route path="jobs/bids" element={<ViewBidsPage />} />
 
           <Route path="post" element={<PostJobPage />} />
 
-          <Route path="messages" element={<MessagesPage />} />
+          <Route path="messages" element={<UserMessagesPage />} />
 
           <Route path="messages/:id" element={<UserChatPage />} />
 
@@ -165,16 +184,26 @@ export default function App() {
 
           <Route path="profile/edit" element={<UserEditProfilePage />} />
 
-          <Route path="profile/security" element={<UserSecuritySettingsPage />} />
+          <Route
+            path="profile/security"
+            element={<UserSecuritySettingsPage />}
+          />
 
-          <Route path="notifications" element={<UserNotificationsPage />} />
+          <Route
+            path="notifications"
+            element={<UserNotificationsPage />}
+          />
 
-          <Route path="messages/:id/profile" element={<WorkerProfilePage />}/>
+          <Route
+            path="messages/:id/profile"
+            element={<UserWorkerProfilePage />}
+          />
 
-          <Route path="messages/:id/recent-activities" element={<RecentActivities />}/>
+          <Route
+            path="messages/:id/recent-activities"
+            element={<RecentActivities />}
+          />
         </Route>
-
-        
 
         {/* ================= 404 ================= */}
 
@@ -190,3 +219,4 @@ export default function App() {
     </BrowserRouter>
   );
 }
+
