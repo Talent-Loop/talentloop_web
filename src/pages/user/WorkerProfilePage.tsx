@@ -59,72 +59,80 @@ export default function WorkerProfilePage() {
   const { id } = useParams();
 
   return (
-    <section className="min-h-full bg-[#F7FAF9] px-[32px] pb-16 pt-[22px]">
+    <section className="w-full bg-[#F7FAF9] pb-12 pt-5 sm:pb-16 sm:pt-7">
       {/* Header */}
-      <div className="mb-[36px] flex items-center gap-3">
+      <div className="mb-6 flex items-center gap-2 sm:mb-8 sm:gap-3">
         <button
           type="button"
           onClick={() => navigate(-1)}
-          className="flex h-8 w-8 items-center justify-center text-[#0F172A]"
+          aria-label="Go back"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[#0F172A] transition hover:bg-[#E8EDF1]"
         >
           <FiArrowLeft size={20} />
         </button>
 
-        <h1 className="font-['Inter'] text-[24px] font-bold leading-8 text-[#24364B]">
+        <h1 className="font-['Inter'] text-[22px] font-bold leading-8 text-[#24364B] sm:text-[24px]">
           Worker Profile
         </h1>
       </div>
 
-      {/* Profile card */}
-      <div className="flex min-h-[159px] w-full max-w-[1113px] items-center rounded-[16px] border border-[#0D2E431F] bg-white px-5">
-        {/* Avatar */}
-        <div className="flex items-center gap-4">
-          <div className="relative flex h-[96px] w-[96px] items-center justify-center rounded-full bg-[#D8DDE0]">
-            <span className="text-[42px]">👨🏾‍🔧</span>
+      {/* Profile Card */}
+      <div className="w-full max-w-[1113px] rounded-[16px] border border-[#0D2E431F] bg-white p-5 sm:p-6">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+          {/* Worker Info */}
+          <div className="flex min-w-0 items-center gap-4">
+            <div className="relative flex h-[80px] w-[80px] shrink-0 items-center justify-center rounded-full bg-[#D8DDE0] sm:h-[96px] sm:w-[96px]">
+              <span className="text-[36px] sm:text-[42px]">👨🏾‍🔧</span>
 
-            <span className="absolute bottom-1 right-1 h-[27px] w-[27px] rounded-full border-2 border-white bg-[#22C55E] p-[4px]">
-              <span className="block h-full w-full rounded-full bg-[#22C55E]" />
-            </span>
-          </div>
+              <span className="absolute bottom-0.5 right-0.5 h-6 w-6 rounded-full border-2 border-white bg-[#22C55E] p-[3px] sm:bottom-1 sm:right-1 sm:h-[27px] sm:w-[27px]">
+                <span className="block h-full w-full rounded-full bg-[#22C55E]" />
+              </span>
+            </div>
 
-          <div>
-            <h2 className="font-['Montserrat'] text-[20px] font-semibold text-[#0F172A]">
-              {worker.name}
-            </h2>
+            <div className="min-w-0">
+              <h2 className="font-['Montserrat'] text-[19px] font-semibold text-[#0F172A] sm:text-[20px]">
+                {worker.name}
+              </h2>
 
-            <p className="mt-1 font-['Montserrat'] text-[14px] font-medium text-[#475569]">
-              {worker.role}
-            </p>
+              <p className="mt-1 font-['Montserrat'] text-[14px] font-medium text-[#475569]">
+                {worker.role}
+              </p>
 
-            <div className="mt-2 flex items-center gap-1 text-[13px] text-[#64748B]">
-              <FiMapPin size={14} />
-              <span>{worker.location}</span>
+              <div className="mt-2 flex items-start gap-1 text-[13px] text-[#64748B]">
+                <FiMapPin className="mt-0.5 shrink-0" size={14} />
+                <span>{worker.location}</span>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Stats */}
-        <div className="ml-auto grid h-[94px] w-[396px] grid-cols-3 gap-8">
-          <StatCard
-            value={worker.completedJobs}
-            label="Jobs completed"
-          />
+          {/* Stats */}
+          <div className="grid w-full grid-cols-3 gap-2 sm:gap-4 lg:w-auto lg:gap-5">
+            <StatCard
+              value={worker.completedJobs}
+              label="Jobs completed"
+            />
 
-          <StatCard
-            value={worker.rating}
-            label="Rating"
-            icon={<FiStar size={14} />}
-          />
+            <StatCard
+              value={worker.rating}
+              label="Rating"
+              icon={
+                <FiStar
+                  size={14}
+                  className="fill-[#164D6F] text-[#164D6F]"
+                />
+              }
+            />
 
-          <StatCard
-            value={worker.responseTime}
-            label="Response time"
-          />
+            <StatCard
+              value={worker.responseTime}
+              label="Response time"
+            />
+          </div>
         </div>
       </div>
 
       {/* About */}
-      <div className="mt-[28px] max-w-[1113px]">
+      <div className="mt-7 w-full max-w-[1113px] sm:mt-8">
         <h2 className="mb-3 font-['Montserrat'] text-[18px] font-semibold text-[#0F172A]">
           About
         </h2>
@@ -135,26 +143,26 @@ export default function WorkerProfilePage() {
       </div>
 
       {/* Portfolio */}
-      <div className="mt-[32px] max-w-[1113px]">
+      <div className="mt-8 w-full max-w-[1113px] sm:mt-9">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="font-['Montserrat'] text-[18px] font-semibold text-[#0F172A]">
             Portfolio
           </h2>
 
-          <span className="text-[13px] text-[#64748B]">
+          <span className="text-[12px] text-[#64748B] sm:text-[13px]">
             Recent work
           </span>
         </div>
 
-        <div className="flex w-[359px] gap-[9px]">
+        <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap sm:gap-[9px]">
           {portfolio.map((item) => (
             <div
               key={item.id}
-              className="h-[114px] w-[114px] overflow-hidden rounded-[10px] bg-[#E8EDF1]"
+              className="aspect-square w-full max-w-[114px] overflow-hidden rounded-[10px] bg-[#E8EDF1]"
             >
               <img
                 src={item.image}
-                alt="Portfolio work"
+                alt={`Portfolio work ${item.id}`}
                 className="h-full w-full object-cover"
               />
             </div>
@@ -163,8 +171,8 @@ export default function WorkerProfilePage() {
       </div>
 
       {/* Reviews */}
-      <div className="mt-[40px] w-full max-w-[1113px]">
-        <div className="mb-4 flex h-7 items-center justify-between px-[15px]">
+      <div className="mt-9 w-full max-w-[1113px] sm:mt-10">
+        <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="font-['Montserrat'] text-[18px] font-semibold text-[#0F172A]">
             Reviews
           </h2>
@@ -185,9 +193,9 @@ export default function WorkerProfilePage() {
           {reviews.map((review) => (
             <div
               key={review.id}
-              className="min-h-[116px] rounded-[16px] border border-[#0D2E431F] bg-white p-4"
+              className="w-full rounded-[16px] border border-[#0D2E431F] bg-white p-4 sm:min-h-[116px] sm:p-5"
             >
-              <div className="flex items-start justify-between">
+              <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="font-['Montserrat'] text-[14px] font-semibold text-[#0F172A]">
                     {review.name}
@@ -206,7 +214,7 @@ export default function WorkerProfilePage() {
                   </div>
                 </div>
 
-                <span className="text-[12px] text-[#94A3B8]">
+                <span className="shrink-0 text-[11px] text-[#94A3B8] sm:text-[12px]">
                   {review.date}
                 </span>
               </div>
@@ -219,12 +227,12 @@ export default function WorkerProfilePage() {
         </div>
       </div>
 
-      {/* Bottom actions */}
-      <div className="mt-10 flex max-w-[1113px] gap-3">
+      {/* Bottom Actions */}
+      <div className="mt-8 flex w-full max-w-[1113px] flex-col gap-3 sm:mt-10 sm:flex-row">
         <button
           type="button"
           onClick={() => navigate(-1)}
-          className="flex h-[48px] w-[90px] items-center justify-center rounded-[8px] border border-[#0D2E431F] bg-[#E8EDF1] font-['Montserrat'] text-[14px] font-semibold text-[#0D2E43]"
+          className="flex h-[48px] w-full items-center justify-center rounded-[8px] border border-[#0D2E431F] bg-[#E8EDF1] font-['Montserrat'] text-[14px] font-semibold text-[#0D2E43] transition hover:bg-[#DDE4E8] sm:w-[90px]"
         >
           Back
         </button>
@@ -232,7 +240,7 @@ export default function WorkerProfilePage() {
         <button
           type="button"
           onClick={() => navigate(`/dashboard/messages/${id ?? "worker"}`)}
-          className="flex h-[48px] items-center justify-center gap-2 rounded-[8px] bg-[#164D6F] px-5 font-['Montserrat'] text-[14px] font-semibold text-white"
+          className="flex h-[48px] w-full items-center justify-center gap-2 rounded-[8px] bg-[#164D6F] px-5 font-['Montserrat'] text-[14px] font-semibold text-white transition hover:bg-[#123F5B] sm:w-auto"
         >
           <FiMessageSquare size={17} />
           Message Worker
@@ -250,13 +258,13 @@ interface StatCardProps {
 
 function StatCard({ value, label, icon }: StatCardProps) {
   return (
-    <div className="flex h-[94px] w-[110.66px] flex-col justify-center rounded-[16px] border border-[#0D2E431F] bg-white p-4">
-      <div className="flex items-center gap-1 font-['Montserrat'] text-[18px] font-bold text-[#0F172A]">
+    <div className="flex h-[88px] min-w-0 flex-col justify-center rounded-[16px] border border-[#0D2E431F] bg-white px-3 py-3 sm:h-[94px] sm:w-[110px] sm:p-4">
+      <div className="flex items-center gap-1 font-['Montserrat'] text-[16px] font-bold text-[#0F172A] sm:text-[18px]">
         {icon}
-        {value}
+        <span className="truncate">{value}</span>
       </div>
 
-      <span className="mt-1 whitespace-nowrap text-[11px] text-[#64748B]">
+      <span className="mt-1 text-[10px] leading-4 text-[#64748B] sm:whitespace-nowrap sm:text-[11px]">
         {label}
       </span>
     </div>

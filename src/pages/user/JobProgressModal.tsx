@@ -25,274 +25,133 @@ export default function JobProgressModal({
   onClose,
 }: JobProgressModalProps) {
   const navigate = useNavigate();
+
+  const handleChat = () => {
+    navigate(`/dashboard/messages/${job.id}`);
+  };
+
   return (
     <div
-      className="
-        fixed
-        inset-0
-        z-[100]
-        flex
-        items-center
-        justify-center
-        bg-[#0000004D]
-      "
+      className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto bg-[#0000004D] p-4 sm:p-6"
       onClick={onClose}
     >
-      {/* =====================================================
-          MODAL
-      ====================================================== */}
-
       <div
-        className="
-          relative
-          flex
-          h-[519px]
-          w-[466px]
-          flex-col
-          items-center
-          rounded-[10px]
-          bg-white
-        "
+        className="relative w-full max-w-[466px] rounded-[10px] bg-white"
         onClick={(event) => event.stopPropagation()}
       >
         {/* Close */}
         <button
           type="button"
           onClick={onClose}
-          className="
-            absolute
-            right-[16px]
-            top-[14px]
-            flex
-            h-[28px]
-            w-[28px]
-            items-center
-            justify-center
-            rounded-full
-            text-[#64748B]
-            hover:bg-[#F1F5F9]
-          "
           aria-label="Close"
+          className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full text-[#64748B] transition hover:bg-[#F1F5F9]"
         >
           <X className="h-[17px] w-[17px]" />
         </button>
 
-        {/* =================================================
-            INNER CONTENT
-        ================================================== */}
-
-        <div
-          className="
-            absolute
-            left-[54px]
-            top-[54px]
-            flex
-            w-[358px]
-            flex-col
-            gap-[16px]
-          "
-        >
-          {/* =================================================
-              JOB PROGRESS
-          ================================================== */}
-
-          <section
-            className="
-              flex
-              h-[188px]
-              w-[358px]
-              flex-col
-              rounded-[16px]
-              border
-              border-[#F1F5F9]
-              bg-white
-              p-[24px]
-            "
-          >
-            <h2
-              className="
-                font-['Montserrat']
-                text-[20px]
-                font-semibold
-                leading-[24px]
-                text-[#1E293B]
-              "
-            >
+        <div className="flex w-full flex-col gap-4 p-6 pt-[54px] sm:p-[54px]">
+          {/* Job Progress */}
+          <section className="w-full rounded-[16px] border border-[#F1F5F9] bg-white p-5 sm:p-6">
+            <h2 className="font-['Montserrat'] text-[18px] font-semibold leading-6 text-[#1E293B] sm:text-[20px]">
               {job.title}
             </h2>
 
-            <p
-              className="
-                mt-[4px]
-                font-['Montserrat']
-                text-[13px]
-                font-normal
-                leading-[18px]
-                text-[#8294AA]
-              "
-            >
+            <p className="mt-1 font-['Montserrat'] text-[13px] font-normal leading-[18px] text-[#8294AA]">
               {job.category} · Lekki, Lagos
             </p>
 
             {/* Progress */}
-            <div className="mt-[22px] flex items-start justify-between">
+            <div className="mt-6 flex w-full items-start">
               {/* Accepted */}
-              <div className="flex w-[72px] flex-col items-center">
-                <div className="flex h-[32px] w-[32px] items-center justify-center rounded-full bg-[#22C55E]">
+              <div className="flex min-w-0 flex-1 flex-col items-center">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#22C55E]">
                   <Check
                     className="h-[18px] w-[18px] text-white"
                     strokeWidth={3}
                   />
                 </div>
 
-                <span className="mt-[8px] font-['Montserrat'] text-[10px] font-medium text-[#64748B]">
+                <span className="mt-2 text-center font-['Montserrat'] text-[10px] font-medium text-[#64748B]">
                   Accepted
                 </span>
               </div>
 
               {/* Line */}
-              <div className="mt-[15px] h-[2px] w-[52px] bg-[#22C55E]" />
+              <div className="mt-[15px] h-[2px] flex-1 bg-[#22C55E]" />
 
               {/* Progress */}
-              <div className="flex w-[72px] flex-col items-center">
-                <div className="flex h-[32px] w-[32px] items-center justify-center rounded-full bg-[#22C55E]">
+              <div className="flex min-w-0 flex-1 flex-col items-center">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#22C55E]">
                   <Check
                     className="h-[18px] w-[18px] text-white"
                     strokeWidth={3}
                   />
                 </div>
 
-                <span className="mt-[8px] font-['Montserrat'] text-[10px] font-medium text-[#64748B]">
+                <span className="mt-2 text-center font-['Montserrat'] text-[10px] font-medium text-[#64748B]">
                   Progress
                 </span>
               </div>
 
               {/* Line */}
-              <div className="mt-[15px] h-[2px] w-[52px] bg-[#22C55E]" />
+              <div className="mt-[15px] h-[2px] flex-1 bg-[#22C55E]" />
 
               {/* Completed */}
-              <div className="flex w-[72px] flex-col items-center">
-                <div className="flex h-[32px] w-[32px] items-center justify-center rounded-full bg-[#22C55E]">
+              <div className="flex min-w-0 flex-1 flex-col items-center">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#22C55E]">
                   <Check
                     className="h-[18px] w-[18px] text-white"
                     strokeWidth={3}
                   />
                 </div>
 
-                <span className="mt-[8px] font-['Montserrat'] text-[10px] font-medium text-[#64748B]">
+                <span className="mt-2 text-center font-['Montserrat'] text-[10px] font-medium text-[#64748B]">
                   Completed
                 </span>
               </div>
             </div>
           </section>
 
-          {/* =================================================
-              PRICE + WORKER
-          ================================================== */}
-
-          <section
-            className="
-              h-[142px]
-              w-[358px]
-              rounded-[16px]
-              border
-              border-[#F1F5F9]
-              bg-white
-              p-[24px]
-              shadow-[0px_1px_2px_0px_#0000000D]
-            "
-          >
+          {/* Price + Worker */}
+          <section className="w-full rounded-[16px] border border-[#F1F5F9] bg-white p-5 shadow-[0px_1px_2px_0px_#0000000D] sm:p-6">
             {/* Price */}
-            <div className="flex items-center justify-between">
-              <span
-                className="
-                  font-['Montserrat']
-                  text-[14px]
-                  font-normal
-                  text-[#8294AA]
-                "
-              >
+            <div className="flex items-center justify-between gap-4">
+              <span className="font-['Montserrat'] text-[14px] font-normal text-[#8294AA]">
                 Agreed Price
               </span>
 
-              <span
-                className="
-                  font-['Montserrat']
-                  text-[18px]
-                  font-semibold
-                  text-[#111827]
-                "
-              >
+              <span className="font-['Montserrat'] text-[17px] font-semibold text-[#111827] sm:text-[18px]">
                 ₦3,000
               </span>
             </div>
 
             {/* Worker */}
-            <div className="mt-[27px] flex items-center justify-between">
-              <span
-                className="
-                  font-['Montserrat']
-                  text-[14px]
-                  font-normal
-                  text-[#8294AA]
-                "
-              >
+            <div className="mt-6 flex items-center justify-between gap-4 sm:mt-[27px]">
+              <span className="shrink-0 font-['Montserrat'] text-[14px] font-normal text-[#8294AA]">
                 Worker
               </span>
 
-              <div className="flex items-center gap-[10px]">
-                <div className="flex h-[36px] w-[36px] items-center justify-center rounded-full bg-[#164D6F] text-[9px] font-semibold text-white">
+              <div className="flex min-w-0 items-center gap-2">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#164D6F] text-[9px] font-semibold text-white">
                   EJ
                 </div>
 
-                <span
-                  className="
-                    font-['Montserrat']
-                    text-[14px]
-                    font-medium
-                    text-[#334155]
-                  "
-                >
-                  Emeka Johnson
+                <span className="truncate font-['Montserrat'] text-[13px] font-medium text-[#334155] sm:text-[14px]">
+                  {job.worker || "Emeka Johnson"}
                 </span>
 
-                <ShieldCheck
-                  className="h-[19px] w-[19px] fill-[#1267D6] text-[#1267D6]"
-                />
+                <ShieldCheck className="h-[19px] w-[19px] shrink-0 fill-[#1267D6] text-[#1267D6]" />
               </div>
             </div>
           </section>
 
-          {/* =================================================
-              CHAT
-          ================================================== */}
-
+          {/* Chat */}
           <button
             type="button"
-              onClick={() =>
-                navigate(`/dashboard/messages/:id`)}
-            className="
-              flex
-              h-[58px]
-              w-[359px]
-              items-center
-              justify-center
-              gap-[8px]
-              rounded-[12px]
-              border
-              border-[#E2E8F0]
-              bg-[#164D6F]
-              px-[24px]
-              py-[16px]
-              font-['Montserrat']
-              text-[14px]
-              font-semibold
-              text-white
-              shadow-[0px_1px_2px_0px_#0000000D]
-            "
+            onClick={handleChat}
+            className="flex min-h-[54px] w-full items-center justify-center gap-2 rounded-[12px] border border-[#E2E8F0] bg-[#164D6F] px-5 py-4 font-['Montserrat'] text-[14px] font-semibold text-white shadow-[0px_1px_2px_0px_#0000000D] transition hover:bg-[#123F5C]"
           >
             <MessageSquare className="h-[18px] w-[18px]" />
-
             Chat
           </button>
         </div>

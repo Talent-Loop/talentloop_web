@@ -7,6 +7,7 @@ import {
   FiUser,
 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
 import userHero from "../../assets/userHero.png";
 
 interface ProfileForm {
@@ -31,57 +32,71 @@ export default function UserEditProfilePage() {
     // Keep the actual API call here rather than introducing mock data.
   }, []);
 
-  const updateField = (
-    field: keyof ProfileForm,
-    value: string
-  ) => {
+  const updateField = (field: keyof ProfileForm, value: string) => {
     setForm((prev) => ({
       ...prev,
       [field]: value,
     }));
   };
 
-  const handleSubmit = async (
-    event: React.FormEvent<HTMLFormElement>
-  ) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    if (!form.fullName.trim()) {
+      toast.error("Please enter your full name.");
+      return;
+    }
+
+    if (!form.email.trim()) {
+      toast.error("Please enter your email address.");
+      return;
+    }
 
     setSaving(true);
 
     try {
+      // Connect your update profile API here.
+
+      toast.success("Profile updated successfully.");
+      navigate("/dashboard/profile");
+    } catch {
+      toast.error("Unable to update your profile.");
     } finally {
       setSaving(false);
     }
   };
 
   return (
-    <section className="px-0 pb-12 pt-[22px]">
-      <div className="mb-[58px] flex items-center gap-3">
+    <section className="w-full pb-12 pt-5 sm:pt-7">
+      {/* Header */}
+      <div className="mb-7 flex items-center gap-3 sm:mb-10">
         <button
           type="button"
           onClick={() => navigate("/dashboard/profile")}
-          className="flex h-8 w-8 items-center justify-center text-[#0F172A]"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[#0F172A] transition hover:bg-white"
+          aria-label="Go back to profile"
         >
           <FiArrowLeft size={20} />
         </button>
 
-        <h1 className="font-['Inter'] text-[24px] font-bold leading-8 text-[#24364B]">
+        <h1 className="font-['Inter'] text-[22px] font-bold leading-8 text-[#24364B] sm:text-[24px]">
           Profile
         </h1>
       </div>
 
-      {/* Profile photo card */}
-      <div className="flex h-[152px] w-[459px] items-center gap-6 rounded-[10px] border border-[#0D2E431F] px-5">
-        <div className="relative h-[128px] w-[141px] flex-shrink-0">
+      {/* Profile photo */}
+      <div className="flex w-full max-w-[459px] flex-col gap-5 rounded-[10px] border border-[#0D2E431F] bg-white p-5 sm:h-[152px] sm:flex-row sm:items-center sm:gap-6">
+        <div className="relative h-[112px] w-[112px] shrink-0 sm:h-[128px] sm:w-[141px]">
           <img
             src={userHero}
             alt="Profile"
-            className="h-[128px] w-[128px] rounded-full object-cover"
+            className="h-[112px] w-[112px] rounded-full object-cover sm:h-[128px] sm:w-[128px]"
           />
 
           <button
             type="button"
-            className="absolute bottom-2 right-[7px] flex h-[27px] w-[27px] items-center justify-center rounded-full border-2 border-white bg-[#164D6F] text-white"
+            aria-label="Change profile photo"
+            className="absolute bottom-1 right-0 flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-[#164D6F] text-white transition hover:bg-[#123F5B] sm:bottom-2 sm:right-[7px]"
           >
             <FiCamera size={13} />
           </button>
@@ -89,7 +104,7 @@ export default function UserEditProfilePage() {
 
         <button
           type="button"
-          className="font-['Montserrat'] text-[14px] font-semibold text-[#164D6F]"
+          className="self-start font-['Montserrat'] text-[14px] font-semibold text-[#164D6F] transition hover:text-[#123F5B]"
         >
           Change Photo
         </button>
@@ -98,9 +113,10 @@ export default function UserEditProfilePage() {
       {/* Form */}
       <form
         onSubmit={handleSubmit}
-        className="mt-[28px] w-full rounded-[12px] bg-white px-6 pb-6 pt-6 shadow-[0px_1px_2px_0px_#0000000D]"
+        className="mt-6 w-full rounded-[12px] bg-white px-4 py-5 shadow-[0px_1px_2px_0px_#0000000D] sm:mt-7 sm:px-6 sm:py-6"
       >
-        <div className="space-y-5">
+        <div className="w-full max-w-[700px] space-y-5">
+          {/* Full name */}
           <div>
             <label className="mb-2 block font-['Montserrat'] text-[13px] font-semibold text-[#64748B]">
               Full Name
@@ -113,16 +129,16 @@ export default function UserEditProfilePage() {
               />
 
               <input
+                type="text"
                 value={form.fullName}
-                onChange={(e) =>
-                  updateField("fullName", e.target.value)
-                }
+                onChange={(e) => updateField("fullName", e.target.value)}
                 placeholder="Full Name"
-                className="h-[44px] w-full rounded-[12px] border border-[#DCE3EA] bg-[#F8FAFC] pl-12 pr-4 text-[14px] text-[#0F172A] outline-none"
+                className="h-[44px] w-full rounded-[12px] border border-[#DCE3EA] bg-[#F8FAFC] pl-12 pr-4 text-[14px] text-[#0F172A] outline-none transition focus:border-[#164D6F] focus:ring-2 focus:ring-[#164D6F]/10"
               />
             </div>
           </div>
 
+          {/* Email */}
           <div>
             <label className="mb-2 block font-['Montserrat'] text-[13px] font-semibold text-[#64748B]">
               Email Address
@@ -137,15 +153,14 @@ export default function UserEditProfilePage() {
               <input
                 type="email"
                 value={form.email}
-                onChange={(e) =>
-                  updateField("email", e.target.value)
-                }
+                onChange={(e) => updateField("email", e.target.value)}
                 placeholder="Email Address"
-                className="h-[44px] w-full rounded-[12px] border border-[#DCE3EA] bg-[#F8FAFC] pl-12 pr-4 text-[14px] text-[#0F172A] outline-none"
+                className="h-[44px] w-full rounded-[12px] border border-[#DCE3EA] bg-[#F8FAFC] pl-12 pr-4 text-[14px] text-[#0F172A] outline-none transition focus:border-[#164D6F] focus:ring-2 focus:ring-[#164D6F]/10"
               />
             </div>
           </div>
 
+          {/* Phone */}
           <div>
             <label className="mb-2 block font-['Montserrat'] text-[13px] font-semibold text-[#64748B]">
               Phone Number
@@ -158,35 +173,38 @@ export default function UserEditProfilePage() {
               />
 
               <input
+                type="tel"
                 value={form.phone}
-                onChange={(e) =>
-                  updateField("phone", e.target.value)
-                }
+                onChange={(e) => updateField("phone", e.target.value)}
                 placeholder="+234 801 234 5678"
-                className="h-[44px] w-full rounded-[12px] border border-[#DCE3EA] bg-[#F8FAFC] pl-12 pr-4 text-[14px] text-[#0F172A] outline-none"
+                className="h-[44px] w-full rounded-[12px] border border-[#DCE3EA] bg-[#F8FAFC] pl-12 pr-4 text-[14px] text-[#0F172A] outline-none transition focus:border-[#164D6F] focus:ring-2 focus:ring-[#164D6F]/10"
               />
             </div>
           </div>
         </div>
 
-        <div className="mt-8 flex justify-center">
+        {/* Save button */}
+        <div className="mt-7 flex w-full justify-center sm:mt-8">
           <button
             type="submit"
             disabled={saving}
-            className="h-[56px] w-[600px] rounded-[12px] bg-[#164D6F] px-4 font-['Montserrat'] text-[14px] font-semibold text-white shadow-[0px_4px_7px_0px_#0000002B] transition hover:bg-[#123F5B] disabled:cursor-not-allowed disabled:opacity-60"
+            className="h-[52px] w-full max-w-[600px] rounded-[12px] bg-[#164D6F] px-4 font-['Montserrat'] text-[14px] font-semibold text-white shadow-[0px_4px_7px_0px_#0000002B] transition hover:bg-[#123F5B] disabled:cursor-not-allowed disabled:opacity-60 sm:h-[56px]"
           >
             {saving ? "Saving..." : "Save Changes"}
           </button>
         </div>
       </form>
 
-      <button
-        type="button"
-        onClick={() => navigate("/dashboard/profile")}
-        className="mt-[226px] flex h-[48px] w-[90px] items-center justify-center rounded-[8px] border border-[#0D2E431F] bg-[#0D2E43] font-['Montserrat'] text-[14px] font-semibold text-white"
-      >
-        Back
-      </button>
+      {/* Back button */}
+      <div className="mt-8 sm:mt-12 lg:mt-16">
+        <button
+          type="button"
+          onClick={() => navigate("/dashboard/profile")}
+          className="flex h-[48px] w-[90px] items-center justify-center rounded-[8px] border border-[#0D2E431F] bg-[#0D2E43] font-['Montserrat'] text-[14px] font-semibold text-white transition hover:bg-[#164D6F]"
+        >
+          Back
+        </button>
+      </div>
     </section>
   );
 }

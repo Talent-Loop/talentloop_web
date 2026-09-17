@@ -50,7 +50,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* ================= USER ================= */}
+        {/* = USER = */}
 
         <Route path="/" element={<LandingPage />} />
 
@@ -108,7 +108,7 @@ export default function App() {
           <Route path="categories" element={<CategoriesPage />} />
         </Route>
 
-        {/* ================= USER DASHBOARD ================= */}
+        {/* = USER DASHBOARD = */}
 
         <Route
           path="/dashboard"
@@ -143,7 +143,7 @@ export default function App() {
           <Route path="messages/:id/recent-activities" element={<RecentActivities />}/>
         </Route>
 
-        {/* ================= 404 ================= */}
+        {/* = 404 = */}
 
         <Route path="*" element={<NotFoundPage />} />
       </Routes>

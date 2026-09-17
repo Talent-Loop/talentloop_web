@@ -1,5 +1,4 @@
 import { NavLink } from "react-router-dom";
-
 import {
   FiShield,
   FiGrid,
@@ -9,6 +8,10 @@ import {
   FiBell,
   FiUser,
 } from "react-icons/fi";
+
+interface UserSidebarProps {
+  onNavigate?: () => void;
+}
 
 const links = [
   {
@@ -43,13 +46,13 @@ const links = [
   },
 ];
 
-export default function UserSidebar() {
+export default function UserSidebar({
+  onNavigate,
+}: UserSidebarProps) {
   return (
-    <aside className="flex h-screen w-[254px] flex-shrink-0 flex-col bg-[#0D2E43] text-white">
-      {/* =====================================================
-          LOGO / BRAND
-      ====================================================== */}
-      <div className="flex h-[80px] flex-shrink-0 items-center border-b border-white/10 px-[20px]">
+    <aside className="flex h-screen w-[254px] flex-shrink-0 flex-col overflow-y-auto bg-[#0D2E43] text-white">
+      {/* Logo / Brand */}
+      <div className="flex h-[80px] flex-shrink-0 items-center border-b border-white/10 px-5">
         <div className="flex items-center gap-[9px]">
           {/* Logo box */}
           <div className="flex h-[31px] w-[31px] items-center justify-center rounded-[6px] bg-[#175071]">
@@ -72,26 +75,23 @@ export default function UserSidebar() {
         </div>
       </div>
 
-      {/* =====================================================
-          NAVIGATION
-      ====================================================== */}
-      <nav className="flex-1 pt-[32px]">
-        <div className="flex flex-col gap-[12px]">
+      {/* Navigation */}
+      <nav className="flex-1 pt-8">
+        <div className="flex flex-col gap-3">
           {links.map(({ label, to, icon: Icon }) => (
             <NavLink
               key={to}
               to={to}
               end={to === "/dashboard"}
+              onClick={onNavigate}
               className={({ isActive }) =>
                 [
-                  "flex h-[44px] items-center gap-[18px]",
+                  "flex h-11 items-center gap-[18px]",
                   "font-['Montserrat'] text-[14px] leading-none",
                   "transition-all duration-200",
-
                   isActive
                     ? [
-                        "ml-[20px]",
-                        "w-[235px]",
+                        "ml-5 w-[234px]",
                         "rounded-l-full",
                         "bg-[#F7FAF9]",
                         "pl-[30px]",
@@ -99,10 +99,9 @@ export default function UserSidebar() {
                         "text-[#17364A]",
                       ].join(" ")
                     : [
-                        "ml-[39px]",
-                        "w-[228px]",
+                        "ml-[39px] w-[215px]",
                         "rounded-l-full",
-                        "pl-[20px]",
+                        "pl-5",
                         "font-semibold",
                         "text-[#F1F5F7]",
                         "hover:bg-white/10",
@@ -111,7 +110,7 @@ export default function UserSidebar() {
               }
             >
               <Icon
-                className="h-[20px] w-[20px] flex-shrink-0"
+                className="h-5 w-5 flex-shrink-0"
                 strokeWidth={1.7}
               />
 
@@ -121,13 +120,11 @@ export default function UserSidebar() {
         </div>
       </nav>
 
-      {/* =====================================================
-          USER FOOTER
-      ====================================================== */}
-      <div className="flex h-[91px] flex-shrink-0 items-center border-t border-white/10 px-[16px]">
-        <div className="flex items-center gap-[10px]">
+      {/* User footer */}
+      <div className="flex min-h-[91px] flex-shrink-0 items-center border-t border-white/10 px-4">
+        <div className="flex min-w-0 items-center gap-[10px]">
           {/* Avatar */}
-          <div className="flex h-[32px] w-[32px] flex-shrink-0 items-center justify-center rounded-full bg-[#175071] font-['Montserrat'] text-[10px] font-semibold text-white">
+          <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-[#175071] font-['Montserrat'] text-[10px] font-semibold text-white">
             MA
           </div>
 
