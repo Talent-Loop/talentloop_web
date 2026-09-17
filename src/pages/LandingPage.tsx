@@ -1,10 +1,10 @@
-import Navbar from "../components/landing/Navbar";
-import Hero from "../components/landing/Hero";
-import PopularServices from "../components/landing/PopularServices";
-import HowItWorks from "../components/landing/HowItWorks";
-import Stats from "../components/landing/Stats";
-import CTA from "../components/landing/CTA";
-import Footer from "../components/landing/Footer";
+import Navbar from "../components/Landing/Navbar";
+import Hero from "../components/Landing/Hero";
+import PopularServices from "../components/Landing/PopularServices";
+import HowItWorks from "../components/Landing/HowItWorks";
+import Stats from "../components/Landing/Stats";
+import CTA from "../components/Landing/CTA";
+import Footer from "../components/Landing/Footer";
 
 export default function LandingPage() {
   return (
