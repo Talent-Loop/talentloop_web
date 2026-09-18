@@ -1,3 +1,4 @@
+
 import { Link } from "react-router-dom";
 
 export default function Navbar() {
@@ -62,9 +63,9 @@ export default function Navbar() {
             Log In
           </Link>
 
-          {/* Client Signup */}
+          {/* Register → Role Selection */}
           <Link
-            to="/register"
+            to="/role-selection"
             className="rounded-xl bg-white px-7 py-3 text-sm font-semibold text-[#16344E] transition hover:bg-slate-100"
           >
             Register
@@ -75,3 +76,4 @@ export default function Navbar() {
     </header>
   );
 }
+

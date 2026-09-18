@@ -1,3 +1,4 @@
+
 import {
   ArrowLeft,
   LockKeyhole,
@@ -94,7 +95,11 @@ export default function RegisterUserLeftPanel() {
 
         {/* Client illustration */}
         <div className="mt-auto flex justify-center pt-8">
-          
+          <img
+            src="/src/assets/auth/login-illustration.png"
+            alt="TalentLoop illustration"
+            className="max-h-[300px] w-auto object-contain"
+          />
         </div>
       </div>
     </section>

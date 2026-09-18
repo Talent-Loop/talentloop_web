@@ -5,7 +5,7 @@ import type { ReactNode } from "react";
 
 import DashboardLayout from "./layout/DashboardLayout";
 import UserDashboardLayout from "./layout/UserDashboardLayout";
-
+import RoleSelectionPage from "./pages/RoleSelectionPage";
 import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
 import AdminLoginPage from "./pages/AdminLoginPage";
@@ -72,7 +72,7 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         {/* ================= USER / PUBLIC ================= */}
-
+<Route path="/role-selection" element={<RoleSelectionPage />} />
         <Route path="/" element={<LandingPage />} />
 
         <Route path="/login" element={<LoginPage />} />
