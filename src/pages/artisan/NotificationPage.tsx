@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Bell,
   CheckCheck,
@@ -10,94 +10,239 @@ import {
 import ArtisanHeader from "../../components/artisan/ArtisanHeader";
 import ArtisanSidebar from "../../components/artisan/ArtisanSidebar";
 
+const API_BASE_URL = "https://backend-talentloop.onrender.com/api/v1";
+
+type NotificationType = "job" | "message" | "commission";
+
 type Notification = {
-  id: number;
-  type: "job" | "message" | "commission";
+  id: string;
+  type: NotificationType;
   title: string;
   description: string;
   time: string;
   unread: boolean;
 };
 
+type ApiNotification = {
+  _id: string;
+  userId: string;
+  type: string;
+  title: string;
+  message: string;
+  link: string | null;
+  isRead: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+
+type NotificationsResponse = {
+  success: boolean;
+  statusCode: number;
+  message: string;
+  data: {
+    notifications: ApiNotification[];
+    total: number;
+    unreadCount: number;
+    page: number;
+    totalPages: number;
+  };
+};
+
 export default function NotificationPage() {
-  const [notifications, setNotifications] = useState<Notification[]>([
-    {
-      id: 1,
-      type: "job",
-      title: "New job assigned",
-      description:
-        "You have been assigned a new plumbing job in Lekki Phase 1.",
-      time: "2 minutes ago",
-      unread: true,
-    },
-    {
-      id: 2,
-      type: "message",
-      title: "New message",
-      description:
-        "Ayo Adebayo sent you a message about the kitchen sink repair.",
-      time: "15 minutes ago",
-      unread: true,
-    },
-    {
-      id: 3,
-      type: "job",
-      title: "Job completed",
-      description:
-        "Your job for Fix Leaking Pipe has been marked as completed.",
-      time: "1 hour ago",
-      unread: true,
-    },
-    {
-      id: 4,
-      type: "commission",
-      title: "Commission reminder",
-      description:
-        "You have ₦1,450.00 in outstanding commission to pay.",
-      time: "3 hours ago",
-      unread: false,
-    },
-    {
-      id: 5,
-      type: "message",
-      title: "New message",
-      description:
-        "Chinelo Okoro replied to your conversation.",
-      time: "Yesterday",
-      unread: false,
-    },
-    {
-      id: 6,
-      type: "job",
-      title: "Job request accepted",
-      description:
-        "Your bid for Kitchen Sink Repair has been accepted.",
-      time: "Yesterday",
-      unread: false,
-    },
-  ]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const unreadCount = notifications.filter(
-    (notification) => notification.unread
-  ).length;
+  const formatTime = (dateString: string) => {
+    const createdAt = new Date(dateString);
+    const now = new Date();
 
-  const markAllAsRead = () => {
-    setNotifications((current) =>
-      current.map((notification) => ({
-        ...notification,
-        unread: false,
-      }))
+    const difference = Math.floor(
+      (now.getTime() - createdAt.getTime()) / 1000
     );
+
+    if (difference < 60) {
+      return "Just now";
+    }
+
+    const minutes = Math.floor(difference / 60);
+
+    if (minutes < 60) {
+      return `${minutes} minute${minutes !== 1 ? "s" : ""} ago`;
+    }
+
+    const hours = Math.floor(minutes / 60);
+
+    if (hours < 24) {
+      return `${hours} hour${hours !== 1 ? "s" : ""} ago`;
+    }
+
+    const days = Math.floor(hours / 24);
+
+    if (days === 1) {
+      return "Yesterday";
+    }
+
+    if (days < 7) {
+      return `${days} days ago`;
+    }
+
+    return createdAt.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
   };
 
-  const markAsRead = (id: number) => {
-    setNotifications((current) =>
-      current.map((notification) =>
-        notification.id === id
-          ? { ...notification, unread: false }
-          : notification
-      )
+  const normalizeType = (type: string): NotificationType => {
+    if (type === "message") {
+      return "message";
+    }
+
+    if (type === "commission") {
+      return "commission";
+    }
+
+    return "job";
+  };
+
+  const fetchNotifications = async () => {
+    try {
+      setLoading(true);
+      setError("");
+
+      const token = localStorage.getItem("accessToken");
+
+      if (!token) {
+        setError("You are not authenticated.");
+        return;
+      }
+
+      const response = await fetch(
+        `${API_BASE_URL}/notifications?page=1&limit=20&unreadOnly=false`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch notifications (${response.status})`);
+      }
+
+      const result: NotificationsResponse = await response.json();
+
+      const mappedNotifications: Notification[] =
+        result.data.notifications.map((notification) => ({
+          id: notification._id,
+          type: normalizeType(notification.type),
+          title: notification.title,
+          description: notification.message,
+          time: formatTime(notification.createdAt),
+          unread: !notification.isRead,
+        }));
+
+      setNotifications(mappedNotifications);
+      setUnreadCount(result.data.unreadCount);
+    } catch (err) {
+      console.error("NOTIFICATIONS ERROR:", err);
+      setError("Unable to load notifications.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchNotifications();
+  }, []);
+
+  const markAllAsRead = async () => {
+    try {
+      const token = localStorage.getItem("accessToken");
+
+      if (!token) {
+        return;
+      }
+
+      const response = await fetch(
+        `${API_BASE_URL}/notifications/read-all`,
+        {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to mark all notifications as read (${response.status})`
+        );
+      }
+
+      setNotifications((current) =>
+        current.map((notification) => ({
+          ...notification,
+          unread: false,
+        }))
+      );
+
+      setUnreadCount(0);
+    } catch (err) {
+      console.error("MARK ALL AS READ ERROR:", err);
+    }
+  };
+
+  const markAsRead = async (id: string) => {
+    const notification = notifications.find(
+      (item) => item.id === id
     );
+
+    if (!notification || !notification.unread) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("accessToken");
+
+      if (!token) {
+        return;
+      }
+
+      const response = await fetch(
+        `${API_BASE_URL}/notifications/${id}/read`,
+        {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to mark notification as read (${response.status})`
+        );
+      }
+
+      setNotifications((current) =>
+        current.map((notification) =>
+          notification.id === id
+            ? { ...notification, unread: false }
+            : notification
+        )
+      );
+
+      setUnreadCount((current) => Math.max(0, current - 1));
+    } catch (err) {
+      console.error("MARK AS READ ERROR:", err);
+    }
   };
 
   const getIcon = (type: Notification["type"]) => {
@@ -183,50 +328,64 @@ export default function NotificationPage() {
 
               {/* Notification list */}
               <div>
-                {notifications.map((notification) => (
-                  <button
-                    key={notification.id}
-                    type="button"
-                    onClick={() => markAsRead(notification.id)}
-                    className={`flex w-full items-start gap-4 border-b border-[#EEF1F0] px-6 py-5 text-left transition last:border-b-0 hover:bg-[#FAFCFB] ${
-                      notification.unread
-                        ? "bg-[#FBFDFC]"
-                        : "bg-white"
-                    }`}
-                  >
-                    {/* Notification icon */}
-                    <div className="relative shrink-0">
-                      {getIcon(notification.type)}
+                {loading ? (
+                  <div className="px-6 py-10 text-center text-[11px] text-[#89969C]">
+                    Loading notifications...
+                  </div>
+                ) : error ? (
+                  <div className="px-6 py-10 text-center text-[11px] text-[#D9534F]">
+                    {error}
+                  </div>
+                ) : notifications.length === 0 ? (
+                  <div className="px-6 py-10 text-center text-[11px] text-[#89969C]">
+                    No notifications yet.
+                  </div>
+                ) : (
+                  notifications.map((notification) => (
+                    <button
+                      key={notification.id}
+                      type="button"
+                      onClick={() => markAsRead(notification.id)}
+                      className={`flex w-full items-start gap-4 border-b border-[#EEF1F0] px-6 py-5 text-left transition last:border-b-0 hover:bg-[#FAFCFB] ${
+                        notification.unread
+                          ? "bg-[#FBFDFC]"
+                          : "bg-white"
+                      }`}
+                    >
+                      {/* Notification icon */}
+                      <div className="relative shrink-0">
+                        {getIcon(notification.type)}
 
-                      {notification.unread && (
-                        <span className="absolute right-0 top-0 h-2 w-2 rounded-full bg-[#FF4B4B]" />
-                      )}
-                    </div>
-
-                    {/* Notification content */}
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-start justify-between gap-4">
-                        <h3
-                          className={`text-[12px] ${
-                            notification.unread
-                              ? "font-semibold text-[#263842]"
-                              : "font-medium text-[#52616A]"
-                          }`}
-                        >
-                          {notification.title}
-                        </h3>
-
-                        <span className="shrink-0 text-[9px] text-[#9AA5A9]">
-                          {notification.time}
-                        </span>
+                        {notification.unread && (
+                          <span className="absolute right-0 top-0 h-2 w-2 rounded-full bg-[#FF4B4B]" />
+                        )}
                       </div>
 
-                      <p className="mt-1.5 max-w-[650px] text-[10px] leading-[1.7] text-[#89969C]">
-                        {notification.description}
-                      </p>
-                    </div>
-                  </button>
-                ))}
+                      {/* Notification content */}
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-start justify-between gap-4">
+                          <h3
+                            className={`text-[12px] ${
+                              notification.unread
+                                ? "font-semibold text-[#263842]"
+                                : "font-medium text-[#52616A]"
+                            }`}
+                          >
+                            {notification.title}
+                          </h3>
+
+                          <span className="shrink-0 text-[9px] text-[#9AA5A9]">
+                            {notification.time}
+                          </span>
+                        </div>
+
+                        <p className="mt-1.5 max-w-[650px] text-[10px] leading-[1.7] text-[#89969C]">
+                          {notification.description}
+                        </p>
+                      </div>
+                    </button>
+                  ))
+                )}
               </div>
             </section>
 

@@ -1,3 +1,5 @@
+
+import { useEffect, useState } from "react";
 import {
   Bell,
   BriefcaseBusiness,
@@ -13,6 +15,16 @@ export default function ArtisanSidebar() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const [profilePhoto, setProfilePhoto] = useState("");
+
+  useEffect(() => {
+    const savedPhoto = localStorage.getItem("profilePhotoUrl");
+
+    if (savedPhoto) {
+      setProfilePhoto(savedPhoto);
+    }
+  }, []);
+
   const isDashboardActive = location.pathname === "/artisan";
   const isMyJobsActive = location.pathname === "/artisan/my-jobs";
 
@@ -23,9 +35,10 @@ export default function ArtisanSidebar() {
   const isCommissionActive = location.pathname === "/commission";
 
   const isNotificationActive = location.pathname === "/notification";
+
   const isProfileActive =
-  location.pathname === "/profile" ||
-  location.pathname === "/profile/view";
+    location.pathname === "/profile" ||
+    location.pathname === "/profile/view";
 
   return (
     <aside className="flex min-h-screen w-[254px] shrink-0 flex-col bg-[#10344A] px-4 py-6">
@@ -135,9 +148,18 @@ export default function ArtisanSidebar() {
 
       {/* User */}
       <div className="mt-auto flex items-center gap-3 border-t border-white/10 px-2 pt-5">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-[11px] font-semibold text-[#17324D]">
-          DE
-        </div>
+        {/* Profile Photo */}
+        {profilePhoto ? (
+          <img
+            src={profilePhoto}
+            alt="Profile"
+            className="h-9 w-9 shrink-0 rounded-full object-cover"
+          />
+        ) : (
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-[11px] font-semibold text-[#17324D]">
+            DE
+          </div>
+        )}
 
         <div className="min-w-0">
           <p className="truncate text-[12px] font-medium text-white">
@@ -152,3 +174,4 @@ export default function ArtisanSidebar() {
     </aside>
   );
 }
+

@@ -1,9 +1,7 @@
-
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
-  Check,
   CheckCheck,
   Send,
   X,
@@ -13,71 +11,317 @@ import ArtisanHeader from "../../components/artisan/ArtisanHeader";
 import ArtisanSidebar from "../../components/artisan/ArtisanSidebar";
 
 type Message = {
-  id: number;
+  id: string;
   text: string;
   time: string;
   sender: "me" | "them";
+};
+
+type ApiMessage = {
+  _id: string;
+  senderId?: {
+    _id?: string;
+    name?: string;
+  } | string;
+  receiverId?: {
+    _id?: string;
+    name?: string;
+  } | string;
+  content?: string;
+  text?: string;
+  message?: string;
+  createdAt?: string;
+  sentAt?: string;
+  isRead?: boolean;
 };
 
 export default function ChatPage() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const conversationId = location.state?.conversationId;
   const contactName = location.state?.name || "Ayo Adebayo";
+  const jobTitle = location.state?.job || "Fix Kitchen Sink";
 
   const [messageText, setMessageText] = useState("");
   const [showDetails, setShowDetails] = useState(false);
 
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: 1,
-      text: "Hello! I can fix your sink today. I'll bring all the tools needed.",
-      time: "09:40 AM",
-      sender: "me",
-    },
-    {
-      id: 2,
-      text: "Great! What time can you come?",
-      time: "09:41 AM",
-      sender: "them",
-    },
-    {
-      id: 3,
-      text: "I can be there by 4:00 PM. Does that work?",
-      time: "09:42 AM",
-      sender: "me",
-    },
-    {
-      id: 4,
-      text: "Perfect, see you then!",
-      time: "09:43 AM",
-      sender: "them",
-    },
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSendMessage = () => {
+  /*
+   * Mark the conversation as read when the chat page opens.
+   */
+  useEffect(() => {
+    const markConversationAsRead = async () => {
+      if (!conversationId) return;
+
+      const accessToken = localStorage.getItem("accessToken");
+
+      if (!accessToken) return;
+
+      try {
+        const response = await fetch(
+          `https://backend-talentloop.onrender.com/api/v1/conversations/${conversationId}/read`,
+          {
+            method: "PATCH",
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+              Accept: "*/*",
+            },
+          }
+        );
+
+        const result = await response.json();
+
+        console.log("MARK CONVERSATION AS READ RESPONSE:", result);
+
+        if (!response.ok) {
+          console.error(
+            "MARK CONVERSATION AS READ ERROR:",
+            result
+          );
+        }
+      } catch (err) {
+        console.error(
+          "MARK CONVERSATION AS READ ERROR:",
+          err
+        );
+      }
+    };
+
+    markConversationAsRead();
+  }, [conversationId]);
+
+  /*
+   * Fetch messages for this conversation.
+   */
+  useEffect(() => {
+    const fetchMessages = async () => {
+      if (!conversationId) {
+        setError("Conversation not found.");
+        setLoading(false);
+        return;
+      }
+
+      const accessToken = localStorage.getItem("accessToken");
+
+      if (!accessToken) {
+        setError("You are not logged in.");
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        setError("");
+
+        const response = await fetch(
+          `https://backend-talentloop.onrender.com/api/v1/messages/${conversationId}`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+              Accept: "*/*",
+            },
+          }
+        );
+
+        const result = await response.json();
+
+        console.log("MESSAGES API RESPONSE:", result);
+
+        if (!response.ok) {
+          throw new Error(
+            result?.message || "Failed to fetch messages."
+          );
+        }
+
+        const apiMessages: ApiMessage[] = Array.isArray(
+          result?.data
+        )
+          ? result.data
+          : [];
+
+        const currentUserId =
+          localStorage.getItem("userId");
+
+        const formattedMessages: Message[] =
+          apiMessages.map((message) => {
+            const senderId =
+              typeof message.senderId === "string"
+                ? message.senderId
+                : message.senderId?._id;
+
+            const isMine =
+              currentUserId && senderId
+                ? senderId === currentUserId
+                : false;
+
+            const messageTime =
+              message.createdAt || message.sentAt;
+
+            return {
+              id: message._id,
+              text:
+                typeof message.content === "string"
+                  ? message.content
+                  : typeof message.text === "string"
+                  ? message.text
+                  : typeof message.message === "string"
+                  ? message.message
+                  : "",
+              time: messageTime
+                ? new Date(
+                    messageTime
+                  ).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })
+                : "",
+              sender: isMine ? "me" : "them",
+            };
+          });
+
+        setMessages(formattedMessages);
+      } catch (err) {
+        console.error("MESSAGES FETCH ERROR:", err);
+
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Failed to load messages."
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMessages();
+  }, [conversationId]);
+
+  /*
+   * Send a new message.
+   */
+  const handleSendMessage = async () => {
     const trimmedMessage = messageText.trim();
 
-    if (!trimmedMessage) return;
+    if (!trimmedMessage || sending) return;
 
-    const now = new Date();
+    if (!conversationId) {
+      setError("Conversation not found.");
+      return;
+    }
 
-    const formattedTime = now.toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+    const accessToken = localStorage.getItem("accessToken");
 
-    setMessages((previousMessages) => [
-      ...previousMessages,
-      {
-        id: Date.now(),
-        text: trimmedMessage,
-        time: formattedTime,
+    if (!accessToken) {
+      setError("You are not logged in.");
+      return;
+    }
+
+    try {
+      setSending(true);
+      setError("");
+
+      const response = await fetch(
+        "https://backend-talentloop.onrender.com/api/v1/messages",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+            Accept: "*/*",
+          },
+          body: JSON.stringify({
+            conversationId: conversationId,
+            content: trimmedMessage,
+          }),
+        }
+      );
+
+      const result = await response.json();
+
+      console.log(
+        "SEND MESSAGE API RESPONSE:",
+        result
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          result?.message ||
+            "Failed to send message."
+        );
+      }
+
+      /*
+       * The API response has this structure:
+       *
+       * data: {
+       *   message: {
+       *     _id,
+       *     conversationId,
+       *     senderId,
+       *     type,
+       *     content,
+       *     ...
+       *   },
+       *   conversation: {...}
+       * }
+       */
+
+      const sentMessage: ApiMessage | undefined =
+        result?.data?.message &&
+        typeof result.data.message === "object"
+          ? result.data.message
+          : undefined;
+
+      const messageContent =
+        typeof sentMessage?.content === "string"
+          ? sentMessage.content
+          : trimmedMessage;
+
+      const messageTime =
+        sentMessage?.createdAt ||
+        sentMessage?.sentAt ||
+        new Date().toISOString();
+
+      const newMessage: Message = {
+        id:
+          sentMessage?._id ||
+          `local-${Date.now()}`,
+        text: messageContent,
+        time: new Date(
+          messageTime
+        ).toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
         sender: "me",
-      },
-    ]);
+      };
 
-    setMessageText("");
+      setMessages((previousMessages) => [
+        ...previousMessages,
+        newMessage,
+      ]);
+
+      setMessageText("");
+    } catch (err) {
+      console.error(
+        "SEND MESSAGE ERROR:",
+        err
+      );
+
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to send message."
+      );
+    } finally {
+      setSending(false);
+    }
   };
 
   const handleKeyDown = (
@@ -120,7 +364,15 @@ export default function ChatPage() {
 
             {/* Avatar */}
             <div className="flex h-[48px] w-[48px] items-center justify-center rounded-full bg-[#D6D8D7] text-[14px] font-semibold text-[#27364A]">
-              AA
+              {contactName
+                .split(" ")
+                .map(
+                  (word: string) =>
+                    word[0]
+                )
+                .join("")
+                .slice(0, 2)
+                .toUpperCase()}
             </div>
 
             {/* Name */}
@@ -140,7 +392,7 @@ export default function ChatPage() {
           <div className="mt-6 flex min-h-[72px] items-center justify-between rounded-[8px] border border-[#E0E4E7] bg-[#F3F5F5] px-6">
             <div>
               <h3 className="text-[14px] font-semibold text-[#27364A]">
-                Fix Kitchen Sink
+                {jobTitle}
               </h3>
 
               <p className="mt-1 text-[10px] font-medium tracking-wide text-[#929BA4]">
@@ -150,7 +402,9 @@ export default function ChatPage() {
 
             <button
               type="button"
-              onClick={() => setShowDetails(true)}
+              onClick={() =>
+                setShowDetails(true)
+              }
               className="flex h-[32px] items-center rounded-[6px] border border-[#D5DADD] bg-white px-4 text-[11px] font-medium text-[#53616D] transition hover:bg-[#F8FAFA]"
             >
               View details
@@ -160,59 +414,98 @@ export default function ChatPage() {
           {/* Chat Area */}
           <section className="mt-8 flex-1 overflow-y-auto pr-2">
             <div className="flex min-h-[390px] flex-col justify-end gap-6">
-              {messages.map((message) => (
-                <div
-                  key={message.id}
-                  className={`flex ${
-                    message.sender === "me"
-                      ? "justify-end"
-                      : "justify-start"
-                  }`}
-                >
-                  {/* Received message avatar */}
-                  {message.sender === "them" && (
-                    <div className="mr-3 mt-1 flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-full bg-[#D6D8D7] text-[10px] font-semibold text-[#27364A]">
-                      AA
-                    </div>
-                  )}
+              {loading && (
+                <div className="flex min-h-[390px] items-center justify-center">
+                  <p className="text-[12px] text-[#929BA4]">
+                    Loading messages...
+                  </p>
+                </div>
+              )}
 
+              {!loading && error && (
+                <div className="flex min-h-[390px] items-center justify-center">
+                  <p className="text-[12px] text-red-500">
+                    {error}
+                  </p>
+                </div>
+              )}
+
+              {!loading &&
+                !error &&
+                messages.length === 0 && (
+                  <div className="flex min-h-[390px] items-center justify-center">
+                    <p className="text-[12px] text-[#929BA4]">
+                      No messages yet.
+                    </p>
+                  </div>
+                )}
+
+              {!loading &&
+                !error &&
+                messages.map((message) => (
                   <div
-                    className={`flex max-w-[470px] flex-col ${
+                    key={message.id}
+                    className={`flex ${
                       message.sender === "me"
-                        ? "items-end"
-                        : "items-start"
+                        ? "justify-end"
+                        : "justify-start"
                     }`}
                   >
-                    <div
-                      className={`rounded-[13px] px-5 py-3.5 text-[13px] leading-[1.55] ${
-                        message.sender === "me"
-                          ? "rounded-br-[4px] bg-[#173B56] text-white"
-                          : "rounded-bl-[4px] border border-[#E0E4E7] bg-white text-[#27364A]"
-                      }`}
-                    >
-                      {message.text}
-                    </div>
+                    {/* Received message avatar */}
+                    {message.sender === "them" && (
+                      <div className="mr-3 mt-1 flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-full bg-[#D6D8D7] text-[10px] font-semibold text-[#27364A]">
+                        {contactName
+                          .split(" ")
+                          .map(
+                            (word: string) =>
+                              word[0]
+                          )
+                          .join("")
+                          .slice(0, 2)
+                          .toUpperCase()}
+                      </div>
+                    )}
 
                     <div
-                      className={`mt-1.5 flex items-center gap-1.5 text-[9px] ${
+                      className={`flex max-w-[470px] flex-col ${
                         message.sender === "me"
-                          ? "text-[#929BA4]"
-                          : "text-[#A0A7AF]"
+                          ? "items-end"
+                          : "items-start"
                       }`}
                     >
-                      <span>{message.time}</span>
+                      <div
+                        className={`rounded-[13px] px-5 py-3.5 text-[13px] leading-[1.55] ${
+                          message.sender === "me"
+                            ? "rounded-br-[4px] bg-[#173B56] text-white"
+                            : "rounded-bl-[4px] border border-[#E0E4E7] bg-white text-[#27364A]"
+                        }`}
+                      >
+                        {message.text}
+                      </div>
 
-                      {message.sender === "me" && (
-                        <CheckCheck
-                          size={12}
-                          strokeWidth={2}
-                          className="text-[#537B96]"
-                        />
-                      )}
+                      <div
+                        className={`mt-1.5 flex items-center gap-1.5 text-[9px] ${
+                          message.sender === "me"
+                            ? "text-[#929BA4]"
+                            : "text-[#A0A7AF]"
+                        }`}
+                      >
+                        <span>
+                          {message.time}
+                        </span>
+
+                        {message.sender ===
+                          "me" && (
+                          <CheckCheck
+                            size={12}
+                            strokeWidth={2}
+                            className="text-[#537B96]"
+                          />
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
             </div>
           </section>
 
@@ -223,23 +516,37 @@ export default function ChatPage() {
                 type="text"
                 value={messageText}
                 onChange={(event) =>
-                  setMessageText(event.target.value)
+                  setMessageText(
+                    event.target.value
+                  )
                 }
                 onKeyDown={handleKeyDown}
                 placeholder="Type a message..."
-                className="h-[54px] w-full rounded-[9px] border border-[#DCE1E5] bg-white px-5 pr-16 text-[13px] text-[#27364A] outline-none placeholder:text-[#A0A7AF] focus:border-[#9BAFC0]"
+                disabled={sending}
+                className="h-[54px] w-full rounded-[9px] border border-[#DCE1E5] bg-white px-5 pr-16 text-[13px] text-[#27364A] outline-none placeholder:text-[#A0A7AF] focus:border-[#9BAFC0] disabled:opacity-60"
               />
 
               <button
                 type="button"
                 onClick={handleSendMessage}
+                disabled={sending}
                 aria-label="Send message"
-                className="absolute right-2.5 top-1/2 flex h-[38px] w-[38px] -translate-y-1/2 items-center justify-center rounded-full bg-[#173B56] text-white transition hover:bg-[#214D6D]"
+                className="absolute right-2.5 top-1/2 flex h-[38px] w-[38px] -translate-y-1/2 items-center justify-center rounded-full bg-[#173B56] text-white transition hover:bg-[#214D6D] disabled:cursor-not-allowed disabled:opacity-60"
               >
-                <Send size={16} strokeWidth={2} />
+                <Send
+                  size={16}
+                  strokeWidth={2}
+                />
               </button>
             </div>
           </div>
+
+          {/* Error message */}
+          {error && !loading && (
+            <p className="mt-3 text-[11px] text-red-500">
+              {error}
+            </p>
+          )}
 
           {/* Back Button */}
           <button
@@ -264,7 +571,9 @@ export default function ChatPage() {
 
               <button
                 type="button"
-                onClick={() => setShowDetails(false)}
+                onClick={() =>
+                  setShowDetails(false)
+                }
                 className="flex h-8 w-8 items-center justify-center rounded-full text-[#7D8794] hover:bg-[#F1F3F4]"
               >
                 <X size={17} />
@@ -277,7 +586,7 @@ export default function ChatPage() {
               </p>
 
               <h3 className="mt-1 text-[15px] font-semibold text-[#27364A]">
-                Fix Kitchen Sink
+                {jobTitle}
               </h3>
 
               <div className="mt-5 border-t border-[#E5E8EA] pt-5">
@@ -303,7 +612,9 @@ export default function ChatPage() {
 
             <button
               type="button"
-              onClick={() => setShowDetails(false)}
+              onClick={() =>
+                setShowDetails(false)
+              }
               className="mt-7 h-[42px] w-full rounded-[7px] bg-[#172D4A] text-[12px] font-medium text-white transition hover:bg-[#203B5D]"
             >
               Close
@@ -314,4 +625,3 @@ export default function ChatPage() {
     </div>
   );
 }
-

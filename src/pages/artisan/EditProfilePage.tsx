@@ -1,274 +1,406 @@
-import { useState } from "react";
+
+import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
   Camera,
-  ChevronDown,
-  Mail,
   CheckCircle2,
+  Save,
 } from "lucide-react";
 
-import ArtisanHeader from "../../components/artisan/ArtisanHeader";
-import ArtisanSidebar from "../../components/artisan/ArtisanSidebar";
+const API_BASE_URL =
+  "https://backend-talentloop.onrender.com/api/v1";
 
 export default function EditProfilePage() {
   const navigate = useNavigate();
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const [firstName, setFirstName] = useState("Dave");
   const [lastName, setLastName] = useState("Ejike");
   const [email, setEmail] = useState("ejikedave@gmail.com");
   const [location, setLocation] = useState("State");
   const [experience, setExperience] = useState("2");
+
   const [about, setAbout] = useState(
     "Expert plumber with over 2 years of experience in residential and commercial plumbing systems. Specialized in leak detection, pipe installation, and emergency repairs. I pride myself on punctuality and high-quality workmanship."
   );
 
+  // Use the uploaded profile photo instead of the old mock image
+  const [profilePhoto, setProfilePhoto] = useState(
+    () => localStorage.getItem("profilePhotoUrl") || ""
+  );
+
   const [showSuccess, setShowSuccess] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSave = () => {
-    setShowSuccess(true);
+  // Open file picker
+  const handlePhotoClick = () => {
+    fileInputRef.current?.click();
+  };
 
-    setTimeout(() => {
-      setShowSuccess(false);
-    }, 3000);
+  // Upload selected photo
+  const handlePhotoChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+
+    if (!file) return;
+
+    setError("");
+    setShowSuccess(false);
+
+    // Check file type
+    if (!["image/jpeg", "image/png", "image/jpg"].includes(file.type)) {
+      setError("Please select a JPG, JPEG, or PNG image.");
+      event.target.value = "";
+      return;
+    }
+
+    // Check file size - 5MB
+    if (file.size > 5 * 1024 * 1024) {
+      setError("Image must be less than 5MB.");
+      event.target.value = "";
+      return;
+    }
+
+    try {
+      setUploadingPhoto(true);
+
+      const token = localStorage.getItem("accessToken");
+
+      if (!token) {
+        setError("Your session has expired. Please login again.");
+        return;
+      }
+
+      const formData = new FormData();
+
+      formData.append("photo", file);
+
+      const response = await fetch(
+        `${API_BASE_URL}/profile/me/photo`,
+        {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          result?.message || "Failed to update profile photo"
+        );
+      }
+
+      // Save the real Cloudinary photo URL
+      if (result?.data?.photoUrl) {
+        setProfilePhoto(result.data.photoUrl);
+
+        localStorage.setItem(
+          "profilePhotoUrl",
+          result.data.photoUrl
+        );
+      }
+
+      setShowSuccess(true);
+
+      setTimeout(() => {
+        setShowSuccess(false);
+      }, 3000);
+    } catch (err) {
+      console.error("Profile photo upload error:", err);
+
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Something went wrong while uploading your photo."
+      );
+    } finally {
+      setUploadingPhoto(false);
+
+      // Allow selecting the same image again
+      event.target.value = "";
+    }
+  };
+
+  // Bio update
+  const handleSave = async () => {
+    setSaving(true);
+    setError("");
+    setShowSuccess(false);
+
+    try {
+      const token = localStorage.getItem("accessToken");
+
+      if (!token) {
+        setError("Your session has expired. Please login again.");
+        return;
+      }
+
+      const formData = new FormData();
+
+      formData.append("bio", about);
+
+      const response = await fetch(
+        `${API_BASE_URL}/profile/me`,
+        {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          result?.message || "Failed to update profile"
+        );
+      }
+
+      setShowSuccess(true);
+
+      setTimeout(() => {
+        setShowSuccess(false);
+      }, 3000);
+    } catch (err) {
+      console.error("Update profile error:", err);
+
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Something went wrong while updating your profile."
+      );
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
-    <div className="flex min-h-screen bg-[#F7FAF9]">
-      {/* SIDEBAR */}
-      <ArtisanSidebar />
+    <div className="min-h-screen bg-[#f8fafc]">
+      {/* Header */}
+      <div className="bg-white border-b border-gray-200 px-6 py-4">
+        <div className="max-w-5xl mx-auto flex items-center gap-4">
+          <button
+            onClick={() => navigate(-1)}
+            className="p-2 rounded-lg hover:bg-gray-100 transition"
+          >
+            <ArrowLeft size={22} />
+          </button>
 
-      {/* MAIN AREA */}
-      <div className="min-w-0 flex-1">
-        {/* HEADER */}
-        <ArtisanHeader />
+          <h1 className="text-xl font-semibold text-gray-800">
+            Edit Profile
+          </h1>
+        </div>
+      </div>
 
-        <main className="px-8 pb-12 pt-5">
-          <div className="max-w-[900px]">
-            {/* PAGE TITLE */}
-            <div className="mb-6 flex items-center gap-3">
-  <button
-    type="button"
-    onClick={() => navigate(-1)}
-    className="flex h-8 w-8 items-center justify-center rounded-full text-[#52616B] transition hover:bg-white hover:text-[#10344A]"
-    aria-label="Go back"
-  >
-    <ArrowLeft size={18} strokeWidth={1.8} />
-  </button>
+      <div className="max-w-5xl mx-auto px-6 py-8">
+        {/* Profile Photo */}
+        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+          <h2 className="text-lg font-semibold text-gray-800 mb-5">
+            Profile Photo
+          </h2>
 
-  <h1 className="text-[21px] font-semibold text-[#263842]">
-    Profile
-  </h1>
-</div>
-
-            {/* =========================================
-                PROFILE PHOTO CARD
-            ========================================= */}
-            <section className="mb-7 flex h-[118px] w-[365px] items-center rounded-[8px] border border-[#E2E8E7] bg-white px-5 shadow-[0_1px_2px_rgba(16,52,74,0.02)]">
-              {/* PHOTO */}
-              <div className="relative shrink-0">
-                <div className="h-[88px] w-[88px] overflow-hidden rounded-full border-[3px] border-[#E5EAE9] bg-[#DCE5E3]">
-                  <img
-                    src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=300&q=80"
-                    alt="Dave Ejike"
-                    className="h-full w-full object-cover"
-                  />
+          <div className="flex items-center gap-5">
+            <div className="relative">
+              {profilePhoto ? (
+                <img
+                  src={profilePhoto}
+                  alt="Profile"
+                  className="w-24 h-24 rounded-full object-cover"
+                />
+              ) : (
+                <div className="w-24 h-24 rounded-full bg-[#DDE3E3] flex items-center justify-center text-xl font-semibold text-[#10344A]">
+                  DE
                 </div>
+              )}
 
-                {/* CAMERA BUTTON */}
-                <button
-                  type="button"
-                  aria-label="Change profile photo"
-                  className="absolute bottom-[-1px] right-[-1px] flex h-[27px] w-[27px] items-center justify-center rounded-full border-2 border-white bg-[#10344A] text-white shadow-sm transition hover:bg-[#0B293A]"
-                >
-                  <Camera size={13} strokeWidth={2} />
-                </button>
-              </div>
-
-              {/* CHANGE PHOTO */}
               <button
                 type="button"
-                className="ml-6 text-[12px] font-medium text-[#33454E] transition hover:text-[#10344A]"
+                onClick={handlePhotoClick}
+                disabled={uploadingPhoto}
+                className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-[#10344A] text-white flex items-center justify-center border-2 border-white disabled:opacity-60"
               >
-                Change Photo
+                <Camera size={15} />
               </button>
-            </section>
+            </div>
 
-            {/* =========================================
-                FORM
-            ========================================= */}
-            <form
-              onSubmit={(event) => {
-                event.preventDefault();
-                handleSave();
-              }}
-              className="w-full"
-            >
-              {/* FIRST NAME */}
-              <div className="mb-5">
-                <label
-                  htmlFor="firstName"
-                  className="mb-2 block text-[11px] font-medium text-[#3D4D55]"
-                >
+            <div>
+              <h3 className="font-medium text-gray-800">
+                Profile Picture
+              </h3>
+
+              <p className="text-sm text-gray-500 mt-1">
+                JPG, PNG or JPEG. Maximum size 5MB.
+              </p>
+
+              <button
+                type="button"
+                onClick={handlePhotoClick}
+                disabled={uploadingPhoto}
+                className="mt-3 text-sm font-medium text-[#10344A] hover:underline disabled:opacity-60"
+              >
+                {uploadingPhoto ? "Uploading..." : "Change Photo"}
+              </button>
+            </div>
+
+            {/* Hidden file input */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/jpg"
+              onChange={handlePhotoChange}
+              className="hidden"
+            />
+          </div>
+        </div>
+
+        {/* Personal Information */}
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSave();
+          }}
+        >
+          <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+            <h2 className="text-lg font-semibold text-gray-800 mb-5">
+              Personal Information
+            </h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              {/* First Name */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   First Name
                 </label>
 
                 <input
-                  id="firstName"
                   type="text"
                   value={firstName}
-                  onChange={(event) => setFirstName(event.target.value)}
-                  className="h-[46px] w-full rounded-[6px] border border-[#DDE4E2] bg-white px-4 text-[12px] text-[#34454E] outline-none transition placeholder:text-[#9AA4A8] focus:border-[#10344A]"
+                  onChange={(e) => setFirstName(e.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:border-[#10344A]"
                 />
               </div>
 
-              {/* LAST NAME */}
-              <div className="mb-5">
-                <label
-                  htmlFor="lastName"
-                  className="mb-2 block text-[11px] font-medium text-[#3D4D55]"
-                >
+              {/* Last Name */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Last Name
                 </label>
 
                 <input
-                  id="lastName"
                   type="text"
                   value={lastName}
-                  onChange={(event) => setLastName(event.target.value)}
-                  className="h-[46px] w-full rounded-[6px] border border-[#DDE4E2] bg-white px-4 text-[12px] text-[#34454E] outline-none transition focus:border-[#10344A]"
+                  onChange={(e) => setLastName(e.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:border-[#10344A]"
                 />
               </div>
 
-              {/* EMAIL */}
-              <div className="mb-5">
-                <label
-                  htmlFor="email"
-                  className="mb-2 block text-[11px] font-medium text-[#3D4D55]"
-                >
+              {/* Email */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Email
                 </label>
 
-                <div className="relative">
-                  <Mail
-                    size={15}
-                    strokeWidth={1.7}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 text-[#89969C]"
-                  />
-
-                  <input
-                    id="email"
-                    type="email"
-                    value={email}
-                    onChange={(event) => setEmail(event.target.value)}
-                    className="h-[46px] w-full rounded-[6px] border border-[#DDE4E2] bg-white pl-11 pr-4 text-[12px] text-[#34454E] outline-none transition focus:border-[#10344A]"
-                  />
-                </div>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:border-[#10344A]"
+                />
               </div>
 
-              {/* LOCATION */}
-              <div className="mb-5">
-                <label
-                  htmlFor="location"
-                  className="mb-2 block text-[11px] font-medium text-[#3D4D55]"
-                >
+              {/* Location */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Location
                 </label>
 
-                <div className="relative">
-                  <select
-                    id="location"
-                    value={location}
-                    onChange={(event) => setLocation(event.target.value)}
-                    className="h-[46px] w-full appearance-none rounded-[6px] border border-[#DDE4E2] bg-white px-4 pr-10 text-[12px] text-[#34454E] outline-none transition focus:border-[#10344A]"
-                  >
-                    <option value="State">State</option>
-                    <option value="Lagos">Lagos</option>
-                    <option value="Abuja">Abuja</option>
-                    <option value="Rivers">Rivers</option>
-                    <option value="Oyo">Oyo</option>
-                    <option value="Kano">Kano</option>
-                  </select>
-
-                  <ChevronDown
-                    size={16}
-                    strokeWidth={1.8}
-                    className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[#74828A]"
-                  />
-                </div>
+                <input
+                  type="text"
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:border-[#10344A]"
+                />
               </div>
 
-              {/* YEARS OF EXPERIENCE */}
-              <div className="mb-5">
-                <label
-                  htmlFor="experience"
-                  className="mb-2 block text-[11px] font-medium text-[#3D4D55]"
-                >
+              {/* Experience */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Years of Experience
                 </label>
 
                 <input
-                  id="experience"
                   type="number"
-                  min="0"
                   value={experience}
-                  onChange={(event) => setExperience(event.target.value)}
-                  className="h-[46px] w-full rounded-[6px] border border-[#DDE4E2] bg-white px-4 text-[12px] text-[#34454E] outline-none transition focus:border-[#10344A]"
+                  onChange={(e) => setExperience(e.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:border-[#10344A]"
                 />
               </div>
-
-              {/* ABOUT */}
-              <div className="mb-8">
-                <label
-                  htmlFor="about"
-                  className="mb-2 block text-[11px] font-medium text-[#3D4D55]"
-                >
-                  About
-                </label>
-
-                <textarea
-                  id="about"
-                  value={about}
-                  onChange={(event) => setAbout(event.target.value)}
-                  rows={6}
-                  className="min-h-[145px] w-full resize-none rounded-[6px] border border-[#DDE4E2] bg-white px-4 py-3 text-[12px] leading-[1.7] text-[#34454E] outline-none transition focus:border-[#10344A]"
-                />
-              </div>
-
-              {/* SAVE BUTTON */}
-              <div className="flex justify-center">
-                <button
-                  type="submit"
-                  className="flex h-[50px] w-full max-w-[500px] items-center justify-center rounded-[7px] bg-[#10344A] text-[12px] font-semibold text-white shadow-[0_3px_8px_rgba(16,52,74,0.12)] transition hover:bg-[#0B293A] active:scale-[0.99]"
-                >
-                  Save Changes
-                </button>
-              </div>
-            </form>
+            </div>
           </div>
-        </main>
-      </div>
 
-      {/* =========================================
-          SUCCESS MESSAGE
-      ========================================= */}
-      {showSuccess && (
-        <div className="fixed right-6 top-6 z-50 flex min-w-[280px] items-center gap-3 rounded-[8px] border border-[#D8E9DF] bg-white px-4 py-3 shadow-[0_5px_20px_rgba(0,0,0,0.10)]">
-          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#E5F4EA]">
-            <CheckCircle2
-              size={17}
-              strokeWidth={2}
-              className="text-[#3D9560]"
+          {/* About */}
+          <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+            <h2 className="text-lg font-semibold text-gray-800 mb-5">
+              About Me
+            </h2>
+
+            <textarea
+              value={about}
+              onChange={(e) => setAbout(e.target.value)}
+              rows={6}
+              className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:border-[#10344A] resize-none"
+              placeholder="Tell clients about yourself..."
             />
           </div>
 
-          <div>
-            <p className="text-[11px] font-semibold text-[#263842]">
-              Profile updated successfully.
-            </p>
+          {/* Error */}
+          {error && (
+            <div className="mb-5 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600">
+              {error}
+            </div>
+          )}
+
+          {/* Success */}
+          {showSuccess && (
+            <div className="mb-5 flex items-center gap-3 rounded-lg bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-700">
+              <CheckCircle2 size={20} />
+              <span>Profile saved successfully.</span>
+            </div>
+          )}
+
+          {/* Buttons */}
+          <div className="flex justify-end gap-3">
+            <button
+              type="button"
+              onClick={() => navigate(-1)}
+              className="px-5 py-3 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition"
+            >
+              Cancel
+            </button>
+
+            <button
+              type="submit"
+              disabled={saving}
+              className="px-5 py-3 rounded-lg bg-[#10344A] text-white flex items-center gap-2 hover:bg-[#0c293a] transition disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              <Save size={18} />
+
+              {saving ? "Saving..." : "Save Changes"}
+            </button>
           </div>
-        </div>
-      )}
+        </form>
+      </div>
     </div>
   );
 }
+

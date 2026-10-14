@@ -1,3 +1,4 @@
+
 import { useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
@@ -10,6 +11,10 @@ import ArtisanSidebar from "../../components/artisan/ArtisanSidebar";
 
 export default function WorkerProfilePage() {
   const navigate = useNavigate();
+
+  // Get the uploaded profile photo saved after photo upload
+  const profilePhoto =
+    localStorage.getItem("profilePhotoUrl") || "";
 
   const portfolioImages = [
     {
@@ -82,12 +87,18 @@ export default function WorkerProfilePage() {
 
                   {/* PROFILE PHOTO */}
                   <div className="relative shrink-0">
-                    <div className="h-[88px] w-[88px] overflow-hidden rounded-full border-[3px] border-[#E8ECEB] bg-[#DCE5E3]">
-                      <img
-                        src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=300&q=80"
-                        alt="Dave Ejike"
-                        className="h-full w-full object-cover"
-                      />
+                    <div className="flex h-[88px] w-[88px] items-center justify-center overflow-hidden rounded-full border-[3px] border-[#E8ECEB] bg-[#DCE5E3]">
+                      {profilePhoto ? (
+                        <img
+                          src={profilePhoto}
+                          alt="Profile"
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-[22px] font-semibold text-[#10344A]">
+                          DE
+                        </span>
+                      )}
                     </div>
 
                     <button
@@ -298,3 +309,4 @@ export default function WorkerProfilePage() {
     </div>
   );
 }
+

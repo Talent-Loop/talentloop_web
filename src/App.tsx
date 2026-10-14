@@ -10,6 +10,7 @@ import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
 import AdminLoginPage from "./pages/AdminLoginPage";
 import RegisterUserPage from "./pages/RegisterUserPage";
+import VerifyEmailPage from "./pages/VerifyEmailPage";
 import RegisterProfessionalPage from "./pages/RegisterProfessionalPage";
 
 import OverviewPage from "./pages/OverviewPage";
@@ -58,7 +59,7 @@ import UserWorkerProfilePage from "./pages/user/WorkerProfilePage";
 import RecentActivities from "./pages/user/RecentActivities";
 
 function ProtectedRoute({ children }: { children: ReactNode }) {
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("accessToken");
 
   if (!token) {
     return <Navigate to="/admin/login" replace />;
@@ -66,7 +67,6 @@ function ProtectedRoute({ children }: { children: ReactNode }) {
 
   return <>{children}</>;
 }
-
 export default function App() {
   return (
     <BrowserRouter>
@@ -83,6 +83,7 @@ export default function App() {
           path="/register/professional"
           element={<RegisterProfessionalPage />}
         />
+        <Route path="/verify-email" element={<VerifyEmailPage />} />
 
         {/* ================= ARTISAN ================= */}
 
