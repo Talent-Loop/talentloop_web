@@ -714,4 +714,3 @@ export default function RegisterProfessionalForm() {
     </section>
   );
 }
-

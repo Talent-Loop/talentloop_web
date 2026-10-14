@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import {
   UserRound,
@@ -28,6 +29,12 @@ export default function RegisterUserPage() {
 
   const [agreeToTerms, setAgreeToTerms] = useState(false);
 
+  const [loading, setLoading] = useState(false);
+  const [resending, setResending] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [showResend, setShowResend] = useState(false);
+
   const passwordRules = [
     {
       label: "At least 8 characters",
@@ -56,6 +63,189 @@ export default function RegisterUserPage() {
       ...prev,
       [name]: value,
     }));
+  };
+
+  const handleRegister = async (
+    e: React.FormEvent<HTMLFormElement>
+  ) => {
+    e.preventDefault();
+
+    setError("");
+    setSuccess("");
+    setShowResend(false);
+
+    if (
+      !formData.fullName.trim() ||
+      !formData.email.trim() ||
+      !formData.phone.trim() ||
+      !password
+    ) {
+      setError("Please fill in all required fields.");
+      return;
+    }
+
+    if (
+      password.length < 8 ||
+      !/[A-Z]/.test(password) ||
+      !/[0-9]/.test(password) ||
+      !/[^A-Za-z0-9]/.test(password)
+    ) {
+      setError(
+        "Please make sure your password meets all the requirements."
+      );
+      return;
+    }
+
+    if (!agreeToTerms) {
+      setError(
+        "Please agree to the Terms of Service and Privacy Policy."
+      );
+      return;
+    }
+
+    const nameParts = formData.fullName.trim().split(/\s+/);
+    const firstName = nameParts[0];
+    const lastName = nameParts.slice(1).join(" ");
+
+    if (!lastName) {
+      setError(
+        "Please enter your full name, including your last name."
+      );
+      return;
+    }
+
+    const cleanedPhone = formData.phone
+      .trim()
+      .replace(/\s+/g, "")
+      .replace(/^0/, "");
+
+    const fullPhone = `+234${cleanedPhone}`;
+
+    const controller = new AbortController();
+
+    const timeoutId = setTimeout(() => {
+      controller.abort();
+    }, 20000);
+
+    try {
+      setLoading(true);
+
+      const response = await fetch(
+        "https://backend-talentloop.onrender.com/api/v1/auth/register",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "*/*",
+          },
+          body: JSON.stringify({
+            firstName,
+            lastName,
+            email: formData.email.trim(),
+            phone: fullPhone,
+            password,
+            roleName: "client",
+          }),
+          signal: controller.signal,
+        }
+      );
+
+      clearTimeout(timeoutId);
+
+      const data = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        setError(
+          data?.message ||
+            "Registration failed. Please try again."
+        );
+        return;
+      }
+
+      console.log("Client registration successful:", data);
+
+      setSuccess(
+        "Account created successfully! Please check your email to verify your account."
+      );
+
+      setShowResend(true);
+
+      setPassword("");
+    } catch (err) {
+      clearTimeout(timeoutId);
+
+      console.error("Registration error:", err);
+
+      if (
+        err instanceof DOMException &&
+        err.name === "AbortError"
+      ) {
+        setError(
+          "The server is taking too long to respond. Your account may have been created. Please check your email or use the resend verification option below."
+        );
+
+        setShowResend(true);
+      } else {
+        setError(
+          "Unable to connect to the server. Please try again."
+        );
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResendVerification = async () => {
+    if (!formData.email.trim()) {
+      setError(
+        "Please enter the email address you used to register."
+      );
+      return;
+    }
+
+    setError("");
+    setSuccess("");
+
+    try {
+      setResending(true);
+
+      const response = await fetch(
+        "https://backend-talentloop.onrender.com/api/v1/auth/resend-verification-email",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "*/*",
+          },
+          body: JSON.stringify({
+            email: formData.email.trim(),
+          }),
+        }
+      );
+
+      const data = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        setError(
+          data?.message ||
+            "Unable to resend verification email. Please try again."
+        );
+        return;
+      }
+
+      setSuccess(
+        data?.message ||
+          "Verification email sent successfully. Please check your inbox."
+      );
+    } catch (err) {
+      console.error("Resend verification error:", err);
+
+      setError(
+        "Unable to connect to the server. Please try again."
+      );
+    } finally {
+      setResending(false);
+    }
   };
 
   return (
@@ -89,7 +279,10 @@ export default function RegisterUserPage() {
             </div>
 
             {/* Form */}
-            <form className="mt-8 space-y-5">
+            <form
+              onSubmit={handleRegister}
+              className="mt-8 space-y-5"
+            >
               {/* Full Name */}
               <div>
                 <label className="mb-2 block text-sm font-medium text-[#252525]">
@@ -181,7 +374,9 @@ export default function RegisterUserPage() {
 
                   <button
                     type="button"
-                    onClick={() => setShowPassword(!showPassword)}
+                    onClick={() =>
+                      setShowPassword(!showPassword)
+                    }
                     className="absolute right-4 top-1/2 -translate-y-1/2 text-[#667085] hover:text-[#173D57]"
                   >
                     {showPassword ? (
@@ -222,7 +417,9 @@ export default function RegisterUserPage() {
                 <input
                   type="checkbox"
                   checked={agreeToTerms}
-                  onChange={(e) => setAgreeToTerms(e.target.checked)}
+                  onChange={(e) =>
+                    setAgreeToTerms(e.target.checked)
+                  }
                   className="mt-1 h-4 w-4 accent-[#173D57]"
                 />
 
@@ -244,13 +441,50 @@ export default function RegisterUserPage() {
                 </span>
               </label>
 
+              {/* Error */}
+              {error && (
+                <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+                  {error}
+                </div>
+              )}
+
+              {/* Success */}
+              {success && (
+                <div className="rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-600">
+                  {success}
+                </div>
+              )}
+
               {/* Create Account */}
               <button
                 type="submit"
-                className="h-14 w-full rounded-xl bg-[#173D57] text-base font-semibold text-white transition hover:bg-[#122F43]"
+                disabled={loading}
+                className="h-14 w-full rounded-xl bg-[#173D57] text-base font-semibold text-white transition hover:bg-[#122F43] disabled:cursor-not-allowed disabled:opacity-60"
               >
-                Create Your Client Account
+                {loading
+                  ? "Creating Account..."
+                  : "Create Your Client Account"}
               </button>
+
+              {/* Resend Verification */}
+              {showResend && (
+                <div className="rounded-xl border border-[#D9DEE5] bg-[#F8FAFC] px-4 py-4 text-center">
+                  <p className="mb-3 text-sm text-[#4B5563]">
+                    Didn't receive the verification email?
+                  </p>
+
+                  <button
+                    type="button"
+                    onClick={handleResendVerification}
+                    disabled={resending}
+                    className="font-semibold text-[#2563EB] hover:underline disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {resending
+                      ? "Sending..."
+                      : "Resend Verification Email"}
+                  </button>
+                </div>
+              )}
 
               {/* Divider */}
               <div className="flex items-center gap-4 py-1">
@@ -291,3 +525,4 @@ export default function RegisterUserPage() {
     </div>
   );
 }
+

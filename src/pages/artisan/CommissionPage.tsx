@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   AlertCircle,
@@ -8,38 +8,81 @@ import {
   Landmark,
   X,
 } from "lucide-react";
-
 import ArtisanHeader from "../../components/artisan/ArtisanHeader";
 import ArtisanSidebar from "../../components/artisan/ArtisanSidebar";
 
-type ProjectStatus = "PENDING" | "PAID";
+type ProjectStatus = "PENDING" | "PAID" | "WAIVED";
 
 type Project = {
+  id: string;
+  title: string;
+  date: string;
+  earning: number;
   status: ProjectStatus;
   commission: string;
 };
 
-const projects: Project[] = [
-  {
-    status: "PENDING",
-    commission: "₦1,000",
-  },
-  {
-    status: "PENDING",
-    commission: "₦450.00",
-  },
-  {
-    status: "PAID",
-    commission: "₦1,000",
-  },
-  {
-    status: "PAID",
-    commission: "₦1,000",
-  },
-];
+type Transaction = {
+  _id: string;
+  jobId: {
+    _id: string;
+    title: string;
+    agreedPrice: number | null;
+    status: string;
+  };
+  providerId: string;
+  clientId: {
+    _id: string;
+    name: string;
+  };
+  agreedPrice: number;
+  commissionRate: number;
+  commissionAmount: number;
+  agentId: string | null;
+  agentFee: number;
+  platformNet: number;
+  status: "pending" | "paid" | "waived";
+  paidAt: string | null;
+  paidBy: string | null;
+  paymentReference: string | null;
+  pendingReference: string | null;
+  waivedAt: string | null;
+  waivedBy: string | null;
+  waivedReason: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+type TransactionsResponse = {
+  success: boolean;
+  statusCode: number;
+  message: string;
+  data: {
+    transactions: Transaction[];
+    total: number;
+    page: number;
+    totalPages: number;
+    balance: {
+      pending: number;
+      paid: number;
+      waived: number;
+    };
+  };
+};
+
+const API_BASE_URL =
+  "https://backend-talentloop.onrender.com/api/v1";
 
 export default function CommissionPage() {
   const navigate = useNavigate();
+
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [commissionDue, setCommissionDue] = useState(0);
+  const [paidCommission, setPaidCommission] = useState(0);
+  const [waivedCommission, setWaivedCommission] = useState(0);
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showBankDetails, setShowBankDetails] = useState(false);
@@ -49,6 +92,73 @@ export default function CommissionPage() {
   const handleBack = () => {
     navigate(-1);
   };
+
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      try {
+        setLoading(true);
+        setError("");
+
+        const token = localStorage.getItem("accessToken");
+
+        if (!token) {
+          setError("You are not logged in.");
+          return;
+        }
+
+        const response = await fetch(
+          `${API_BASE_URL}/transactions/my?page=1&limit=20`,
+          {
+            method: "GET",
+            headers: {
+              Accept: "*/*",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        const result: TransactionsResponse = await response.json();
+
+        console.log("COMMISSION TRANSACTIONS RESPONSE:", result);
+
+        if (!response.ok || !result.success) {
+          throw new Error(
+            result.message || "Failed to fetch commission transactions."
+          );
+        }
+
+        const transactionData = result.data;
+
+        setCommissionDue(transactionData.balance.pending);
+        setPaidCommission(transactionData.balance.paid);
+        setWaivedCommission(transactionData.balance.waived);
+
+        const formattedProjects: Project[] =
+          transactionData.transactions.map((transaction) => ({
+            id: transaction._id,
+            title: transaction.jobId?.title || "Untitled Job",
+            date: formatDate(transaction.createdAt),
+            earning: transaction.agreedPrice || 0,
+            commission: formatCurrency(transaction.commissionAmount),
+            status: mapStatus(transaction.status),
+          }));
+
+        setProjects(formattedProjects);
+      } catch (err) {
+        console.error("COMMISSION FETCH ERROR:", err);
+
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Failed to load commission data."
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTransactions();
+  }, []);
 
   return (
     <div className="flex min-h-screen bg-white font-sans text-[#263238]">
@@ -97,16 +207,23 @@ export default function CommissionPage() {
               </p>
 
               <h2 className="text-[38px] font-bold leading-[1.1] tracking-[-1px] text-white sm:text-[42px]">
-                ₦1,450.00
+                {loading ? "Loading..." : formatCurrency(commissionDue)}
               </h2>
 
               <div className="mt-3 inline-flex items-center rounded-full border border-white/10 bg-white/15 px-3 py-[5px] backdrop-blur-sm">
                 <span className="text-[11px] font-medium text-white/90">
-                  ↗ +12.5% this month
+                  Total paid: {formatCurrency(paidCommission)}
                 </span>
               </div>
             </div>
           </section>
+
+          {/* Error */}
+          {error && (
+            <div className="mt-4 rounded-[10px] bg-red-50 px-4 py-3 text-[12px] text-red-600">
+              {error}
+            </div>
+          )}
 
           {/* Notice + Payment */}
           <section className="mt-5 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
@@ -130,6 +247,7 @@ export default function CommissionPage() {
             <button
               type="button"
               onClick={() => setShowPaymentModal(true)}
+              disabled={loading || commissionDue <= 0}
               className="
                 flex
                 h-[50px]
@@ -149,6 +267,8 @@ export default function CommissionPage() {
                 hover:bg-[#17465F]
                 hover:shadow-[0_6px_16px_rgba(16,52,74,0.18)]
                 active:scale-[0.99]
+                disabled:cursor-not-allowed
+                disabled:opacity-50
                 sm:w-[205px]
               "
             >
@@ -172,14 +292,24 @@ export default function CommissionPage() {
             </div>
 
             {/* Project Grid */}
-            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-              {projects.map((project, index) => (
-                <ProjectCard
-                  key={`${project.status}-${index}`}
-                  project={project}
-                />
-              ))}
-            </div>
+            {loading ? (
+              <div className="rounded-[12px] border border-[#EDF0F1] bg-white p-8 text-center text-[13px] text-[#899399]">
+                Loading commission transactions...
+              </div>
+            ) : projects.length === 0 ? (
+              <div className="rounded-[12px] border border-[#EDF0F1] bg-white p-8 text-center text-[13px] text-[#899399]">
+                No commission transactions found.
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                {projects.map((project) => (
+                  <ProjectCard
+                    key={project.id}
+                    project={project}
+                  />
+                ))}
+              </div>
+            )}
           </section>
 
           {/* Back Button */}
@@ -215,7 +345,6 @@ export default function CommissionPage() {
       {/* ========================================================= */}
       {/* CAUTION MODAL                                             */}
       {/* ========================================================= */}
-
       {showPaymentModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0D2635]/35 px-4 backdrop-blur-[2px]">
           <div className="relative w-full max-w-[430px] rounded-[16px] bg-white px-8 py-8 shadow-[0_20px_60px_rgba(0,0,0,0.18)]">
@@ -302,7 +431,6 @@ export default function CommissionPage() {
       {/* ========================================================= */}
       {/* TRANSFER FUNDS MODAL                                     */}
       {/* ========================================================= */}
-
       {showBankDetails && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0D2635]/35 px-4 backdrop-blur-[2px]">
           <div className="relative w-full max-w-[500px] rounded-[16px] bg-white px-8 py-8 shadow-[0_20px_60px_rgba(0,0,0,0.18)]">
@@ -428,9 +556,8 @@ export default function CommissionPage() {
       )}
 
       {/* ========================================================= */}
-      {/* VERIFICATION IN PROGRESS MODAL                            */}
+      {/* VERIFICATION IN PROGRESS MODAL                           */}
       {/* ========================================================= */}
-
       {showVerification && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0D2635]/35 px-4 backdrop-blur-[2px]">
           <div className="relative flex w-full max-w-[430px] flex-col items-center rounded-[16px] bg-white px-8 py-10 shadow-[0_20px_60px_rgba(0,0,0,0.18)]">
@@ -451,7 +578,6 @@ export default function CommissionPage() {
                     stroke="#E69141"
                     strokeWidth="1.8"
                   />
-
                   <path
                     d="M12 7V12L15 14"
                     stroke="#E69141"
@@ -471,7 +597,6 @@ export default function CommissionPage() {
             {/* Loading / Verifying Circle */}
             <div className="relative mt-8 flex h-[58px] w-[58px] items-center justify-center">
               <div className="absolute h-[58px] w-[58px] animate-spin rounded-full border-[4px] border-[#F6E5D3] border-t-[#E69141]" />
-
               <div className="h-[38px] w-[38px] rounded-full bg-white" />
             </div>
 
@@ -487,70 +612,67 @@ export default function CommissionPage() {
       {/* ========================================================= */}
       {/* SAVE SUCCESSFULLY MODAL                                   */}
       {/* ========================================================= */}
+      {showSuccess && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0D2635]/35 px-4 backdrop-blur-[2px]">
+          <div className="relative flex w-full max-w-[430px] flex-col items-center rounded-[16px] bg-white px-8 py-10 shadow-[0_20px_60px_rgba(0,0,0,0.18)]">
+            {/* Success Icon Box */}
+            <div
+              className="
+                flex
+                h-[72px]
+                w-[72px]
+                items-center
+                justify-center
+                rounded-[10px]
+                border
+                border-[#E3EAF0]
+                bg-white
+                shadow-[0_10px_24px_rgba(16,52,74,0.18)]
+              "
+            >
+              <div className="flex h-[42px] w-[42px] items-center justify-center rounded-full bg-[#EEF7F2]">
+                <Check
+                  size={25}
+                  strokeWidth={2.5}
+                  className="text-[#31935A]"
+                />
+              </div>
+            </div>
 
-      
-       {showSuccess && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0D2635]/35 px-4 backdrop-blur-[2px]">
-    <div className="relative flex w-full max-w-[430px] flex-col items-center rounded-[16px] bg-white px-8 py-10 shadow-[0_20px_60px_rgba(0,0,0,0.18)]">
-      {/* Success Icon Box */}
-      <div
-        className="
-          flex
-          h-[72px]
-          w-[72px]
-          items-center
-          justify-center
-          rounded-[10px]
-          border
-          border-[#E3EAF0]
-          bg-white
-          shadow-[0_10px_24px_rgba(16,52,74,0.18)]
-        "
-      >
-        <div className="flex h-[42px] w-[42px] items-center justify-center rounded-full bg-[#EEF7F2]">
-          <Check
-            size={25}
-            strokeWidth={2.5}
-            className="text-[#31935A]"
-          />
+            {/* Success Text */}
+            <h2 className="mt-6 text-[20px] font-semibold text-[#263238]">
+              Save successfully
+            </h2>
+
+            {/* Done Button */}
+            <button
+              type="button"
+              onClick={() => setShowSuccess(false)}
+              className="
+                mt-7
+                flex
+                h-[46px]
+                w-full
+                items-center
+                justify-center
+                rounded-[9px]
+                bg-[#10344A]
+                text-[13px]
+                font-semibold
+                text-white
+                shadow-[0_4px_12px_rgba(230,145,65,0.28)]
+                transition-all
+                duration-200
+                hover:bg-[#17465F]
+                hover:shadow-[0_6px_16px_rgba(230,145,65,0.35)]
+                active:scale-[0.99]
+              "
+            >
+              Done
+            </button>
+          </div>
         </div>
-      </div>
-
-      {/* Success Text */}
-      <h2 className="mt-6 text-[20px] font-semibold text-[#263238]">
-        Save successfully
-      </h2>
-
-      {/* Done Button */}
-      <button
-        type="button"
-        onClick={() => setShowSuccess(false)}
-        className="
-          mt-7
-          flex
-          h-[46px]
-          w-full
-          items-center
-          justify-center
-          rounded-[9px]
-          bg-[#10344A]
-          text-[13px]
-          font-semibold
-          text-white
-          shadow-[0_4px_12px_rgba(230,145,65,0.28)]
-          transition-all
-          duration-200
-          hover:bg-[#17465F]
-          hover:shadow-[0_6px_16px_rgba(230,145,65,0.35)]
-          active:scale-[0.99]
-        "
-      >
-        Done
-      </button>
-    </div>
-  </div>
-)}
-     
+      )}
     </div>
   );
 }
@@ -561,6 +683,7 @@ export default function CommissionPage() {
 
 function ProjectCard({ project }: { project: Project }) {
   const isPaid = project.status === "PAID";
+  const isWaived = project.status === "WAIVED";
 
   return (
     <article
@@ -593,11 +716,11 @@ function ProjectCard({ project }: { project: Project }) {
 
           <div className="min-w-0 pt-[1px]">
             <h3 className="truncate text-[13px] font-semibold text-[#263238]">
-              Fixing of Sink
+              {project.title}
             </h3>
 
             <p className="mt-[5px] text-[10px] text-[#899399]">
-              Completed May 12, 2024
+              {project.date}
             </p>
           </div>
         </div>
@@ -616,6 +739,8 @@ function ProjectCard({ project }: { project: Project }) {
             ${
               isPaid
                 ? "bg-[#EDF8F1] text-[#31935A]"
+                : isWaived
+                ? "bg-[#F1F4F5] text-[#68747A]"
                 : "bg-[#FFF7E5] text-[#B98222]"
             }
           `}
@@ -633,7 +758,7 @@ function ProjectCard({ project }: { project: Project }) {
           </p>
 
           <p className="mt-1 text-[14px] font-semibold text-[#37434A]">
-            ₦11,500
+            {formatCurrency(project.earning)}
           </p>
         </div>
 
@@ -645,7 +770,11 @@ function ProjectCard({ project }: { project: Project }) {
 
           <p
             className={`mt-1 text-[14px] font-semibold ${
-              isPaid ? "text-[#31935A]" : "text-[#C28A2A]"
+              isPaid
+                ? "text-[#31935A]"
+                : isWaived
+                ? "text-[#68747A]"
+                : "text-[#C28A2A]"
             }`}
           >
             {project.commission}
@@ -654,4 +783,41 @@ function ProjectCard({ project }: { project: Project }) {
       </div>
     </article>
   );
+}
+
+/* =============================================================== */
+/* HELPERS                                                         */
+/* =============================================================== */
+
+function formatCurrency(amount: number) {
+  return `₦${amount.toLocaleString("en-NG", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
+}
+
+function formatDate(dateString: string) {
+  const date = new Date(dateString);
+
+  if (Number.isNaN(date.getTime())) {
+    return "Date unavailable";
+  }
+
+  return `Completed ${date.toLocaleDateString("en-NG", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  })}`;
+}
+
+function mapStatus(status: Transaction["status"]): ProjectStatus {
+  switch (status) {
+    case "paid":
+      return "PAID";
+    case "waived":
+      return "WAIVED";
+    case "pending":
+    default:
+      return "PENDING";
+  }
 }

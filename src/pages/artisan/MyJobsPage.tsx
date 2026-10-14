@@ -217,4 +217,3 @@ function StatusBadge({ status }: { status: string }) {
     </div>
   );
 }
-

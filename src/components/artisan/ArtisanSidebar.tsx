@@ -174,4 +174,3 @@ export default function ArtisanSidebar() {
     </aside>
   );
 }
-
