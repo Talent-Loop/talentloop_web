@@ -6,10 +6,8 @@ import { FaFacebookF } from "react-icons/fa";
 
 export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -20,8 +18,6 @@ export default function LoginForm() {
       "pendingProfessionalProfile"
     );
 
-    // If there is no pending professional profile,
-    // simply continue with normal login.
     if (!pendingProfile) {
       return;
     }
@@ -29,8 +25,6 @@ export default function LoginForm() {
     try {
       const parsedProfile = JSON.parse(pendingProfile);
 
-      // The backend currently supports skills,
-      // but NOT experience or location.
       if (
         !parsedProfile?.skills ||
         !Array.isArray(parsedProfile.skills) ||
@@ -71,16 +65,10 @@ export default function LoginForm() {
           data
         );
 
-        // Profile information has successfully been
-        // sent to the backend.
-        localStorage.removeItem(
-          "pendingProfessionalProfile"
-        );
-
+        localStorage.removeItem("pendingProfessionalProfile");
         return;
       }
 
-      // If the profile already exists, try updating it instead.
       if (response.status === 409) {
         console.log(
           "Professional profile already exists. Attempting to update skills..."
@@ -115,9 +103,7 @@ export default function LoginForm() {
             updateData
           );
 
-          localStorage.removeItem(
-            "pendingProfessionalProfile"
-          );
+          localStorage.removeItem("pendingProfessionalProfile");
         } else {
           console.warn(
             "Profile update failed:",
@@ -144,7 +130,6 @@ export default function LoginForm() {
     e: React.FormEvent<HTMLFormElement>
   ) => {
     e.preventDefault();
-
     setError("");
 
     if (!email || !password) {
@@ -174,8 +159,7 @@ export default function LoginForm() {
 
       if (!response.ok) {
         setError(
-          data?.message ||
-            "Login failed. Please try again."
+          data?.message || "Login failed. Please try again."
         );
         return;
       }
@@ -190,35 +174,67 @@ export default function LoginForm() {
         return;
       }
 
-      // Save authentication tokens
-      localStorage.setItem(
-        "accessToken",
-        accessToken
-      );
+      // Read the authenticated user's role from the access token.
+      let role: string;
 
-      if (refreshToken) {
-        localStorage.setItem(
-          "refreshToken",
-          refreshToken
+      try {
+        const tokenParts = accessToken.split(".");
+        const tokenPayload = tokenParts[1];
+
+        if (!tokenPayload) {
+          throw new Error("Invalid access token.");
+        }
+
+        // Decode Base64URL format used by JWT tokens.
+        const normalizedPayload = tokenPayload
+          .replace(/-/g, "+")
+          .replace(/_/g, "/");
+
+        const userData = JSON.parse(
+          atob(normalizedPayload)
         );
+
+        role = userData?.role;
+      } catch (err) {
+        console.error("Unable to read account role:", err);
+
+        setError(
+          "Login succeeded, but we couldn't determine your account role."
+        );
+        return;
       }
 
-      console.log("Login successful:", data);
+      // Only allow client and provider accounts through this login.
+      if (role !== "client" && role !== "provider") {
+        setError(
+          role === "admin"
+            ? "Please use the admin login page."
+            : "Your account role is not recognized."
+        );
+        return;
+      }
 
-      /*
-       * If this is a newly registered professional,
-       * create their profile using the saved skill.
-       *
-       * Experience and location are intentionally NOT
-       * sent because the backend does not currently
-       * support those fields.
-       */
-      await handleCreateProfessionalProfile(
-        accessToken
-      );
+      // Save authentication tokens.
+      localStorage.setItem("accessToken", accessToken);
 
-      // Keep the existing dashboard navigation.
-      window.location.href = "/artisan";
+      if (refreshToken) {
+        localStorage.setItem("refreshToken", refreshToken);
+      }
+
+      console.log("Login successful. Account role:", role);
+
+      // Only create/update a professional profile for providers.
+      if (role === "provider") {
+        await handleCreateProfessionalProfile(accessToken);
+      }
+
+      // Redirect according to the authenticated account role.
+      if (role === "client") {
+        window.location.href = "/dashboard";
+      } else {
+        window.location.href = "/artisan";
+      }
+
     } catch (err) {
       console.error("Login error:", err);
 
@@ -233,7 +249,6 @@ export default function LoginForm() {
   return (
     <section className="flex items-center justify-center bg-white px-12 py-12">
       <div className="w-full max-w-[700px] rounded-[32px] border border-[#D8DEE6] bg-white p-12 shadow-sm">
-
         {/* Heading */}
         <div className="mb-10">
           <h2 className="text-[42px] font-bold text-[#17324D]">
@@ -246,11 +261,7 @@ export default function LoginForm() {
         </div>
 
         {/* Form */}
-        <form
-          onSubmit={handleLogin}
-          className="space-y-8"
-        >
-
+        <form onSubmit={handleLogin} className="space-y-8">
           {/* Email */}
           <div>
             <label className="mb-3 block text-lg font-semibold text-[#17324D]">
@@ -258,18 +269,13 @@ export default function LoginForm() {
             </label>
 
             <div className="flex h-[64px] items-center rounded-2xl border border-[#D8DEE6] px-5">
-              <Mail
-                size={22}
-                className="text-slate-400"
-              />
+              <Mail size={22} className="text-slate-400" />
 
               <input
                 type="email"
                 placeholder="Enter your email"
                 value={email}
-                onChange={(e) =>
-                  setEmail(e.target.value)
-                }
+                onChange={(e) => setEmail(e.target.value)}
                 className="w-full bg-transparent px-4 text-lg outline-none"
               />
             </div>
@@ -282,43 +288,24 @@ export default function LoginForm() {
             </label>
 
             <div className="flex h-[64px] items-center rounded-2xl border border-[#D8DEE6] px-5">
-              <Lock
-                size={22}
-                className="text-slate-400"
-              />
+              <Lock size={22} className="text-slate-400" />
 
               <input
-                type={
-                  showPassword
-                    ? "text"
-                    : "password"
-                }
+                type={showPassword ? "text" : "password"}
                 placeholder="Enter your password"
                 value={password}
-                onChange={(e) =>
-                  setPassword(e.target.value)
-                }
+                onChange={(e) => setPassword(e.target.value)}
                 className="w-full bg-transparent px-4 text-lg outline-none"
               />
 
               <button
                 type="button"
-                onClick={() =>
-                  setShowPassword(
-                    !showPassword
-                  )
-                }
+                onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? (
-                  <EyeOff
-                    size={22}
-                    className="text-slate-400"
-                  />
+                  <EyeOff size={22} className="text-slate-400" />
                 ) : (
-                  <Eye
-                    size={22}
-                    className="text-slate-400"
-                  />
+                  <Eye size={22} className="text-slate-400" />
                 )}
               </button>
             </div>
@@ -352,9 +339,7 @@ export default function LoginForm() {
             disabled={loading}
             className="h-[62px] w-full rounded-2xl bg-[#17324D] text-xl font-semibold text-white transition hover:bg-[#244867] disabled:cursor-not-allowed disabled:opacity-70"
           >
-            {loading
-              ? "Logging in..."
-              : "Login"}
+            {loading ? "Logging in..." : "Login"}
           </button>
         </form>
 
@@ -362,16 +347,13 @@ export default function LoginForm() {
         <div className="my-10 flex items-center gap-4">
           <div className="h-px flex-1 bg-gray-200" />
 
-          <span className="text-[#6B7280]">
-            or Continue with
-          </span>
+          <span className="text-[#6B7280]">or Continue with</span>
 
           <div className="h-px flex-1 bg-gray-200" />
         </div>
 
         {/* Social */}
         <div className="grid grid-cols-2 gap-5">
-
           <button
             type="button"
             className="flex h-[60px] items-center justify-center gap-3 rounded-2xl border border-[#D8DEE6] font-semibold"
@@ -384,13 +366,9 @@ export default function LoginForm() {
             type="button"
             className="flex h-[60px] items-center justify-center gap-3 rounded-2xl border border-[#D8DEE6] font-semibold"
           >
-            <FaFacebookF
-              size={20}
-              className="text-blue-600"
-            />
+            <FaFacebookF size={20} className="text-blue-600" />
             Facebook
           </button>
-
         </div>
 
         {/* Terms */}
@@ -407,7 +385,6 @@ export default function LoginForm() {
 
         {/* Help */}
         <div className="mt-10 rounded-2xl border border-[#D8DEE6] bg-[#F8FAFC] p-6">
-
           <h3 className="font-semibold text-[#17324D]">
             Need help?
           </h3>
@@ -423,9 +400,7 @@ export default function LoginForm() {
           >
             Contact Support →
           </button>
-
         </div>
-
       </div>
     </section>
   );

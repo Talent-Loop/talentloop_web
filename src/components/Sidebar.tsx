@@ -22,46 +22,46 @@ interface SidebarLink {
 }
 
 const links: SidebarLink[] = [
-  { label: "Overview", to: "/", icon: FiHome },
-  { label: "User", to: "/users", icon: FiUsers },
+  { label: "Overview", to: "/admin", icon: FiHome },
+  { label: "User", to: "/admin/users", icon: FiUsers },
   {
     label: "Agent Application",
-    to: "/agent-applications",
+    to: "/admin/agent-applications",
     icon: FiFileText,
   },
   {
     label: "Transactions",
-    to: "/transactions",
+    to: "/admin/transactions",
     icon: FiBarChart2,
   },
   {
     label: "Wallet Deposits",
-    to: "/wallet-deposits",
+    to: "/admin/wallet-deposits",
     icon: FiDollarSign,
   },
   {
     label: "Withdrawal Request",
-    to: "/withdrawal-request",
+    to: "/admin/withdrawal-request",
     icon: FiCreditCard,
   },
   {
     label: "Categories",
-    to: "/categories",
+    to: "/admin/categories",
     icon: FiList,
   },
   {
     label: "Withdrawal History",
-    to: "/withdrawal-history",
+    to: "/admin/withdrawal-history",
     icon: FiRotateCcw,
   },
   {
     label: "Agent Earnings Report",
-    to: "/agent-earnings-report",
+    to: "/admin/agent-earnings-report",
     icon: FiClipboard,
   },
   {
     label: "Bonus Management",
-    to: "/bonus-management",
+    to: "/admin/bonus-management",
     icon: FiGift,
   },
 ];
@@ -95,7 +95,7 @@ export default function Sidebar() {
             <NavLink
               key={to}
               to={to}
-              end={to === "/"}
+              end={to === "/admin"}
               className={({ isActive }) =>
                 isActive
                   ? "flex items-center gap-3 rounded-full bg-white px-4 py-3 text-sm font-semibold text-slate-900 shadow-sm transition-all duration-200"

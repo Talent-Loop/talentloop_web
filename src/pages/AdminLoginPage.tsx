@@ -49,20 +49,51 @@ export default function LoginPage() {
         password: form.password,
       });
 
-      console.log(response);
+      
+console.log(response);
 
-      const token =
-        response?.data?.accessToken ||
-        response?.accessToken ||
-        response?.token;
+const token =
+  response?.data?.accessToken ||
+  response?.accessToken ||
+  response?.token;
 
-      if (token) {
-        localStorage.setItem("token", token);
-      }
+if (!token) {
+  toast.error("Login failed: no access token received.");
+  return;
+}
 
-      toast.success("Login successful");
+// Read the role from the access token.
+let role: string;
 
-      navigate("/");
+try {
+  const payload = token.split(".")[1];
+
+  if (!payload) {
+    throw new Error("Invalid token");
+  }
+
+  const normalizedPayload = payload
+    .replace(/-/g, "+")
+    .replace(/_/g, "/");
+
+  const userData = JSON.parse(atob(normalizedPayload));
+  role = userData?.role;
+} catch {
+  toast.error("Unable to verify your account role.");
+  return;
+}
+
+// Only admin accounts can use this login page.
+if (role !== "admin") {
+  toast.error("Access denied. Please use your correct login page.");
+  return;
+}
+
+localStorage.setItem("token", token);
+
+toast.success("Admin login successful");
+navigate("/admin");
+
     } catch (error: any) {
       console.error(error);
 
