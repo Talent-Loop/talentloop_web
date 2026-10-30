@@ -16,12 +16,12 @@ export default function RoleSelectionPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAFBFC] font-sans text-[#111827]">
-      <header className="h-[72px] w-full bg-[#173D57]">
-        <div className="mx-auto flex h-full max-w-[1440px] items-center justify-between px-6 lg:px-12 xl:px-16">
+    <div className="min-h-screen overflow-x-hidden bg-[#FAFBFC] font-sans text-[#111827]">
+      <header className="relative z-50 h-[72px] w-full bg-[#173D57]">
+        <div className="mx-auto flex h-full max-w-[1440px] items-center justify-between px-4 sm:px-6 lg:px-12 xl:px-16">
           <Link
             to="/"
-            className="shrink-0 text-[22px] font-bold tracking-[-0.3px] text-white"
+            className="shrink-0 text-[20px] font-bold tracking-[-0.3px] text-white sm:text-[22px]"
           >
             TALENTLOOP
           </Link>
@@ -84,15 +84,16 @@ export default function RoleSelectionPage() {
           <button
             type="button"
             onClick={() => setMobileMenuOpen((prev) => !prev)}
-            className="flex h-10 w-10 items-center justify-center rounded-lg border border-white/30 text-white lg:hidden"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-white/30 text-white lg:hidden"
             aria-label="Toggle navigation menu"
+            aria-expanded={mobileMenuOpen}
           >
             {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
           </button>
         </div>
 
         {mobileMenuOpen && (
-          <div className="relative z-50 border-t border-white/10 bg-[#173D57] px-6 pb-6 pt-4 shadow-lg lg:hidden">
+          <div className="absolute left-0 top-full z-50 w-full border-t border-white/10 bg-[#173D57] px-4 pb-6 pt-4 shadow-lg sm:px-6 lg:hidden">
             <nav className="flex flex-col gap-1">
               <Link
                 to="/"
@@ -162,24 +163,24 @@ export default function RoleSelectionPage() {
         )}
       </header>
 
-      <main className="flex min-h-[calc(100vh-72px)] items-start justify-center px-5 pb-16 pt-[105px] sm:px-6 sm:pt-[115px]">
+      <main className="flex min-h-[calc(100vh-72px)] items-start justify-center px-4 pb-12 pt-16 sm:px-6 sm:pb-16 sm:pt-[115px]">
         <section className="flex w-full max-w-[500px] flex-col items-center">
-          <h1 className="text-center text-[28px] font-bold leading-[1.25] tracking-[-0.4px] text-[#252525] sm:text-[30px]">
+          <h1 className="max-w-full text-center text-[24px] font-bold leading-[1.3] tracking-[-0.4px] text-[#252525] sm:text-[30px]">
             How will you use SkillConnect?
           </h1>
 
-          <p className="mt-4 max-w-[430px] text-center text-[16px] font-normal leading-[1.55] text-[#667085]">
+          <p className="mt-3 max-w-[430px] text-center text-[14px] font-normal leading-[1.55] text-[#667085] sm:mt-4 sm:text-[16px]">
             Select how you intend to use the platform to
             <br className="hidden sm:block" />
             personalize your experience.
           </p>
 
-          <div className="mt-[38px] flex w-full flex-col gap-4">
+          <div className="mt-8 flex w-full flex-col gap-4 sm:mt-[38px]">
             {/* CLIENT */}
             <button
               type="button"
               onClick={() => handleRoleSelect("client")}
-              className="group flex h-[94px] w-full items-center rounded-[13px] border border-[#E2E5E9] bg-white px-6 text-left shadow-[0_2px_8px_rgba(16,24,40,0.04)] transition duration-200 hover:border-[#173D57]/40 hover:bg-[#FCFDFE] hover:shadow-[0_5px_14px_rgba(16,24,40,0.08)] focus:outline-none focus:ring-2 focus:ring-[#173D57]/20"
+              className="group flex min-h-[94px] w-full items-center rounded-[13px] border border-[#E2E5E9] bg-white px-4 py-4 text-left shadow-[0_2px_8px_rgba(16,24,40,0.04)] transition duration-200 hover:border-[#173D57]/40 hover:bg-[#FCFDFE] hover:shadow-[0_5px_14px_rgba(16,24,40,0.08)] focus:outline-none focus:ring-2 focus:ring-[#173D57]/20 sm:px-6 sm:py-0"
             >
               <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#F1F4F6]">
                 <UserRound
@@ -189,12 +190,12 @@ export default function RoleSelectionPage() {
                 />
               </div>
 
-              <div className="ml-4">
-                <h2 className="text-[18px] font-semibold leading-6 text-[#252525]">
+              <div className="ml-4 min-w-0">
+                <h2 className="text-[17px] font-semibold leading-6 text-[#252525] sm:text-[18px]">
                   Client
                 </h2>
 
-                <p className="mt-1 text-[15px] font-normal leading-5 text-[#667085]">
+                <p className="mt-1 text-[13px] font-normal leading-5 text-[#667085] sm:text-[15px]">
                   I need to hire a skilled worker
                 </p>
               </div>
@@ -204,7 +205,7 @@ export default function RoleSelectionPage() {
             <button
               type="button"
               onClick={() => handleRoleSelect("provider")}
-              className="group flex h-[94px] w-full items-center rounded-[13px] border border-[#E2E5E9] bg-white px-6 text-left shadow-[0_2px_8px_rgba(16,24,40,0.04)] transition duration-200 hover:border-[#173D57]/40 hover:bg-[#FCFDFE] hover:shadow-[0_5px_14px_rgba(16,24,40,0.08)] focus:outline-none focus:ring-2 focus:ring-[#173D57]/20"
+              className="group flex min-h-[94px] w-full items-center rounded-[13px] border border-[#E2E5E9] bg-white px-4 py-4 text-left shadow-[0_2px_8px_rgba(16,24,40,0.04)] transition duration-200 hover:border-[#173D57]/40 hover:bg-[#FCFDFE] hover:shadow-[0_5px_14px_rgba(16,24,40,0.08)] focus:outline-none focus:ring-2 focus:ring-[#173D57]/20 sm:px-6 sm:py-0"
             >
               <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#F1F4F6]">
                 <Wrench
@@ -214,13 +215,13 @@ export default function RoleSelectionPage() {
                 />
               </div>
 
-              <div className="ml-4">
-                <h2 className="text-[18px] font-semibold leading-6 text-[#252525]">
+              <div className="ml-4 min-w-0">
+                <h2 className="text-[17px] font-semibold leading-6 text-[#252525] sm:text-[18px]">
                   Service Provider
                 </h2>
 
-                <p className="mt-1 text-[15px] font-normal leading-5 text-[#667085]">
-                  I want to find jobs nad earn
+                <p className="mt-1 text-[13px] font-normal leading-5 text-[#667085] sm:text-[15px]">
+                  I want to find jobs and earn
                 </p>
               </div>
             </button>
