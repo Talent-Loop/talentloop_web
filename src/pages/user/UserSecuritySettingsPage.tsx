@@ -1,11 +1,20 @@
+
 import { useState } from "react";
 import { FiArrowLeft, FiLock } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
+import clientApi from "../../services/clientApi";
+import toast from "react-hot-toast";
 
 interface PasswordForm {
   currentPassword: string;
   newPassword: string;
   confirmPassword: string;
+}
+
+interface PasswordErrors {
+  currentPassword?: string;
+  newPassword?: string;
+  confirmPassword?: string;
 }
 
 export default function UserSecuritySettingsPage() {
@@ -18,6 +27,7 @@ export default function UserSecuritySettingsPage() {
   });
 
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<PasswordErrors>({});
 
   const updateField = (
     field: keyof PasswordForm,
@@ -27,6 +37,11 @@ export default function UserSecuritySettingsPage() {
       ...prev,
       [field]: value,
     }));
+
+    setErrors((prev) => ({
+      ...prev,
+      [field]: "",
+    }));
   };
 
   const handleSubmit = async (
@@ -34,15 +49,97 @@ export default function UserSecuritySettingsPage() {
   ) => {
     event.preventDefault();
 
-    if (form.newPassword !== form.confirmPassword) {
+    const newErrors: PasswordErrors = {};
+
+    if (!form.currentPassword) {
+      newErrors.currentPassword = "Current password is required.";
+    }
+
+    if (!form.newPassword) {
+      newErrors.newPassword = "New password is required.";
+    }
+
+    if (!form.confirmPassword) {
+      newErrors.confirmPassword =
+        "Please confirm your new password.";
+    }
+
+    if (
+      form.newPassword &&
+      form.confirmPassword &&
+      form.newPassword !== form.confirmPassword
+    ) {
+      newErrors.confirmPassword = "Passwords do not match.";
+    }
+
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length > 0) {
       return;
     }
 
     setLoading(true);
 
     try {
-      // Connect to your existing change-password service here.
-      // Do not create a fake endpoint.
+      const response = await clientApi.patch(
+        "/auth/update-password",
+        {
+          oldPassword: form.currentPassword,
+          newPassword: form.newPassword,
+          confirmPassword: form.confirmPassword,
+        }
+      );
+
+      toast.success(
+        response.data?.message || "Password updated successfully!"
+      );
+
+      setForm({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+
+      setErrors({});
+    } catch (error: any) {
+      const responseData = error.response?.data;
+      const backendErrors: string[] = responseData?.errors || [];
+
+      if (backendErrors.length > 0) {
+        const newErrors: PasswordErrors = {};
+
+        backendErrors.forEach((message) => {
+          const lowerMessage = message.toLowerCase();
+
+          if (lowerMessage.includes("oldpassword")) {
+            newErrors.currentPassword = message;
+          }
+
+          if (lowerMessage.includes("newpassword")) {
+            newErrors.newPassword = message;
+          }
+
+          if (lowerMessage.includes("confirmpassword")) {
+            newErrors.confirmPassword = message;
+          }
+        });
+
+        setErrors(newErrors);
+
+        if (Object.keys(newErrors).length === 0) {
+          toast.error(
+            responseData?.message || "Password update failed."
+          );
+        }
+      } else {
+        const message =
+          responseData?.message ||
+          "Unable to update password. Please try again.";
+
+        toast.error(
+          Array.isArray(message) ? message.join(", ") : message
+        );
+      }
     } finally {
       setLoading(false);
     }
@@ -89,14 +186,21 @@ export default function UserSecuritySettingsPage() {
               type="password"
               value={form.currentPassword}
               onChange={(e) =>
-                updateField(
-                  "currentPassword",
-                  e.target.value
-                )
+                updateField("currentPassword", e.target.value)
               }
               placeholder="Enter current password"
-              className="h-[44px] w-full rounded-[12px] border border-[#DCE3EA] bg-[#F8FAFC] px-3 text-[14px] text-[#0F172A] outline-none placeholder:text-[#94A3B8]"
+              className={`h-[44px] w-full rounded-[12px] border ${
+                errors.currentPassword
+                  ? "border-red-500"
+                  : "border-[#DCE3EA]"
+              } bg-[#F8FAFC] px-3 text-[14px] text-[#0F172A] outline-none placeholder:text-[#94A3B8]`}
             />
+
+            {errors.currentPassword && (
+              <p className="mt-1 text-[12px] text-red-500">
+                {errors.currentPassword}
+              </p>
+            )}
           </div>
 
           <div>
@@ -111,8 +215,18 @@ export default function UserSecuritySettingsPage() {
                 updateField("newPassword", e.target.value)
               }
               placeholder="Enter new password"
-              className="h-[44px] w-full rounded-[12px] border border-[#DCE3EA] bg-[#F8FAFC] px-3 text-[14px] text-[#0F172A] outline-none placeholder:text-[#94A3B8]"
+              className={`h-[44px] w-full rounded-[12px] border ${
+                errors.newPassword
+                  ? "border-red-500"
+                  : "border-[#DCE3EA]"
+              } bg-[#F8FAFC] px-3 text-[14px] text-[#0F172A] outline-none placeholder:text-[#94A3B8]`}
             />
+
+            {errors.newPassword && (
+              <p className="mt-1 text-[12px] text-red-500">
+                {errors.newPassword}
+              </p>
+            )}
           </div>
 
           <div>
@@ -124,14 +238,21 @@ export default function UserSecuritySettingsPage() {
               type="password"
               value={form.confirmPassword}
               onChange={(e) =>
-                updateField(
-                  "confirmPassword",
-                  e.target.value
-                )
+                updateField("confirmPassword", e.target.value)
               }
               placeholder="Confirm new password"
-              className="h-[44px] w-full rounded-[12px] border border-[#DCE3EA] bg-[#F8FAFC] px-3 text-[14px] text-[#0F172A] outline-none placeholder:text-[#94A3B8]"
+              className={`h-[44px] w-full rounded-[12px] border ${
+                errors.confirmPassword
+                  ? "border-red-500"
+                  : "border-[#DCE3EA]"
+              } bg-[#F8FAFC] px-3 text-[14px] text-[#0F172A] outline-none placeholder:text-[#94A3B8]`}
             />
+
+            {errors.confirmPassword && (
+              <p className="mt-1 text-[12px] text-red-500">
+                {errors.confirmPassword}
+              </p>
+            )}
           </div>
         </div>
 
