@@ -540,7 +540,7 @@ export default function PostJobPage() {
         </div>
 
         {/* LOCATION */}
-        <div className="absolute left-[10px] right-[10px] top-[806px] w-auto lg:left-[10px] lg:right-auto lg:top-[700px] lg:w-[min(980px,calc(100%-20px))]">
+        <div className="absolute left-[10px] right-[10px] top-[890px] w-auto lg:left-[10px] lg:right-auto lg:top-[700px] lg:w-[min(980px,calc(100%-20px))]">
           <label
             htmlFor="location"
             className="
