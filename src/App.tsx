@@ -1,4 +1,3 @@
-
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import type { ReactNode } from "react";
@@ -46,6 +45,7 @@ import NotFoundPage from "./pages/NotFoundPage";
 // ================= USER DASHBOARD =================
 
 import UserDashboardPage from "./pages/user/UserDashboardPage";
+import JobDetailsPage from "./pages/user/JobDetailsPage";
 import PostJobPage from "./pages/user/PostJobPage";
 import UserMyJobsPage from "./pages/user/MyJobsPage";
 import ViewBidsPage from "./pages/user/ViewBidsPage";
@@ -56,10 +56,13 @@ import UserEditProfilePage from "./pages/user/UserEditProfilePage";
 import UserSecuritySettingsPage from "./pages/user/UserSecuritySettingsPage";
 import UserNotificationsPage from "./pages/user/UserNotificationsPage";
 import UserWorkerProfilePage from "./pages/user/WorkerProfilePage";
+import UserPaymentPage from "./pages/user/UserPaymentPage";
 import RecentActivities from "./pages/user/RecentActivities";
 
-function ProtectedRoute({ children }: { children: ReactNode }) {
-  const token = localStorage.getItem("accessToken");
+// ================= ROUTE PROTECTION =================
+
+function AdminProtectedRoute({ children }: { children: ReactNode }) {
+  const token = localStorage.getItem("token");
 
   if (!token) {
     return <Navigate to="/admin/login" replace />;
@@ -67,12 +70,27 @@ function ProtectedRoute({ children }: { children: ReactNode }) {
 
   return <>{children}</>;
 }
+
+function UserProtectedRoute({ children }: { children: ReactNode }) {
+  const token = localStorage.getItem("accessToken");
+
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return <>{children}</>;
+}
+
+// ================= APP =================
+
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
         {/* ================= USER / PUBLIC ================= */}
-<Route path="/role-selection" element={<RoleSelectionPage />} />
+
+        <Route path="/role-selection" element={<RoleSelectionPage />} />
+
         <Route path="/" element={<LandingPage />} />
 
         <Route path="/login" element={<LoginPage />} />
@@ -83,6 +101,7 @@ export default function App() {
           path="/register/professional"
           element={<RegisterProfessionalPage />}
         />
+
         <Route path="/verify-email" element={<VerifyEmailPage />} />
 
         {/* ================= ARTISAN ================= */}
@@ -121,9 +140,9 @@ export default function App() {
         <Route
           path="/admin"
           element={
-            <ProtectedRoute>
+            <AdminProtectedRoute>
               <DashboardLayout />
-            </ProtectedRoute>
+            </AdminProtectedRoute>
           }
         >
           <Route index element={<OverviewPage />} />
@@ -164,9 +183,9 @@ export default function App() {
         <Route
           path="/dashboard"
           element={
-            <ProtectedRoute>
+            <UserProtectedRoute>
               <UserDashboardLayout />
-            </ProtectedRoute>
+            </UserProtectedRoute>
           }
         >
           <Route index element={<UserDashboardPage />} />
@@ -175,11 +194,13 @@ export default function App() {
 
           <Route path="jobs/bids" element={<ViewBidsPage />} />
 
+          <Route path="jobs/:id" element={<JobDetailsPage />} />
           <Route path="post" element={<PostJobPage />} />
 
           <Route path="messages" element={<UserMessagesPage />} />
 
           <Route path="messages/:id" element={<UserChatPage />} />
+          <Route path="payment" element={<UserPaymentPage />} />
 
           <Route path="profile" element={<UserProfilePage />} />
 
@@ -220,4 +241,3 @@ export default function App() {
     </BrowserRouter>
   );
 }
-
