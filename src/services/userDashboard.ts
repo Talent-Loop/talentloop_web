@@ -25,16 +25,16 @@ export interface ClientJob {
 }
 
 interface MyJobsResponse {
-  success: boolean;
-  data: {
-    data: ClientJob[];
-    meta: {
+  success?: boolean;
+  data?: {
+    data?: ClientJob[];
+    meta?: {
       total: number;
       page: number;
       limit: number;
       totalPages: number;
     };
-  };
+  } | ClientJob[];
 }
 
 export async function getMyJobs(): Promise<ClientJob[]> {
@@ -46,5 +46,17 @@ export async function getMyJobs(): Promise<ClientJob[]> {
     },
   });
 
-  return response.data.data.data;
+  const payload = response.data?.data;
+
+  // Handle either a direct array or a paginated response.
+  if (Array.isArray(payload)) {
+    return payload;
+  }
+
+  if (payload && Array.isArray(payload.data)) {
+    return payload.data;
+  }
+
+  console.warn("Unexpected /jobs/my-jobs response:", response.data);
+  return [];
 }

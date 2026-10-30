@@ -57,11 +57,11 @@ export default function UserDashboardPage() {
         setLoading(true);
         setError("");
 
-        const result = await getMyJobs();
+       const result = await getMyJobs();
 
-        if (active) {
-          setJobs(result);
-        }
+if (active) {
+  setJobs(Array.isArray(result) ? result : []);
+}
       } catch (err) {
         console.error("Failed to load client jobs:", err);
 

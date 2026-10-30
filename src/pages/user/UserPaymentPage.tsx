@@ -1,17 +1,14 @@
 
 import { useMemo, useState } from "react";
-import type { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  FiArrowLeft,
-  FiCheckCircle,
-  FiClock,
-  FiCreditCard,
-  FiFilter,
-  FiSearch,
-  FiXCircle,
-  FiChevronDown,
-} from "react-icons/fi";
+import ConfirmProfessionalModal from "../../components/user/ConfirmProfessionalModal";
+import VerificationInProgressModal from "../../components/user/VerificationInProgressModal";
+import BankTransferVerificationModal from "../../components/user/BankTransferVerificationModal";
+import PaymentSummaryModal from "../../components/user/PaymentSummaryModal";
+import PaymentMethodModal, {
+  type PaymentMethod,
+} from "../../components/user/PaymentMethodModal";
+import PaymentSuccessModal from "../../components/user/PaymentSuccessModal";
 
 type PaymentStatus = "Completed" | "Pending" | "Failed";
 type PaymentTab = "All" | PaymentStatus;
@@ -84,6 +81,16 @@ export default function UserPaymentPage() {
   const [category, setCategory] = useState("All Categories");
   const [filterOpen, setFilterOpen] = useState(false);
 
+  const [selectedPayment, setSelectedPayment] =
+    useState<Payment | null>(null);
+
+  const [showVerification, setShowVerification] = useState(false);
+  const [showPaymentSummary, setShowPaymentSummary] = useState(false);
+  const [showPaymentMethod, setShowPaymentMethod] = useState(false);
+  const [showBankTransferVerification, setShowBankTransferVerification] =
+    useState(false);
+  const [showPaymentSuccess, setShowPaymentSuccess] = useState(false);
+
   const filteredPayments = useMemo(() => {
     const query = search.trim().toLowerCase();
 
@@ -92,7 +99,8 @@ export default function UserPaymentPage() {
         activeTab === "All" || payment.status === activeTab;
 
       const matchesCategory =
-        category === "All Categories" || payment.category === category;
+        category === "All Categories" ||
+        payment.category === category;
 
       const searchableText = [
         payment.title,
@@ -119,286 +127,362 @@ export default function UserPaymentPage() {
     setFilterOpen(false);
   };
 
+  // Existing confirmation flow.
+  const handleContinueToPayment = () => {
+    setShowVerification(true);
+  };
+
+  const handleCancelConfirmation = () => {
+    setSelectedPayment(null);
+  };
+
+  const handleCancelVerification = () => {
+    setShowVerification(false);
+  };
+
+  const handleOpenPaymentSummary = () => {
+    setShowVerification(false);
+    setShowPaymentSummary(true);
+  };
+
+  const handleCancelPaymentSummary = () => {
+    setShowPaymentSummary(false);
+    setSelectedPayment(null);
+  };
+
+  const handleProceedToPayment = () => {
+    if (!selectedPayment) return;
+
+    setShowPaymentSummary(false);
+    setShowPaymentMethod(true);
+  };
+
+  const handleCancelPaymentMethod = () => {
+    setShowPaymentMethod(false);
+    setShowPaymentSummary(true);
+  };
+
+  // Open bank-transfer verification or retain the card placeholder.
+  const handleSelectPaymentMethod = (method: PaymentMethod) => {
+    if (!selectedPayment) return;
+
+    setShowPaymentMethod(false);
+
+    if (method === "bank-transfer") {
+      setShowBankTransferVerification(true);
+      return;
+    }
+
+    console.log("Selected card payment (UI preview only)", {
+      paymentId: selectedPayment.id,
+      amount: selectedPayment.amount,
+    });
+  };
+
+  // TEMPORARY UI PREVIEW ONLY.
+  // This does not verify a transaction or initiate a real payment.
+  const handlePreviewPaymentSuccess = () => {
+    setShowBankTransferVerification(false);
+    setShowPaymentSuccess(true);
+  };
+
+  const handlePaymentSuccessClose = () => {
+    setShowPaymentSuccess(false);
+    setSelectedPayment(null);
+  };
+
   return (
-    <div className="w-full min-w-0 bg-white font-['Montserrat'] text-[#333333]">
-      <div className="w-full pb-8">
-        {/* Back navigation and page heading */}
-        <div className="mb-7">
+    <main className="min-h-full w-full min-w-0 bg-[#F6F9F9] font-['Montserrat'] text-[#202C40]">
+      <div className="mx-auto w-full max-w-[1200px] px-4 pb-10 pt-5 sm:px-6 lg:px-7 lg:pt-7">
+        {/* Page heading */}
+        <header className="mb-8">
           <button
             type="button"
             onClick={() => navigate("/dashboard")}
-            className="mb-4 inline-flex items-center gap-2 text-[12px] font-medium text-[#526A79] transition-colors hover:text-[#0D2E43]"
+            className="mb-4 text-[13px] font-medium text-[#23658B] transition-colors hover:text-[#10344A]"
           >
-            <FiArrowLeft className="h-[15px] w-[15px]" />
-            Back to Dashboard
+            Back
           </button>
 
-          <h1 className="text-[25px] font-semibold leading-tight text-[#333333]">
+          <h1 className="text-[23px] font-bold leading-tight tracking-[-0.5px] text-[#202C40] sm:text-[25px]">
             Payment
           </h1>
 
-          <p className="mt-2 text-[13px] leading-5 text-[#777777]">
-            Manage your payments and transaction history.
+          <p className="mt-2 text-[13px] leading-5 text-[#344155] sm:text-[15px]">
+            Manage your payments and transaction history
           </p>
-        </div>
+        </header>
 
-        {/* Four summary cards */}
+        {/* Payment summary cards */}
         <section
           aria-label="Payment summary"
-          className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4"
+          className="mb-10 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 xl:gap-6"
         >
-          <SummaryCard
-            title="Total Paid"
-            value="₦45,000"
-            icon={<FiCreditCard />}
-          />
-
-          <SummaryCard
-            title="Pending"
-            value="₦4,000"
-            icon={<FiClock />}
-          />
-
-          <SummaryCard
-            title="Completed"
-            value="12"
-            icon={<FiCheckCircle />}
-          />
-
-          <SummaryCard
-            title="Failed"
-            value="0"
-            icon={<FiXCircle />}
-          />
+          <SummaryCard title="Total Paid" value="₦45,000" />
+          <SummaryCard title="Pending" value="₦4,000" />
+          <SummaryCard title="Completed" value="12" />
+          <SummaryCard title="Failed" value="0" />
         </section>
 
-        {/* Transaction history */}
-        <section className="w-full">
-          <div className="mb-4">
-            <h2 className="text-[18px] font-semibold leading-6 text-[#333333]">
-              Transaction History
-            </h2>
+        {/* Status tabs */}
+        <nav
+          aria-label="Filter payments by status"
+          className="mb-7 grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-5 xl:max-w-[770px] xl:gap-8"
+        >
+          {tabs.map((tab) => {
+            const selected = activeTab === tab;
 
-            <p className="mt-1 text-[12px] leading-5 text-[#777777]">
-              View and track your recent payments.
-            </p>
-          </div>
-
-          {/* Status tabs */}
-          <div className="mb-4 flex flex-wrap items-center gap-2">
-            {tabs.map((tab) => {
-              const selected = activeTab === tab;
-
-              return (
-                <button
-                  key={tab}
-                  type="button"
-                  onClick={() => setActiveTab(tab)}
-                  aria-pressed={selected}
-                  className={[
-                    "inline-flex h-[35px] items-center justify-center rounded-md px-4 text-[12px] font-medium transition-colors duration-200",
-                    selected
-                      ? "bg-[#E9EDF0] text-[#0D2E43]"
-                      : "bg-white text-[#777777] hover:bg-[#F6F8F9] hover:text-[#0D2E43]",
-                  ].join(" ")}
-                >
-                  {tab}
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Search and category filter */}
-          <div className="relative mb-5 flex w-full items-center gap-3">
-            <div className="relative min-w-0 flex-1">
-              <FiSearch
-                aria-hidden="true"
-                className="absolute left-3.5 top-1/2 h-[16px] w-[16px] -translate-y-1/2 text-[#849197]"
-              />
-
-              <input
-                type="search"
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-                placeholder="Search Payments"
-                aria-label="Search payments"
-                className="h-[42px] w-full rounded-md border border-[#E1E5E8] bg-white pl-10 pr-3 text-[12px] text-[#333333] outline-none placeholder:text-[#8A969D] transition-colors focus:border-[#526F81]"
-              />
-            </div>
-
-            <button
-              type="button"
-              onClick={() => setFilterOpen((open) => !open)}
-              aria-expanded={filterOpen}
-              className="inline-flex h-[42px] flex-shrink-0 items-center justify-center gap-2 rounded-md bg-[#0D2E43] px-4 text-[12px] font-medium text-white transition-colors hover:bg-[#17445D]"
-            >
-              <FiFilter className="h-[15px] w-[15px]" />
-              Filter
-              <FiChevronDown
-                className={`h-[13px] w-[13px] transition-transform ${
-                  filterOpen ? "rotate-180" : ""
+            return (
+              <button
+                key={tab}
+                type="button"
+                onClick={() => setActiveTab(tab)}
+                aria-pressed={selected}
+                className={`flex h-[42px] items-center justify-center rounded-full border px-4 text-[12px] font-medium transition-colors sm:text-[13px] ${
+                  selected
+                    ? "border-[#DFE6E8] bg-[#DFE6E8] text-[#163B51]"
+                    : "border-[#DFE5E8] bg-white text-[#171717] hover:bg-[#F0F4F5]"
                 }`}
-              />
-            </button>
-
-            {filterOpen && (
-              <div className="absolute right-0 top-[49px] z-30 w-[220px] rounded-md border border-[#E1E5E8] bg-white p-4 shadow-lg">
-                <label
-                  htmlFor="payment-category"
-                  className="mb-2 block text-[12px] font-medium text-[#333333]"
-                >
-                  Category
-                </label>
-
-                <select
-                  id="payment-category"
-                  value={category}
-                  onChange={(event) => setCategory(event.target.value)}
-                  className="h-[38px] w-full rounded-md border border-[#E1E5E8] bg-white px-2 text-[12px] text-[#526A79] outline-none focus:border-[#526F81]"
-                >
-                  {categories.map((item) => (
-                    <option key={item} value={item}>
-                      {item}
-                    </option>
-                  ))}
-                </select>
-
-                <button
-                  type="button"
-                  onClick={resetFilters}
-                  className="mt-3 w-full rounded-md border border-[#DDE3E7] px-3 py-2 text-[12px] font-medium text-[#0D2E43] transition-colors hover:bg-[#F6F8F9]"
-                >
-                  Reset filters
-                </button>
-              </div>
-            )}
-          </div>
-
-          {/* Individual transaction rows */}
-          <div className="flex flex-col gap-3">
-            {filteredPayments.map((payment) => (
-              <article
-                key={payment.id}
-                className="flex min-h-[98px] w-full items-center justify-between gap-4 rounded-lg border border-[#E3E7E9] bg-white px-4 py-4 transition-colors hover:border-[#CCD6DC] sm:px-5"
               >
-                {/* Worker and job information */}
-                <div className="flex min-w-0 flex-1 items-center gap-3">
-                  <div className="relative h-[42px] w-[42px] flex-shrink-0 overflow-hidden rounded-full bg-[#E9EDF0]">
-                    <span className="absolute inset-0 flex items-center justify-center text-[11px] font-semibold text-[#0D2E43]">
-                      {payment.initials}
-                    </span>
+                {tab}
+              </button>
+            );
+          })}
+        </nav>
 
-                    <img
-                      src={payment.avatar}
-                      alt={payment.professional}
-                      loading="lazy"
-                      className="absolute inset-0 h-full w-full rounded-full object-cover"
-                      onError={(event) => {
-                        event.currentTarget.style.display = "none";
-                      }}
-                    />
-                  </div>
+        {/* Search and filter */}
+        <div className="relative mb-7 flex w-full items-center gap-3 sm:gap-6">
+          <input
+            type="search"
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="Search Payments"
+            aria-label="Search payments"
+            className="h-[47px] min-w-0 flex-1 rounded-full border border-[#DDE3E3] bg-white px-5 text-[12px] text-[#253447] outline-none placeholder:text-[#929CA8] focus:border-[#185779] sm:text-[13px]"
+          />
 
-                  <div className="min-w-0">
-                    <h3 className="break-words text-[12px] font-semibold leading-[18px] text-[#34454E] sm:text-[13px]">
-                      {payment.title}
-                    </h3>
-
-                    <p className="mt-1 break-words text-[11px] leading-[17px] text-[#849197] sm:text-[12px]">
-                      {payment.professional} ({payment.category})
-                    </p>
-
-                    <p className="mt-1 text-[10px] leading-[15px] text-[#849197] sm:text-[11px]">
-                      {payment.date}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Amount and status */}
-                <div className="flex flex-shrink-0 flex-col items-end gap-2">
-                  <p className="whitespace-nowrap text-[13px] font-semibold tabular-nums text-[#34454E] sm:text-[14px]">
-                    {currency(payment.amount)}
-                  </p>
-
-                  <StatusBadge status={payment.status} />
-                </div>
-              </article>
-            ))}
-
-            {filteredPayments.length === 0 && (
-              <div className="rounded-lg border border-[#E3E7E9] bg-white px-4 py-10 text-center">
-                <p className="text-[13px] font-semibold text-[#34454E]">
-                  No payments found
-                </p>
-
-                <p className="mt-1 text-[12px] text-[#849197]">
-                  Try another search or change your filters.
-                </p>
-
-                <button
-                  type="button"
-                  onClick={resetFilters}
-                  className="mt-3 text-[12px] font-semibold text-[#0D2E43] underline underline-offset-4 hover:text-[#17445D]"
-                >
-                  Reset filters
-                </button>
-              </div>
-            )}
-          </div>
-        </section>
-
-        {/* Bottom back button */}
-        <div className="mt-7">
           <button
             type="button"
-            onClick={() => navigate("/dashboard")}
-            className="inline-flex h-[38px] min-w-[72px] items-center justify-center gap-2 rounded-[6px] bg-[#10344A] px-4 text-[11px] font-medium text-white transition-colors hover:bg-[#0B293A]"
+            onClick={() => setFilterOpen((open) => !open)}
+            aria-expanded={filterOpen}
+            className="flex h-[47px] shrink-0 items-center justify-center rounded-full bg-[#185779] px-6 text-[12px] font-medium text-white transition-colors hover:bg-[#104661] sm:min-w-[100px] sm:text-[13px]"
           >
-            <FiArrowLeft className="h-[14px] w-[14px]" />
-            Back
+            Filter
           </button>
+
+          {filterOpen && (
+            <div className="absolute right-0 top-[55px] z-30 w-[230px] rounded-xl border border-[#E0E6E8] bg-white p-4 shadow-lg">
+              <label
+                htmlFor="payment-category"
+                className="mb-2 block text-[12px] font-medium text-[#344155]"
+              >
+                Category
+              </label>
+
+              <select
+                id="payment-category"
+                value={category}
+                onChange={(event) => setCategory(event.target.value)}
+                className="h-[40px] w-full rounded-lg border border-[#DFE5E8] bg-white px-3 text-[12px] text-[#344155] outline-none focus:border-[#185779]"
+              >
+                {categories.map((item) => (
+                  <option key={item} value={item}>
+                    {item}
+                  </option>
+                ))}
+              </select>
+
+              <button
+                type="button"
+                onClick={resetFilters}
+                className="mt-3 w-full rounded-lg border border-[#DFE5E8] px-3 py-2.5 text-[12px] font-medium text-[#185779] hover:bg-[#F3F7F8]"
+              >
+                Reset filters
+              </button>
+            </div>
+          )}
         </div>
+
+        {/* Transaction history */}
+        <section
+          aria-label="Payment transactions"
+          className="flex flex-col gap-4"
+        >
+          {filteredPayments.map((payment) => (
+            <article
+              key={payment.id}
+              role="button"
+              tabIndex={0}
+              aria-label={`Select ${payment.professional} for ${payment.title}`}
+              onClick={() => setSelectedPayment(payment)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  setSelectedPayment(payment);
+                }
+              }}
+              className="flex min-h-[108px] w-full cursor-pointer items-center justify-between gap-3 rounded-[15px] border border-[#DCE5E9] bg-white px-4 py-5 transition-colors hover:border-[#185779] hover:bg-[#FBFDFD] focus:outline-none focus:ring-2 focus:ring-[#185779] sm:min-h-[138px] sm:gap-5 sm:px-8"
+            >
+              <div className="flex min-w-0 flex-1 items-center gap-3 sm:gap-4">
+                <div className="flex h-[48px] w-[48px] shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#E8EEF0] text-[12px] font-semibold text-[#17364A] sm:h-[66px] sm:w-[66px]">
+                  <img
+                    src={payment.avatar}
+                    alt={payment.professional}
+                    loading="lazy"
+                    className="h-full w-full rounded-full object-cover"
+                    onError={(event) => {
+                      event.currentTarget.style.display = "none";
+                    }}
+                  />
+                  <span className="sr-only">{payment.initials}</span>
+                </div>
+
+                <div className="min-w-0">
+                  <h2 className="break-words text-[12px] font-medium leading-5 text-[#344155] sm:text-[13px]">
+                    {payment.title}
+                  </h2>
+
+                  <p className="mt-1 break-words text-[11px] leading-5 text-[#46546B] sm:text-[13px]">
+                    {payment.professional} ({payment.category})
+                  </p>
+
+                  <p className="mt-1 text-[10px] leading-5 text-[#46546B] sm:text-[12px]">
+                    {payment.date}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex shrink-0 flex-col items-end gap-3 sm:gap-4">
+                <p className="whitespace-nowrap text-[12px] font-bold tabular-nums text-[#202C40] sm:text-[13px]">
+                  {currency(payment.amount)}
+                </p>
+
+                <StatusBadge status={payment.status} />
+              </div>
+            </article>
+          ))}
+
+          {filteredPayments.length === 0 && (
+            <div className="rounded-[15px] border border-[#DCE5E9] bg-white px-4 py-12 text-center">
+              <p className="text-[14px] font-semibold text-[#202C40]">
+                No payments found
+              </p>
+
+              <p className="mt-2 text-[12px] text-[#849197]">
+                Try another search or change your filters.
+              </p>
+
+              <button
+                type="button"
+                onClick={resetFilters}
+                className="mt-4 text-[12px] font-semibold text-[#185779] underline underline-offset-4 hover:text-[#104661]"
+              >
+                Reset filters
+              </button>
+            </div>
+          )}
+        </section>
       </div>
-    </div>
+
+      {/* Confirm selected professional */}
+      {selectedPayment &&
+        !showVerification &&
+        !showPaymentSummary &&
+        !showPaymentMethod &&
+        !showBankTransferVerification &&
+        !showPaymentSuccess && (
+          <ConfirmProfessionalModal
+            isOpen={true}
+            professional={{
+              id: String(selectedPayment.id),
+              name: selectedPayment.professional,
+              photo: selectedPayment.avatar,
+              category: selectedPayment.category,
+            }}
+            job={{
+              id: String(selectedPayment.id),
+              title: selectedPayment.title,
+            }}
+            agreedPrice={selectedPayment.amount}
+            onCancel={handleCancelConfirmation}
+            onContinue={handleContinueToPayment}
+          />
+        )}
+
+      {/* Existing verification flow */}
+      <VerificationInProgressModal
+        isOpen={showVerification}
+        onCancel={handleCancelVerification}
+        onComplete={handleOpenPaymentSummary}
+      />
+
+      {/* Payment summary */}
+      <PaymentSummaryModal
+        isOpen={showPaymentSummary}
+        professionalName={selectedPayment?.professional ?? "Emeka Johnson"}
+        professionalPhoto={selectedPayment?.avatar}
+        serviceFee={selectedPayment?.amount ?? 3000}
+        onCancel={handleCancelPaymentSummary}
+        onProceed={handleProceedToPayment}
+      />
+
+      {/* Choose payment method */}
+      <PaymentMethodModal
+        isOpen={showPaymentMethod}
+        onCancel={handleCancelPaymentMethod}
+        onContinue={handleSelectPaymentMethod}
+      />
+
+      {/* Bank-transfer verification */}
+      <BankTransferVerificationModal
+        isOpen={showBankTransferVerification}
+        onPreviewSuccess={handlePreviewPaymentSuccess}
+      />
+
+      {/* Payment success */}
+      <PaymentSuccessModal
+        isOpen={showPaymentSuccess}
+        reference="UI-PREVIEW-REFERENCE"
+        amount={selectedPayment?.amount ?? 3000}
+        status="Paid"
+        professionalName={selectedPayment?.professional ?? "Emeka Johnson"}
+        jobId={String(selectedPayment?.id ?? "")}
+        onClose={handlePaymentSuccessClose}
+      />
+    </main>
   );
 }
 
-interface SummaryCardProps {
+function SummaryCard({
+  title,
+  value,
+}: {
   title: string;
   value: string;
-  icon: ReactNode;
-}
-
-function SummaryCard({ title, value, icon }: SummaryCardProps) {
+}) {
   return (
-    <article className="flex min-h-[106px] items-center justify-between gap-3 rounded-lg border border-[#E3E7E9] bg-white px-4 py-4 sm:px-5">
-      <div className="min-w-0">
-        <p className="text-[11px] font-medium leading-4 text-[#849197] sm:text-[12px]">
-          {title}
-        </p>
+    <article className="flex min-h-[112px] flex-col items-center justify-center gap-5 rounded-[9px] border border-[#DCE5E9] bg-white px-4 py-5 sm:min-h-[130px]">
+      <p className="text-center text-[13px] font-normal leading-5 text-[#344155] sm:text-[15px]">
+        {title}
+      </p>
 
-        <p className="mt-2 text-[21px] font-semibold leading-tight tracking-[-0.3px] text-[#34454E] sm:text-[23px]">
-          {value}
-        </p>
-      </div>
-
-      <div className="flex h-[36px] w-[36px] flex-shrink-0 items-center justify-center rounded-md bg-[#EDF2F5] text-[17px] text-[#10344A]">
-        {icon}
-      </div>
+      <p className="text-center text-[22px] font-bold leading-tight tracking-[-0.4px] text-[#202C40] sm:text-[24px]">
+        {value}
+      </p>
     </article>
   );
 }
 
 function StatusBadge({ status }: { status: PaymentStatus }) {
   const styles: Record<PaymentStatus, string> = {
-    Completed: "bg-[#E3F1E8] text-[#39805A]",
-    Pending: "bg-[#FFF1D9] text-[#B77924]",
-    Failed: "bg-[#FBE7E7] text-[#BF4646]",
+    Completed: "bg-[#C9F0DA] text-[#27844D]",
+    Pending: "bg-[#F9DFC4] text-[#BD6C28]",
+    Failed: "bg-[#F8D9D9] text-[#B93C3C]",
   };
 
   return (
     <span
-      className={`inline-flex min-h-[22px] items-center justify-center rounded-full px-2.5 py-1 text-[10px] font-medium leading-none ${styles[status]}`}
+      className={`inline-flex min-h-[24px] items-center justify-center rounded-full px-3 py-1 text-[9px] font-medium leading-none ${styles[status]}`}
     >
       {status}
     </span>
