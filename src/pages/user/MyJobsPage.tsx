@@ -232,8 +232,9 @@ export default function MyJobsPage() {
       : jobs.filter((job) => job.status === activeFilter);
 
   return (
-    <main className="relative min-h-[1117px] w-full bg-[#F0F4F2]">
-      <div className="relative min-h-[1117px] w-[1179px] bg-[#F7FAF9]">
+    <main className="relative min-h-[1117px] w-full overflow-x-hidden bg-[#F0F4F2]">
+      <div className="relative min-h-[1117px] w-full max-w-[1179px] bg-[#F7FAF9]">
+
         {/* PAGE TITLE */}
         <h1
           className="
@@ -248,8 +249,11 @@ export default function MyJobsPage() {
         {/* FILTER BUTTONS */}
         <div
           className="
-            absolute left-[10px] top-[140px] flex h-[40px]
-            w-[1108px] items-center gap-[16px]
+            absolute left-[10px] right-[10px] top-[100px]
+            flex min-h-[40px] w-auto flex-wrap items-center
+            gap-[10px] lg:left-[10px] lg:right-auto
+            lg:top-[140px] lg:h-[40px] lg:w-[1108px]
+            lg:flex-nowrap lg:gap-[16px]
           "
         >
           {filters.map((filter) => {
@@ -261,9 +265,9 @@ export default function MyJobsPage() {
                 type="button"
                 onClick={() => setActiveFilter(filter)}
                 className={`
-                  flex h-[40px] items-center justify-center rounded-[10px]
-                  border px-[34px] font-['Montserrat'] text-[12px]
-                  font-semibold transition
+                  flex h-[40px] shrink-0 items-center justify-center rounded-[10px]
+                  border px-[16px] font-['Montserrat'] text-[11px]
+                  font-semibold transition lg:px-[34px] lg:text-[12px]
                   ${
                     active
                       ? "border-[#DCE4E9] bg-[#DCE4E9] text-[#1E293B]"
@@ -280,8 +284,9 @@ export default function MyJobsPage() {
         {/* JOB LIST */}
         <div
           className="
-            absolute left-[10px] top-[220px] flex w-screen
-            flex-col gap-[10px]
+            absolute left-[10px] right-[10px] top-[200px]
+            flex w-auto flex-col gap-[10px]
+            lg:left-[10px] lg:right-auto lg:top-[220px] lg:w-screen
           "
         >
           {loading ? (
@@ -317,11 +322,12 @@ export default function MyJobsPage() {
                 type="button"
                 onClick={() => setSelectedJob(job)}
                 className="
-                  relative flex h-[86px] w-[1000px] flex-shrink-0
+                  relative flex h-[86px] w-full flex-shrink-0
                   cursor-pointer flex-col items-start rounded-[10px]
                   bg-white px-[16px] pt-[12px] text-left
                   shadow-[0px_4px_6px_-5px_#0000001F]
                   transition hover:shadow-[0px_5px_12px_-5px_#00000030]
+                  lg:w-[1000px]
                 "
               >
                 <span
@@ -372,10 +378,10 @@ export default function MyJobsPage() {
 
                 <span
                   className={`
-                    absolute right-[50px] top-[31px] flex h-[23px]
+                    absolute right-[12px] top-[31px] flex h-[23px]
                     w-[93px] items-center justify-center rounded-[22px]
                     px-[10px] font-['Montserrat'] text-[10px]
-                    font-normal ${getStatusClasses(job.status)}
+                    font-normal lg:right-[50px] ${getStatusClasses(job.status)}
                   `}
                 >
                   {job.status === "Progress" ? "In Progress" : job.status}
