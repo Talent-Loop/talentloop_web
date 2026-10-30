@@ -110,8 +110,6 @@ export default function PostJobPage() {
         if (photo) URL.revokeObjectURL(photo);
       });
     };
-    // This cleanup intentionally runs on unmount only.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handlePhotoChange = (
@@ -297,8 +295,9 @@ export default function PostJobPage() {
   };
 
   return (
-    <main className="relative min-h-[1117px] w-full bg-[#F8FAFA]">
-      <div className="relative min-h-[1117px] w-full max-w-[1179px]">
+    <main className="relative min-h-[1200px] w-full overflow-x-hidden bg-[#F8FAFA] lg:min-h-[1117px]">
+      <div className="relative min-h-[1200px] w-full max-w-[1179px] lg:min-h-[1117px]">
+
         <h1
           className="
             absolute left-[10px] top-[22px]
@@ -333,7 +332,7 @@ export default function PostJobPage() {
         </section>
 
         {/* SERVICE */}
-        <div className="absolute left-[10px] top-[160px] w-[531px]">
+        <div className="absolute left-[10px] right-[10px] top-[160px] w-auto lg:left-[10px] lg:right-auto lg:w-[531px]">
           <label
             htmlFor="category"
             className="
@@ -383,7 +382,7 @@ export default function PostJobPage() {
         </div>
 
         {/* BUDGET */}
-        <div className="absolute left-[570px] top-[160px] w-[300px]">
+        <div className="absolute left-[10px] right-[10px] top-[266px] w-auto lg:left-[570px] lg:right-auto lg:top-[160px] lg:w-[300px]">
           <label
             htmlFor="budget"
             className="
@@ -416,7 +415,7 @@ export default function PostJobPage() {
         </div>
 
         {/* JOB TITLE */}
-        <div className="absolute left-[10px] top-[266px] w-[532px]">
+        <div className="absolute left-[10px] right-[10px] top-[372px] w-auto lg:left-[10px] lg:right-auto lg:top-[266px] lg:w-[532px]">
           <label
             htmlFor="job-title"
             className="
@@ -447,7 +446,7 @@ export default function PostJobPage() {
         </div>
 
         {/* DESCRIPTION */}
-        <div className="absolute left-[10px] top-[374px] w-[min(1055px,calc(100%-20px))]">
+        <div className="absolute left-[10px] right-[10px] top-[480px] w-auto lg:left-[10px] lg:right-auto lg:top-[374px] lg:w-[min(1055px,calc(100%-20px))]">
           <label
             htmlFor="description"
             className="
@@ -478,7 +477,7 @@ export default function PostJobPage() {
         </div>
 
         {/* PHOTOS */}
-        <div className="absolute left-[10px] top-[550px] w-[681px]">
+        <div className="absolute left-[10px] right-[10px] top-[656px] w-auto lg:left-[10px] lg:right-auto lg:top-[550px] lg:w-[681px]">
           <p
             className="
               mb-[12px] font-['Montserrat'] text-[14px]
@@ -541,7 +540,7 @@ export default function PostJobPage() {
         </div>
 
         {/* LOCATION */}
-        <div className="absolute left-[10px] top-[700px] w-[min(980px,calc(100%-20px))]">
+        <div className="absolute left-[10px] right-[10px] top-[806px] w-auto lg:left-[10px] lg:right-auto lg:top-[700px] lg:w-[min(980px,calc(100%-20px))]">
           <label
             htmlFor="location"
             className="
@@ -607,9 +606,10 @@ export default function PostJobPage() {
           <p
             role="alert"
             className="
-              absolute left-[10px] top-[880px]
+              absolute left-[10px] right-[10px] top-[986px]
               max-w-[850px] font-['Montserrat']
               text-[14px] font-medium text-red-600
+              lg:top-[880px]
             "
           >
             {error}
@@ -622,13 +622,14 @@ export default function PostJobPage() {
           disabled={submitting}
           onClick={() => navigate(-1)}
           className="
-            absolute left-[10px] top-[990px]
+            absolute left-[10px] top-[1090px]
             flex h-[48px] w-[90px] items-center
             justify-center gap-[10px] rounded-[8px]
             border border-[#0D2E431F] bg-[#E8EDF1]
             px-[10px] font-['Montserrat'] text-[14px]
             font-medium text-[#294B60]
             disabled:opacity-60
+            lg:top-[990px]
           "
         >
           Cancel
@@ -644,13 +645,15 @@ export default function PostJobPage() {
           }
           onClick={handleNext}
           className="
-            absolute left-[min(900px,calc(100%-100px))]
-            top-[1003px] flex h-[48px] w-[90px]
+            absolute right-[10px] top-[1090px]
+            flex h-[48px] w-[90px]
             items-center justify-center gap-[10px]
             rounded-[8px] border border-[#0D2E431F]
             bg-[#0D2E43] px-[10px] font-['Montserrat']
             text-[14px] font-semibold text-white
             disabled:cursor-not-allowed disabled:opacity-60
+            lg:left-[min(900px,calc(100%-100px))]
+            lg:right-auto lg:top-[1003px]
           "
         >
           {submitting ? "Sending..." : "Next"}
