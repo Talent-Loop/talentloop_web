@@ -1,7 +1,10 @@
 
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { UserRound, Wrench, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
+
+import clientIllustration from "../assets/auth/login-illustration.png";
+import providerIllustration from "../assets/auth/professional-illustration.png";
 
 export default function RoleSelectionPage() {
   const navigate = useNavigate();
@@ -27,38 +30,19 @@ export default function RoleSelectionPage() {
           </Link>
 
           <nav className="hidden items-center gap-8 lg:flex">
-            <Link
-              to="/"
-              className="text-[14px] font-medium text-white/90 transition hover:text-white"
-            >
+            <Link to="/" className="text-[14px] font-medium text-white/90 transition hover:text-white">
               Home
             </Link>
-
-            <Link
-              to="/services"
-              className="text-[14px] font-medium text-white/90 transition hover:text-white"
-            >
+            <Link to="/services" className="text-[14px] font-medium text-white/90 transition hover:text-white">
               Services
             </Link>
-
-            <Link
-              to="/how-it-works"
-              className="text-[14px] font-medium text-white/90 transition hover:text-white"
-            >
+            <Link to="/how-it-works" className="text-[14px] font-medium text-white/90 transition hover:text-white">
               How it works
             </Link>
-
-            <Link
-              to="/become-a-professional"
-              className="text-[14px] font-medium text-white/90 transition hover:text-white"
-            >
+            <Link to="/become-a-professional" className="text-[14px] font-medium text-white/90 transition hover:text-white">
               Become a Professional
             </Link>
-
-            <Link
-              to="/about"
-              className="text-[14px] font-medium text-white/90 transition hover:text-white"
-            >
+            <Link to="/about" className="text-[14px] font-medium text-white/90 transition hover:text-white">
               About Us
             </Link>
           </nav>
@@ -95,43 +79,19 @@ export default function RoleSelectionPage() {
         {mobileMenuOpen && (
           <div className="absolute left-0 top-full z-50 w-full border-t border-white/10 bg-[#173D57] px-4 pb-6 pt-4 shadow-lg sm:px-6 lg:hidden">
             <nav className="flex flex-col gap-1">
-              <Link
-                to="/"
-                onClick={() => setMobileMenuOpen(false)}
-                className="rounded-lg px-3 py-3 text-sm font-medium text-white/90 hover:bg-white/10"
-              >
+              <Link to="/" onClick={() => setMobileMenuOpen(false)} className="rounded-lg px-3 py-3 text-sm font-medium text-white/90 hover:bg-white/10">
                 Home
               </Link>
-
-              <Link
-                to="/services"
-                onClick={() => setMobileMenuOpen(false)}
-                className="rounded-lg px-3 py-3 text-sm font-medium text-white/90 hover:bg-white/10"
-              >
+              <Link to="/services" onClick={() => setMobileMenuOpen(false)} className="rounded-lg px-3 py-3 text-sm font-medium text-white/90 hover:bg-white/10">
                 Services
               </Link>
-
-              <Link
-                to="/how-it-works"
-                onClick={() => setMobileMenuOpen(false)}
-                className="rounded-lg px-3 py-3 text-sm font-medium text-white/90 hover:bg-white/10"
-              >
+              <Link to="/how-it-works" onClick={() => setMobileMenuOpen(false)} className="rounded-lg px-3 py-3 text-sm font-medium text-white/90 hover:bg-white/10">
                 How it works
               </Link>
-
-              <Link
-                to="/become-a-professional"
-                onClick={() => setMobileMenuOpen(false)}
-                className="rounded-lg px-3 py-3 text-sm font-medium text-white/90 hover:bg-white/10"
-              >
+              <Link to="/become-a-professional" onClick={() => setMobileMenuOpen(false)} className="rounded-lg px-3 py-3 text-sm font-medium text-white/90 hover:bg-white/10">
                 Become a Professional
               </Link>
-
-              <Link
-                to="/about"
-                onClick={() => setMobileMenuOpen(false)}
-                className="rounded-lg px-3 py-3 text-sm font-medium text-white/90 hover:bg-white/10"
-              >
+              <Link to="/about" onClick={() => setMobileMenuOpen(false)} className="rounded-lg px-3 py-3 text-sm font-medium text-white/90 hover:bg-white/10">
                 About Us
               </Link>
 
@@ -182,11 +142,11 @@ export default function RoleSelectionPage() {
               onClick={() => handleRoleSelect("client")}
               className="group flex min-h-[94px] w-full items-center rounded-[13px] border border-[#E2E5E9] bg-white px-4 py-4 text-left shadow-[0_2px_8px_rgba(16,24,40,0.04)] transition duration-200 hover:border-[#173D57]/40 hover:bg-[#FCFDFE] hover:shadow-[0_5px_14px_rgba(16,24,40,0.08)] focus:outline-none focus:ring-2 focus:ring-[#173D57]/20 sm:px-6 sm:py-0"
             >
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#F1F4F6]">
-                <UserRound
-                  size={21}
-                  strokeWidth={1.9}
-                  className="text-[#173D57]"
+              <div className="flex h-14 w-14 shrink-0 items-center justify-center">
+                <img
+                  src={clientIllustration}
+                  alt="Client illustration"
+                  className="h-full w-full object-contain"
                 />
               </div>
 
@@ -194,7 +154,6 @@ export default function RoleSelectionPage() {
                 <h2 className="text-[17px] font-semibold leading-6 text-[#252525] sm:text-[18px]">
                   Client
                 </h2>
-
                 <p className="mt-1 text-[13px] font-normal leading-5 text-[#667085] sm:text-[15px]">
                   I need to hire a skilled worker
                 </p>
@@ -207,11 +166,11 @@ export default function RoleSelectionPage() {
               onClick={() => handleRoleSelect("provider")}
               className="group flex min-h-[94px] w-full items-center rounded-[13px] border border-[#E2E5E9] bg-white px-4 py-4 text-left shadow-[0_2px_8px_rgba(16,24,40,0.04)] transition duration-200 hover:border-[#173D57]/40 hover:bg-[#FCFDFE] hover:shadow-[0_5px_14px_rgba(16,24,40,0.08)] focus:outline-none focus:ring-2 focus:ring-[#173D57]/20 sm:px-6 sm:py-0"
             >
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#F1F4F6]">
-                <Wrench
-                  size={21}
-                  strokeWidth={1.9}
-                  className="text-[#173D57]"
+              <div className="flex h-14 w-14 shrink-0 items-center justify-center">
+                <img
+                  src={providerIllustration}
+                  alt="Service provider illustration"
+                  className="h-full w-full object-contain"
                 />
               </div>
 
@@ -219,7 +178,6 @@ export default function RoleSelectionPage() {
                 <h2 className="text-[17px] font-semibold leading-6 text-[#252525] sm:text-[18px]">
                   Service Provider
                 </h2>
-
                 <p className="mt-1 text-[13px] font-normal leading-5 text-[#667085] sm:text-[15px]">
                   I want to find jobs and earn
                 </p>
