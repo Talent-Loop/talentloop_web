@@ -247,60 +247,61 @@ export default function LoginForm() {
   };
 
   return (
-    <section className="flex items-center justify-center bg-white px-12 py-12">
-      <div className="w-full max-w-[700px] rounded-[32px] border border-[#D8DEE6] bg-white p-12 shadow-sm">
+    <section className="flex items-center justify-center bg-white px-4 py-8 sm:px-8 sm:py-10 lg:px-10 lg:py-12 xl:px-12">
+      <div className="w-full max-w-[700px] rounded-2xl border border-[#D8DEE6] bg-white p-5 shadow-sm sm:rounded-3xl sm:p-8 lg:p-10 xl:rounded-[32px] xl:p-12">
         {/* Heading */}
-        <div className="mb-10">
-          <h2 className="text-[42px] font-bold text-[#17324D]">
+        <div className="mb-7 sm:mb-8 lg:mb-10">
+          <h2 className="text-2xl font-bold text-[#17324D] sm:text-3xl lg:text-[42px]">
             Login to your account
           </h2>
 
-          <p className="mt-3 text-xl text-[#6B7280]">
+          <p className="mt-2 text-sm text-[#6B7280] sm:mt-3 sm:text-base lg:text-xl">
             Enter your details to access your account
           </p>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleLogin} className="space-y-8">
+        <form onSubmit={handleLogin} className="space-y-6 sm:space-y-7 lg:space-y-8">
           {/* Email */}
           <div>
-            <label className="mb-3 block text-lg font-semibold text-[#17324D]">
+            <label className="mb-2 block text-sm font-semibold text-[#17324D] sm:mb-3 sm:text-base lg:text-lg">
               Email Address
             </label>
 
-            <div className="flex h-[64px] items-center rounded-2xl border border-[#D8DEE6] px-5">
-              <Mail size={22} className="text-slate-400" />
+            <div className="flex h-12 items-center rounded-xl border border-[#D8DEE6] px-3 sm:h-14 sm:rounded-2xl sm:px-5 lg:h-[64px]">
+              <Mail size={22} className="shrink-0 text-slate-400" />
 
               <input
                 type="email"
                 placeholder="Enter your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-transparent px-4 text-lg outline-none"
+                className="w-full min-w-0 bg-transparent px-3 text-sm outline-none sm:px-4 sm:text-base lg:text-lg"
               />
             </div>
           </div>
 
           {/* Password */}
           <div>
-            <label className="mb-3 block text-lg font-semibold text-[#17324D]">
+            <label className="mb-2 block text-sm font-semibold text-[#17324D] sm:mb-3 sm:text-base lg:text-lg">
               Password
             </label>
 
-            <div className="flex h-[64px] items-center rounded-2xl border border-[#D8DEE6] px-5">
-              <Lock size={22} className="text-slate-400" />
+            <div className="flex h-12 items-center rounded-xl border border-[#D8DEE6] px-3 sm:h-14 sm:rounded-2xl sm:px-5 lg:h-[64px]">
+              <Lock size={22} className="shrink-0 text-slate-400" />
 
               <input
                 type={showPassword ? "text" : "password"}
                 placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-transparent px-4 text-lg outline-none"
+                className="w-full min-w-0 bg-transparent px-3 text-sm outline-none sm:px-4 sm:text-base lg:text-lg"
               />
 
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
+                className="shrink-0"
               >
                 {showPassword ? (
                   <EyeOff size={22} className="text-slate-400" />
@@ -313,21 +314,21 @@ export default function LoginForm() {
 
           {/* Error */}
           {error && (
-            <div className="rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-600">
+            <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600 sm:px-5 sm:py-4">
               {error}
             </div>
           )}
 
           {/* Remember */}
-          <div className="flex items-center justify-between">
-            <label className="flex items-center gap-3 text-lg text-[#6B7280]">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <label className="flex items-center gap-2 text-sm text-[#6B7280] sm:gap-3 sm:text-base lg:text-lg">
               <input type="checkbox" />
               Remember me
             </label>
 
             <button
               type="button"
-              className="font-medium text-[#17324D]"
+              className="text-sm font-medium text-[#17324D] sm:text-base"
             >
               Forgot Password?
             </button>
@@ -337,26 +338,28 @@ export default function LoginForm() {
           <button
             type="submit"
             disabled={loading}
-            className="h-[62px] w-full rounded-2xl bg-[#17324D] text-xl font-semibold text-white transition hover:bg-[#244867] disabled:cursor-not-allowed disabled:opacity-70"
+            className="h-12 w-full rounded-xl bg-[#17324D] text-base font-semibold text-white transition hover:bg-[#244867] disabled:cursor-not-allowed disabled:opacity-70 sm:h-14 sm:rounded-2xl sm:text-lg lg:h-[62px] lg:text-xl"
           >
             {loading ? "Logging in..." : "Login"}
           </button>
         </form>
 
         {/* Divider */}
-        <div className="my-10 flex items-center gap-4">
+        <div className="my-7 flex items-center gap-3 sm:my-8 sm:gap-4 lg:my-10">
           <div className="h-px flex-1 bg-gray-200" />
 
-          <span className="text-[#6B7280]">or Continue with</span>
+          <span className="whitespace-nowrap text-sm text-[#6B7280]">
+            or Continue with
+          </span>
 
           <div className="h-px flex-1 bg-gray-200" />
         </div>
 
         {/* Social */}
-        <div className="grid grid-cols-2 gap-5">
+        <div className="grid grid-cols-2 gap-3 sm:gap-5">
           <button
             type="button"
-            className="flex h-[60px] items-center justify-center gap-3 rounded-2xl border border-[#D8DEE6] font-semibold"
+            className="flex h-12 items-center justify-center gap-2 rounded-xl border border-[#D8DEE6] text-sm font-semibold sm:h-[60px] sm:gap-3 sm:rounded-2xl sm:text-base"
           >
             <FcGoogle size={24} />
             Google
@@ -364,7 +367,7 @@ export default function LoginForm() {
 
           <button
             type="button"
-            className="flex h-[60px] items-center justify-center gap-3 rounded-2xl border border-[#D8DEE6] font-semibold"
+            className="flex h-12 items-center justify-center gap-2 rounded-xl border border-[#D8DEE6] text-sm font-semibold sm:h-[60px] sm:gap-3 sm:rounded-2xl sm:text-base"
           >
             <FaFacebookF size={20} className="text-blue-600" />
             Facebook
@@ -372,7 +375,7 @@ export default function LoginForm() {
         </div>
 
         {/* Terms */}
-        <p className="mt-10 text-center text-[15px] leading-7 text-[#6B7280]">
+        <p className="mt-7 text-center text-xs leading-6 text-[#6B7280] sm:mt-8 sm:text-sm sm:leading-7 lg:mt-10 lg:text-[15px]">
           By signing in, you agree to our{" "}
           <span className="font-semibold text-[#17324D]">
             Terms of Service
@@ -384,19 +387,19 @@ export default function LoginForm() {
         </p>
 
         {/* Help */}
-        <div className="mt-10 rounded-2xl border border-[#D8DEE6] bg-[#F8FAFC] p-6">
-          <h3 className="font-semibold text-[#17324D]">
+        <div className="mt-7 rounded-xl border border-[#D8DEE6] bg-[#F8FAFC] p-4 sm:mt-8 sm:rounded-2xl sm:p-5 lg:mt-10 lg:p-6">
+          <h3 className="text-sm font-semibold text-[#17324D] sm:text-base">
             Need help?
           </h3>
 
-          <p className="mt-2 text-[#6B7280]">
+          <p className="mt-2 text-sm leading-6 text-[#6B7280] sm:text-base">
             Contact our support team if you're having trouble
             logging into your account.
           </p>
 
           <button
             type="button"
-            className="mt-4 font-semibold text-[#17324D]"
+            className="mt-3 text-sm font-semibold text-[#17324D] sm:mt-4 sm:text-base"
           >
             Contact Support →
           </button>
