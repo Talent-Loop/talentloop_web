@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import defaultAvatar from "../../assets/userHero.png";
 import {
   FiBell,
   FiCamera,
@@ -24,7 +25,7 @@ export default function UserProfilePage() {
           <div className="relative flex-shrink-0">
             <div className="h-[128px] w-[128px] overflow-hidden rounded-full border-[4px] border-white shadow-md">
               <img
-                src="/src/assets/userHero.png"
+               src={defaultAvatar}
                 alt="Emeka Johnson"
                 className="h-full w-full object-cover"
               />
