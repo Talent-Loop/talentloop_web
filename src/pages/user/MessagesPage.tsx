@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { FiSearch, FiCheckCircle } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
+import defaultAvatar from "../../assets/userHero.png";
 import clientApi from "../../services/clientApi";
 
 type ApiObject = Record<string, unknown>;
@@ -18,8 +19,7 @@ type Conversation = {
   avatar: string;
 };
 
-const DEFAULT_AVATAR = "/src/assets/userHero.png";
-
+const DEFAULT_AVATAR = defaultAvatar;
 function asObject(value: unknown): ApiObject {
   return value && typeof value === "object" && !Array.isArray(value)
     ? (value as ApiObject)
