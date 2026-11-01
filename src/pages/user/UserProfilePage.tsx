@@ -1,5 +1,8 @@
+
+import { useRef, useState, type ChangeEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import defaultAvatar from "../../assets/userHero.png";
+import clientApi from "../../services/clientApi";
 import {
   FiBell,
   FiCamera,
@@ -10,6 +13,77 @@ import {
 
 export default function UserProfilePage() {
   const navigate = useNavigate();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [avatar, setAvatar] = useState(
+    () => localStorage.getItem("userProfilePhotoUrl") || defaultAvatar
+  );
+  const [uploading, setUploading] = useState(false);
+
+  const handlePhotoChange = async (
+    event: ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      alert("Please select a valid image.");
+      event.target.value = "";
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      alert("Image must not be larger than 10MB.");
+      event.target.value = "";
+      return;
+    }
+
+    const previousAvatar = avatar;
+    const previewUrl = URL.createObjectURL(file);
+
+    setAvatar(previewUrl);
+    setUploading(true);
+
+    const formData = new FormData();
+    formData.append("photo", file);
+
+    try {
+      const response = await clientApi.patch(
+        "/profile/me/photo",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      const photoUrl = response.data?.data?.photoUrl;
+
+      if (!photoUrl) {
+        throw new Error("Photo uploaded, but no photo URL was returned.");
+      }
+
+      setAvatar(photoUrl);
+      localStorage.setItem("userProfilePhotoUrl", photoUrl);
+
+      URL.revokeObjectURL(previewUrl);
+      alert("Profile picture updated successfully!");
+    } catch (error: any) {
+      setAvatar(previousAvatar);
+      URL.revokeObjectURL(previewUrl);
+
+      alert(
+        error.response?.data?.message ||
+          error.message ||
+          "Unable to update profile picture. Please try again."
+      );
+    } finally {
+      setUploading(false);
+      event.target.value = "";
+    }
+  };
 
   return (
     <div className="min-h-[1117px] bg-[#F7FAF9] px-0 pt-[22px]">
@@ -25,15 +99,27 @@ export default function UserProfilePage() {
           <div className="relative flex-shrink-0">
             <div className="h-[128px] w-[128px] overflow-hidden rounded-full border-[4px] border-white shadow-md">
               <img
-               src={defaultAvatar}
+                src={avatar}
                 alt="Emeka Johnson"
                 className="h-full w-full object-cover"
+                onError={() => setAvatar(defaultAvatar)}
               />
             </div>
 
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handlePhotoChange}
+            />
+
             <button
               type="button"
-              className="absolute bottom-3 right-[-1px] flex h-[27px] w-[27px] items-center justify-center rounded-full border-2 border-white bg-[#164D6F] text-white"
+              disabled={uploading}
+              onClick={() => fileInputRef.current?.click()}
+              title="Change profile picture"
+              className="absolute bottom-3 right-[-1px] flex h-[27px] w-[27px] items-center justify-center rounded-full border-2 border-white bg-[#164D6F] text-white disabled:cursor-not-allowed disabled:opacity-60"
             >
               <FiCamera className="h-3.5 w-3.5" />
             </button>
@@ -48,6 +134,12 @@ export default function UserProfilePage() {
             <p className="mt-1 font-['Inter'] text-[14px] text-[#7B8FA3]">
               emekajohnson@gmail.com
             </p>
+
+            {uploading && (
+              <p className="mt-1 text-xs text-[#164D6F]">
+                Uploading picture...
+              </p>
+            )}
           </div>
         </div>
 
@@ -55,7 +147,7 @@ export default function UserProfilePage() {
         <button
           type="button"
           onClick={() => navigate("edit")}
-          className="h-[48px] w-[337px] rounded-[12px] border border-[#164D6F] bg-transparent font-['Inter'] text-[16px] font-semibold text-[#164D6F] mr-[40px]" 
+          className="mr-[40px] h-[48px] w-[337px] rounded-[12px] border border-[#164D6F] bg-transparent font-['Inter'] text-[16px] font-semibold text-[#164D6F]"
         >
           Edit profile
         </button>
