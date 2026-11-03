@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import {
   Bell,
@@ -6,9 +7,6 @@ import {
   MessageCircle,
   WalletCards,
 } from "lucide-react";
-
-import ArtisanHeader from "../../components/artisan/ArtisanHeader";
-import ArtisanSidebar from "../../components/artisan/ArtisanSidebar";
 
 const API_BASE_URL = "https://backend-talentloop.onrender.com/api/v1";
 
@@ -270,139 +268,133 @@ export default function NotificationPage() {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#F7FAF9]">
-      <ArtisanSidebar />
+    <div className="w-full min-w-0 bg-[#F7FAF9]">
+      <main className="px-4 pb-12 pt-5 sm:px-6 md:px-8">
+        <div className="max-w-[900px]">
 
-      <div className="min-w-0 flex-1">
-        <ArtisanHeader />
+          {/* Page heading */}
+          <div className="mb-6 flex items-center justify-between">
+            <div>
+              <h1 className="text-[21px] font-semibold text-[#263842]">
+                Notifications
+              </h1>
 
-        <main className="px-8 pb-12 pt-5">
-          <div className="max-w-[900px]">
-
-            {/* Page heading */}
-            <div className="mb-6 flex items-center justify-between">
-              <div>
-                <h1 className="text-[21px] font-semibold text-[#263842]">
-                  Notifications
-                </h1>
-
-                <p className="mt-1 text-[11px] text-[#89969C]">
-                  Stay updated with your latest activities.
-                </p>
-              </div>
-
-              {unreadCount > 0 && (
-                <button
-                  type="button"
-                  onClick={markAllAsRead}
-                  className="flex items-center gap-2 text-[11px] font-medium text-[#10344A] transition hover:text-[#0B293A]"
-                >
-                  <CheckCheck size={16} strokeWidth={1.8} />
-                  Mark all as read
-                </button>
-              )}
+              <p className="mt-1 text-[11px] text-[#89969C]">
+                Stay updated with your latest activities.
+              </p>
             </div>
 
-            {/* Notification card */}
-            <section className="overflow-hidden rounded-[9px] border border-[#E2E8E7] bg-white shadow-[0_1px_2px_rgba(16,52,74,0.02)]">
-
-              {/* Card header */}
-              <div className="flex items-center justify-between border-b border-[#EEF1F0] px-6 py-4">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#E7F6D5] text-[#72A928]">
-                    <Bell size={17} strokeWidth={1.9} />
-                  </div>
-
-                  <div>
-                    <h2 className="text-[13px] font-semibold text-[#34454E]">
-                      Recent Notifications
-                    </h2>
-
-                    <p className="mt-0.5 text-[9px] text-[#98A3A8]">
-                      {unreadCount} unread notification
-                      {unreadCount !== 1 ? "s" : ""}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Notification list */}
-              <div>
-                {loading ? (
-                  <div className="px-6 py-10 text-center text-[11px] text-[#89969C]">
-                    Loading notifications...
-                  </div>
-                ) : error ? (
-                  <div className="px-6 py-10 text-center text-[11px] text-[#D9534F]">
-                    {error}
-                  </div>
-                ) : notifications.length === 0 ? (
-                  <div className="px-6 py-10 text-center text-[11px] text-[#89969C]">
-                    No notifications yet.
-                  </div>
-                ) : (
-                  notifications.map((notification) => (
-                    <button
-                      key={notification.id}
-                      type="button"
-                      onClick={() => markAsRead(notification.id)}
-                      className={`flex w-full items-start gap-4 border-b border-[#EEF1F0] px-6 py-5 text-left transition last:border-b-0 hover:bg-[#FAFCFB] ${
-                        notification.unread
-                          ? "bg-[#FBFDFC]"
-                          : "bg-white"
-                      }`}
-                    >
-                      {/* Notification icon */}
-                      <div className="relative shrink-0">
-                        {getIcon(notification.type)}
-
-                        {notification.unread && (
-                          <span className="absolute right-0 top-0 h-2 w-2 rounded-full bg-[#FF4B4B]" />
-                        )}
-                      </div>
-
-                      {/* Notification content */}
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-start justify-between gap-4">
-                          <h3
-                            className={`text-[12px] ${
-                              notification.unread
-                                ? "font-semibold text-[#263842]"
-                                : "font-medium text-[#52616A]"
-                            }`}
-                          >
-                            {notification.title}
-                          </h3>
-
-                          <span className="shrink-0 text-[9px] text-[#9AA5A9]">
-                            {notification.time}
-                          </span>
-                        </div>
-
-                        <p className="mt-1.5 max-w-[650px] text-[10px] leading-[1.7] text-[#89969C]">
-                          {notification.description}
-                        </p>
-                      </div>
-                    </button>
-                  ))
-                )}
-              </div>
-            </section>
-
-            {/* Back button */}
-            <div className="mt-6">
+            {unreadCount > 0 && (
               <button
                 type="button"
-                onClick={() => window.history.back()}
-                className="flex h-[38px] min-w-[72px] items-center justify-center rounded-[6px] bg-[#10344A] px-4 text-[11px] font-medium text-white shadow-sm transition hover:bg-[#0B293A]"
+                onClick={markAllAsRead}
+                className="flex items-center gap-2 text-[11px] font-medium text-[#10344A] transition hover:text-[#0B293A]"
               >
-                Back
+                <CheckCheck size={16} strokeWidth={1.8} />
+                Mark all as read
               </button>
+            )}
+          </div>
+
+          {/* Notification card */}
+          <section className="overflow-hidden rounded-[9px] border border-[#E2E8E7] bg-white shadow-[0_1px_2px_rgba(16,52,74,0.02)]">
+
+            {/* Card header */}
+            <div className="flex items-center justify-between border-b border-[#EEF1F0] px-6 py-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#E7F6D5] text-[#72A928]">
+                  <Bell size={17} strokeWidth={1.9} />
+                </div>
+
+                <div>
+                  <h2 className="text-[13px] font-semibold text-[#34454E]">
+                    Recent Notifications
+                  </h2>
+
+                  <p className="mt-0.5 text-[9px] text-[#98A3A8]">
+                    {unreadCount} unread notification
+                    {unreadCount !== 1 ? "s" : ""}
+                  </p>
+                </div>
+              </div>
             </div>
 
+            {/* Notification list */}
+            <div>
+              {loading ? (
+                <div className="px-6 py-10 text-center text-[11px] text-[#89969C]">
+                  Loading notifications...
+                </div>
+              ) : error ? (
+                <div className="px-6 py-10 text-center text-[11px] text-[#D9534F]">
+                  {error}
+                </div>
+              ) : notifications.length === 0 ? (
+                <div className="px-6 py-10 text-center text-[11px] text-[#89969C]">
+                  No notifications yet.
+                </div>
+              ) : (
+                notifications.map((notification) => (
+                  <button
+                    key={notification.id}
+                    type="button"
+                    onClick={() => markAsRead(notification.id)}
+                    className={`flex w-full items-start gap-4 border-b border-[#EEF1F0] px-6 py-5 text-left transition last:border-b-0 hover:bg-[#FAFCFB] ${
+                      notification.unread
+                        ? "bg-[#FBFDFC]"
+                        : "bg-white"
+                    }`}
+                  >
+                    {/* Notification icon */}
+                    <div className="relative shrink-0">
+                      {getIcon(notification.type)}
+
+                      {notification.unread && (
+                        <span className="absolute right-0 top-0 h-2 w-2 rounded-full bg-[#FF4B4B]" />
+                      )}
+                    </div>
+
+                    {/* Notification content */}
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-start justify-between gap-4">
+                        <h3
+                          className={`text-[12px] ${
+                            notification.unread
+                              ? "font-semibold text-[#263842]"
+                              : "font-medium text-[#52616A]"
+                          }`}
+                        >
+                          {notification.title}
+                        </h3>
+
+                        <span className="shrink-0 text-[9px] text-[#9AA5A9]">
+                          {notification.time}
+                        </span>
+                      </div>
+
+                      <p className="mt-1.5 max-w-[650px] text-[10px] leading-[1.7] text-[#89969C]">
+                        {notification.description}
+                      </p>
+                    </div>
+                  </button>
+                ))
+              )}
+            </div>
+          </section>
+
+          {/* Back button */}
+          <div className="mt-6">
+            <button
+              type="button"
+              onClick={() => window.history.back()}
+              className="flex h-[38px] min-w-[72px] items-center justify-center rounded-[6px] bg-[#10344A] px-4 text-[11px] font-medium text-white shadow-sm transition hover:bg-[#0B293A]"
+            >
+              Back
+            </button>
           </div>
-        </main>
-      </div>
+
+        </div>
+      </main>
     </div>
   );
 }

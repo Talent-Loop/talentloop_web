@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 
 import DashboardLayout from "./layout/DashboardLayout";
 import UserDashboardLayout from "./layout/UserDashboardLayout";
+import ArtisanLayout from "./layout/ArtisanLayout";
 import RoleSelectionPage from "./pages/RoleSelectionPage";
 import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
@@ -106,32 +107,36 @@ export default function App() {
 
         {/* ================= ARTISAN ================= */}
 
-        <Route path="/artisan" element={<ArtisanDashboardPage />} />
+       {/* ================= ARTISAN ================= */}
 
-        <Route path="/artisan/my-jobs" element={<MyJobsPage />} />
+<Route element={<ArtisanLayout />}>
+  <Route path="/artisan" element={<ArtisanDashboardPage />} />
 
-        <Route path="/my-jobs/:jobId" element={<JobProgressPage />} />
+  <Route path="/artisan/my-jobs" element={<MyJobsPage />} />
 
-        <Route path="/artisan/place-bid" element={<PlaceBidPage />} />
+  <Route path="/my-jobs/:jobId" element={<JobProgressPage />} />
 
-        <Route
-          path="/my-jobs/update-status"
-          element={<UpdateJobStatusPage />}
-        />
+  <Route path="/artisan/place-bid" element={<PlaceBidPage />} />
 
-        <Route path="/messages" element={<MessagesPage />} />
+  <Route
+    path="/my-jobs/update-status"
+    element={<UpdateJobStatusPage />}
+  />
 
-        <Route path="/messages/chat" element={<ChatPage />} />
+  <Route path="/messages" element={<MessagesPage />} />
 
-        <Route path="/commission" element={<CommissionPage />} />
+  <Route path="/messages/chat" element={<ChatPage />} />
 
-        <Route path="/profile" element={<ProfilePage />} />
+  <Route path="/commission" element={<CommissionPage />} />
 
-        <Route path="/profile/view" element={<WorkerProfilePage />} />
+  <Route path="/profile" element={<ProfilePage />} />
 
-        <Route path="/profile/edit" element={<EditProfilePage />} />
+  <Route path="/profile/view" element={<WorkerProfilePage />} />
 
-        <Route path="/notification" element={<NotificationPage />} />
+  <Route path="/profile/edit" element={<EditProfilePage />} />
+
+  <Route path="/notification" element={<NotificationPage />} />
+</Route>
 
         {/* ================= ADMIN ================= */}
 

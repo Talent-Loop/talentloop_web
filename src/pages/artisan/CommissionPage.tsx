@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -8,8 +9,6 @@ import {
   Landmark,
   X,
 } from "lucide-react";
-import ArtisanHeader from "../../components/artisan/ArtisanHeader";
-import ArtisanSidebar from "../../components/artisan/ArtisanSidebar";
 
 type ProjectStatus = "PENDING" | "PAID" | "WAIVED";
 
@@ -161,16 +160,9 @@ export default function CommissionPage() {
   }, []);
 
   return (
-    <div className="flex min-h-screen bg-white font-sans text-[#263238]">
-      {/* Sidebar */}
-      <ArtisanSidebar />
-
-      {/* Main Content */}
-      <main className="min-w-0 flex-1 bg-[#FCFDFD]">
-        {/* Header */}
-        <ArtisanHeader />
-
-        <div className="px-7 pb-10 pt-7 sm:px-8 lg:px-10">
+    <div className="min-h-screen w-full bg-white font-sans text-[#263238]">
+      <main className="min-w-0 w-full bg-[#FCFDFD]">
+        <div className="px-4 pb-10 pt-6 sm:px-6 sm:pt-8 lg:px-10 lg:pt-7">
           {/* Page Title */}
           <div className="mb-5">
             <h1 className="text-[25px] font-semibold tracking-[-0.3px] text-[#263238]">
@@ -180,25 +172,12 @@ export default function CommissionPage() {
 
           {/* Commission Hero Card */}
           <section
-            className="
-              relative
-              flex
-              min-h-[145px]
-              w-full
-              items-center
-              justify-center
-              overflow-hidden
-              rounded-[16px]
-              px-6
-              py-6
-              shadow-[0_5px_20px_rgba(16,52,74,0.08)]
-            "
+            className="relative flex min-h-[145px] w-full items-center justify-center overflow-hidden rounded-[16px] px-6 py-6 shadow-[0_5px_20px_rgba(16,52,74,0.08)]"
             style={{
               background:
                 "linear-gradient(108deg, #123A53 0%, #153E54 38%, #4E4140 67%, #A76B43 100%)",
             }}
           >
-            {/* Subtle warm glow */}
             <div className="pointer-events-none absolute -right-20 top-[-80px] h-[240px] w-[240px] rounded-full bg-[#D8894F]/20 blur-3xl" />
 
             <div className="relative z-10 flex flex-col items-center justify-center text-center">
@@ -227,7 +206,6 @@ export default function CommissionPage() {
 
           {/* Notice + Payment */}
           <section className="mt-5 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-            {/* Notice */}
             <div className="flex min-h-[50px] flex-1 items-center rounded-[10px] bg-[#FFFDF3] px-4 py-3">
               <div className="mr-3 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#FFF3C7]">
                 <AlertCircle
@@ -243,34 +221,11 @@ export default function CommissionPage() {
               </p>
             </div>
 
-            {/* Payment Button */}
             <button
               type="button"
               onClick={() => setShowPaymentModal(true)}
               disabled={loading || commissionDue <= 0}
-              className="
-                flex
-                h-[50px]
-                w-full
-                shrink-0
-                items-center
-                justify-center
-                rounded-[9px]
-                bg-[#10344A]
-                px-7
-                text-[13px]
-                font-semibold
-                text-white
-                shadow-[0_4px_12px_rgba(16,52,74,0.14)]
-                transition-all
-                duration-200
-                hover:bg-[#17465F]
-                hover:shadow-[0_6px_16px_rgba(16,52,74,0.18)]
-                active:scale-[0.99]
-                disabled:cursor-not-allowed
-                disabled:opacity-50
-                sm:w-[205px]
-              "
+              className="flex h-[50px] w-full shrink-0 items-center justify-center rounded-[9px] bg-[#10344A] px-7 text-[13px] font-semibold text-white shadow-[0_4px_12px_rgba(16,52,74,0.14)] transition-all duration-200 hover:bg-[#17465F] hover:shadow-[0_6px_16px_rgba(16,52,74,0.18)] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50 sm:w-[205px]"
             >
               Pay Commission Now
             </button>
@@ -291,7 +246,6 @@ export default function CommissionPage() {
               </button>
             </div>
 
-            {/* Project Grid */}
             {loading ? (
               <div className="rounded-[12px] border border-[#EDF0F1] bg-white p-8 text-center text-[13px] text-[#899399]">
                 Loading commission transactions...
@@ -303,10 +257,7 @@ export default function CommissionPage() {
             ) : (
               <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
                 {projects.map((project) => (
-                  <ProjectCard
-                    key={project.id}
-                    project={project}
-                  />
+                  <ProjectCard key={project.id} project={project} />
                 ))}
               </div>
             )}
@@ -317,23 +268,7 @@ export default function CommissionPage() {
             <button
               type="button"
               onClick={handleBack}
-              className="
-                inline-flex
-                h-[40px]
-                items-center
-                gap-2
-                rounded-[8px]
-                bg-[#10344A]
-                px-5
-                text-[12px]
-                font-medium
-                text-white
-                shadow-[0_3px_10px_rgba(16,52,74,0.12)]
-                transition-all
-                duration-200
-                hover:bg-[#17465F]
-                hover:shadow-[0_5px_13px_rgba(16,52,74,0.16)]
-              "
+              className="inline-flex h-[40px] items-center gap-2 rounded-[8px] bg-[#10344A] px-5 text-[12px] font-medium text-white shadow-[0_3px_10px_rgba(16,52,74,0.12)] transition-all duration-200 hover:bg-[#17465F] hover:shadow-[0_5px_13px_rgba(16,52,74,0.16)]"
             >
               <ArrowLeft size={15} strokeWidth={2} />
               Back
@@ -342,39 +277,20 @@ export default function CommissionPage() {
         </div>
       </main>
 
-      {/* ========================================================= */}
-      {/* CAUTION MODAL                                             */}
-      {/* ========================================================= */}
+      {/* CAUTION MODAL */}
       {showPaymentModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0D2635]/35 px-4 backdrop-blur-[2px]">
           <div className="relative w-full max-w-[430px] rounded-[16px] bg-white px-8 py-8 shadow-[0_20px_60px_rgba(0,0,0,0.18)]">
-            {/* Close */}
             <button
               type="button"
               onClick={() => setShowPaymentModal(false)}
-              className="
-                absolute
-                right-5
-                top-5
-                flex
-                h-8
-                w-8
-                items-center
-                justify-center
-                rounded-full
-                text-[#68747A]
-                transition-colors
-                hover:bg-[#F4F6F7]
-                hover:text-[#263238]
-              "
+              className="absolute right-5 top-5 flex h-8 w-8 items-center justify-center rounded-full text-[#68747A] transition-colors hover:bg-[#F4F6F7] hover:text-[#263238]"
               aria-label="Close"
             >
               <X size={18} strokeWidth={2} />
             </button>
 
-            {/* Content */}
             <div className="flex flex-col items-center text-center">
-              {/* Warning Icon */}
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#FFF5D8]">
                 <AlertCircle
                   size={24}
@@ -383,43 +299,22 @@ export default function CommissionPage() {
                 />
               </div>
 
-              {/* Title */}
               <h2 className="mt-4 text-[20px] font-semibold text-[#263238]">
                 Caution
               </h2>
 
-              {/* Description */}
               <p className="mt-3 max-w-[330px] text-[13px] leading-[22px] text-[#737E84]">
                 Please transfer the exact amount to the bank account details
                 provided to complete your subscription.
               </p>
 
-              {/* Proceed */}
               <button
                 type="button"
                 onClick={() => {
                   setShowPaymentModal(false);
                   setShowBankDetails(true);
                 }}
-                className="
-                  mt-7
-                  flex
-                  h-[46px]
-                  w-full
-                  items-center
-                  justify-center
-                  rounded-[9px]
-                  bg-[#10344A]
-                  text-[13px]
-                  font-semibold
-                  text-white
-                  shadow-[0_4px_12px_rgba(230,145,65,0.28)]
-                  transition-all
-                  duration-200
-                  hover:bg-[#17465F]
-                  hover:shadow-[0_6px_16px_rgba(230,145,65,0.35)]
-                  active:scale-[0.99]
-                "
+                className="mt-7 flex h-[46px] w-full items-center justify-center rounded-[9px] bg-[#10344A] text-[13px] font-semibold text-white shadow-[0_4px_12px_rgba(230,145,65,0.28)] transition-all duration-200 hover:bg-[#17465F] hover:shadow-[0_6px_16px_rgba(230,145,65,0.35)] active:scale-[0.99]"
               >
                 Proceed
               </button>
@@ -428,39 +323,20 @@ export default function CommissionPage() {
         </div>
       )}
 
-      {/* ========================================================= */}
-      {/* TRANSFER FUNDS MODAL                                     */}
-      {/* ========================================================= */}
+      {/* TRANSFER FUNDS MODAL */}
       {showBankDetails && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0D2635]/35 px-4 backdrop-blur-[2px]">
           <div className="relative w-full max-w-[500px] rounded-[16px] bg-white px-8 py-8 shadow-[0_20px_60px_rgba(0,0,0,0.18)]">
-            {/* Close */}
             <button
               type="button"
               onClick={() => setShowBankDetails(false)}
-              className="
-                absolute
-                right-5
-                top-5
-                flex
-                h-8
-                w-8
-                items-center
-                justify-center
-                rounded-full
-                text-[#68747A]
-                transition-colors
-                hover:bg-[#F4F6F7]
-                hover:text-[#263238]
-              "
+              className="absolute right-5 top-5 flex h-8 w-8 items-center justify-center rounded-full text-[#68747A] transition-colors hover:bg-[#F4F6F7] hover:text-[#263238]"
               aria-label="Close"
             >
               <X size={18} strokeWidth={2} />
             </button>
 
-            {/* Header */}
             <div className="flex flex-col items-center text-center">
-              {/* Bank Icon */}
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#EEF4F7]">
                 <Landmark
                   size={24}
@@ -469,55 +345,45 @@ export default function CommissionPage() {
                 />
               </div>
 
-              {/* Title */}
               <h2 className="mt-4 text-[20px] font-semibold text-[#263238]">
                 Transfer Funds
               </h2>
 
-              {/* Description */}
               <p className="mt-3 max-w-[390px] text-[13px] leading-[22px] text-[#737E84]">
                 Please transfer the exact amount to the bank account details
                 provided below to complete your subscription.
               </p>
             </div>
 
-            {/* Bank Details */}
             <div className="mt-7 rounded-[10px] border border-[#EDF0F1] bg-[#FBFCFC] px-5 py-2">
-              {/* Bank Name */}
               <div className="flex min-h-[55px] items-center justify-between gap-5 border-b border-[#EDF0F1]">
                 <span className="text-[12px] font-medium text-[#7A858B]">
                   Bank Name
                 </span>
-
                 <span className="text-right text-[12px] font-semibold text-[#263238]">
                   Horizonatl Finaancial Bank
                 </span>
               </div>
 
-              {/* Account Number */}
               <div className="flex min-h-[55px] items-center justify-between gap-5 border-b border-[#EDF0F1]">
                 <span className="text-[12px] font-medium text-[#7A858B]">
                   Account Number
                 </span>
-
                 <span className="text-right text-[12px] font-semibold tracking-[0.3px] text-[#263238]">
                   2234578998
                 </span>
               </div>
 
-              {/* Account Name */}
               <div className="flex min-h-[55px] items-center justify-between gap-5">
                 <span className="text-[12px] font-medium text-[#7A858B]">
                   Account Name
                 </span>
-
                 <span className="text-right text-[12px] font-semibold text-[#263238]">
                   SaaS Flow Pro Inc.
                 </span>
               </div>
             </div>
 
-            {/* I Have Paid */}
             <button
               type="button"
               onClick={() => {
@@ -529,25 +395,7 @@ export default function CommissionPage() {
                   setShowSuccess(true);
                 }, 3000);
               }}
-              className="
-                mt-6
-                flex
-                h-[47px]
-                w-full
-                items-center
-                justify-center
-                rounded-[9px]
-                bg-[#10344A]
-                text-[13px]
-                font-semibold
-                text-white
-                shadow-[0_4px_12px_rgba(230,145,65,0.28)]
-                transition-all
-                duration-200
-                hover:bg-[#17465F]
-                hover:shadow-[0_6px_16px_rgba(230,145,65,0.35)]
-                active:scale-[0.99]
-              "
+              className="mt-6 flex h-[47px] w-full items-center justify-center rounded-[9px] bg-[#10344A] text-[13px] font-semibold text-white shadow-[0_4px_12px_rgba(230,145,65,0.28)] transition-all duration-200 hover:bg-[#17465F] hover:shadow-[0_6px_16px_rgba(230,145,65,0.35)] active:scale-[0.99]"
             >
               I have paid
             </button>
@@ -555,13 +403,10 @@ export default function CommissionPage() {
         </div>
       )}
 
-      {/* ========================================================= */}
-      {/* VERIFICATION IN PROGRESS MODAL                           */}
-      {/* ========================================================= */}
+      {/* VERIFICATION IN PROGRESS MODAL */}
       {showVerification && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0D2635]/35 px-4 backdrop-blur-[2px]">
           <div className="relative flex w-full max-w-[430px] flex-col items-center rounded-[16px] bg-white px-8 py-10 shadow-[0_20px_60px_rgba(0,0,0,0.18)]">
-            {/* Clock Icon */}
             <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#FFF5EA]">
               <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-[#E69141]">
                 <svg
@@ -589,18 +434,15 @@ export default function CommissionPage() {
               </div>
             </div>
 
-            {/* Title */}
             <h2 className="mt-5 text-[20px] font-semibold text-[#263238]">
               Verification in progress
             </h2>
 
-            {/* Loading / Verifying Circle */}
             <div className="relative mt-8 flex h-[58px] w-[58px] items-center justify-center">
               <div className="absolute h-[58px] w-[58px] animate-spin rounded-full border-[4px] border-[#F6E5D3] border-t-[#E69141]" />
               <div className="h-[38px] w-[38px] rounded-full bg-white" />
             </div>
 
-            {/* Supporting Text */}
             <p className="mt-6 max-w-[340px] text-center text-[13px] leading-[21px] text-[#737E84]">
               We are verifying your payment. Please wait while we confirm your
               transaction.
@@ -609,27 +451,11 @@ export default function CommissionPage() {
         </div>
       )}
 
-      {/* ========================================================= */}
-      {/* SAVE SUCCESSFULLY MODAL                                   */}
-      {/* ========================================================= */}
+      {/* SUCCESS MODAL */}
       {showSuccess && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0D2635]/35 px-4 backdrop-blur-[2px]">
           <div className="relative flex w-full max-w-[430px] flex-col items-center rounded-[16px] bg-white px-8 py-10 shadow-[0_20px_60px_rgba(0,0,0,0.18)]">
-            {/* Success Icon Box */}
-            <div
-              className="
-                flex
-                h-[72px]
-                w-[72px]
-                items-center
-                justify-center
-                rounded-[10px]
-                border
-                border-[#E3EAF0]
-                bg-white
-                shadow-[0_10px_24px_rgba(16,52,74,0.18)]
-              "
-            >
+            <div className="flex h-[72px] w-[72px] items-center justify-center rounded-[10px] border border-[#E3EAF0] bg-white shadow-[0_10px_24px_rgba(16,52,74,0.18)]">
               <div className="flex h-[42px] w-[42px] items-center justify-center rounded-full bg-[#EEF7F2]">
                 <Check
                   size={25}
@@ -639,34 +465,14 @@ export default function CommissionPage() {
               </div>
             </div>
 
-            {/* Success Text */}
             <h2 className="mt-6 text-[20px] font-semibold text-[#263238]">
               Save successfully
             </h2>
 
-            {/* Done Button */}
             <button
               type="button"
               onClick={() => setShowSuccess(false)}
-              className="
-                mt-7
-                flex
-                h-[46px]
-                w-full
-                items-center
-                justify-center
-                rounded-[9px]
-                bg-[#10344A]
-                text-[13px]
-                font-semibold
-                text-white
-                shadow-[0_4px_12px_rgba(230,145,65,0.28)]
-                transition-all
-                duration-200
-                hover:bg-[#17465F]
-                hover:shadow-[0_6px_16px_rgba(230,145,65,0.35)]
-                active:scale-[0.99]
-              "
+              className="mt-7 flex h-[46px] w-full items-center justify-center rounded-[9px] bg-[#10344A] text-[13px] font-semibold text-white shadow-[0_4px_12px_rgba(230,145,65,0.28)] transition-all duration-200 hover:bg-[#17465F] hover:shadow-[0_6px_16px_rgba(230,145,65,0.35)] active:scale-[0.99]"
             >
               Done
             </button>
@@ -677,35 +483,16 @@ export default function CommissionPage() {
   );
 }
 
-/* =============================================================== */
-/* PROJECT CARD                                                    */
-/* =============================================================== */
+/* PROJECT CARD */
 
 function ProjectCard({ project }: { project: Project }) {
   const isPaid = project.status === "PAID";
   const isWaived = project.status === "WAIVED";
 
   return (
-    <article
-      className="
-        group
-        min-h-[177px]
-        rounded-[12px]
-        border
-        border-[#EDF0F1]
-        bg-white
-        p-5
-        shadow-[0_2px_9px_rgba(24,42,52,0.025)]
-        transition-all
-        duration-200
-        hover:-translate-y-[1px]
-        hover:shadow-[0_5px_16px_rgba(24,42,52,0.07)]
-      "
-    >
-      {/* Top section */}
+    <article className="group min-h-[177px] rounded-[12px] border border-[#EDF0F1] bg-white p-5 shadow-[0_2px_9px_rgba(24,42,52,0.025)] transition-all duration-200 hover:-translate-y-[1px] hover:shadow-[0_5px_16px_rgba(24,42,52,0.07)]">
       <div className="flex items-start justify-between">
         <div className="flex min-w-0 items-start gap-3">
-          {/* Tool Icon */}
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#F1F4F5]">
             <BriefcaseBusiness
               size={17}
@@ -725,33 +512,20 @@ function ProjectCard({ project }: { project: Project }) {
           </div>
         </div>
 
-        {/* Status */}
         <span
-          className={`
-            ml-3
-            shrink-0
-            rounded-full
-            px-3
-            py-[5px]
-            text-[9px]
-            font-semibold
-            tracking-[0.3px]
-            ${
-              isPaid
-                ? "bg-[#EDF8F1] text-[#31935A]"
-                : isWaived
-                ? "bg-[#F1F4F5] text-[#68747A]"
-                : "bg-[#FFF7E5] text-[#B98222]"
-            }
-          `}
+          className={`ml-3 shrink-0 rounded-full px-3 py-[5px] text-[9px] font-semibold tracking-[0.3px] ${
+            isPaid
+              ? "bg-[#EDF8F1] text-[#31935A]"
+              : isWaived
+              ? "bg-[#F1F4F5] text-[#68747A]"
+              : "bg-[#FFF7E5] text-[#B98222]"
+          }`}
         >
           {project.status}
         </span>
       </div>
 
-      {/* Financial Information */}
       <div className="mt-6 grid grid-cols-2">
-        {/* Earning */}
         <div>
           <p className="text-[9px] font-semibold uppercase tracking-[1px] text-[#9AA3A8]">
             EARNING
@@ -762,7 +536,6 @@ function ProjectCard({ project }: { project: Project }) {
           </p>
         </div>
 
-        {/* Commission */}
         <div>
           <p className="text-[9px] font-semibold uppercase tracking-[1px] text-[#9AA3A8]">
             COMMISSION
@@ -785,9 +558,7 @@ function ProjectCard({ project }: { project: Project }) {
   );
 }
 
-/* =============================================================== */
-/* HELPERS                                                         */
-/* =============================================================== */
+/* HELPERS */
 
 function formatCurrency(amount: number) {
   return `₦${amount.toLocaleString("en-NG", {

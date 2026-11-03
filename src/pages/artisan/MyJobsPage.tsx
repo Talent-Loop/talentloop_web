@@ -1,8 +1,6 @@
 
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import ArtisanHeader from "../../components/artisan/ArtisanHeader";
-import ArtisanSidebar from "../../components/artisan/ArtisanSidebar";
 import { CheckCircle2, Clock3 } from "lucide-react";
 
 interface Job {
@@ -78,89 +76,79 @@ export default function MyJobsPage() {
   };
 
   const getCategory = (job: Job) => {
-    // The jobs API currently returns serviceId rather than
-    // the service name, so we keep the category area safe.
     return job.serviceId || "Service";
   };
 
   return (
-    <div className="flex min-h-screen bg-[#F5F7F8]">
-      {/* Sidebar */}
-      <ArtisanSidebar />
+    <div className="min-h-screen w-full bg-[#F5F7F8]">
+      <div className="px-4 pb-8 pt-6 sm:px-6 sm:pb-10 sm:pt-8 lg:px-8 lg:pt-10">
+        {/* Page Title */}
+        <h1 className="mb-10 text-[20px] font-semibold text-[#111111]">
+          My Jobs
+        </h1>
 
-      {/* Main Content */}
-      <main className="min-w-0 flex-1">
-        <ArtisanHeader />
+        {/* Loading */}
+        {loading && (
+          <div className="py-10 text-center text-[13px] text-[#8A9AB5]">
+            Loading your jobs...
+          </div>
+        )}
 
-        <div className="px-8 pb-10 pt-10">
-          {/* Page Title */}
-          <h1 className="mb-10 text-[20px] font-semibold text-[#111111]">
-            My Jobs
-          </h1>
+        {/* Error */}
+        {!loading && error && (
+          <div className="rounded-2xl bg-white px-5 py-8 text-center shadow-[0_2px_8px_rgba(0,0,0,0.06)]">
+            <p className="text-[13px] text-red-500">{error}</p>
+          </div>
+        )}
 
-          {/* Loading */}
-          {loading && (
-            <div className="py-10 text-center text-[13px] text-[#8A9AB5]">
-              Loading your jobs...
-            </div>
-          )}
+        {/* No Jobs */}
+        {!loading && !error && jobs.length === 0 && (
+          <div className="rounded-2xl bg-white px-5 py-10 text-center shadow-[0_2px_8px_rgba(0,0,0,0.06)]">
+            <p className="text-[14px] font-medium text-[#172033]">
+              No jobs found
+            </p>
 
-          {/* Error */}
-          {!loading && error && (
-            <div className="rounded-2xl bg-white px-5 py-8 text-center shadow-[0_2px_8px_rgba(0,0,0,0.06)]">
-              <p className="text-[13px] text-red-500">{error}</p>
-            </div>
-          )}
+            <p className="mt-2 text-[12px] text-[#8A9AB5]">
+              Your jobs will appear here when you have jobs assigned to you.
+            </p>
+          </div>
+        )}
 
-          {/* No Jobs */}
-          {!loading && !error && jobs.length === 0 && (
-            <div className="rounded-2xl bg-white px-5 py-10 text-center shadow-[0_2px_8px_rgba(0,0,0,0.06)]">
-              <p className="text-[14px] font-medium text-[#172033]">
-                No jobs found
-              </p>
+        {/* Jobs */}
+        {!loading && !error && jobs.length > 0 && (
+          <div className="space-y-4">
+            {jobs.map((job) => (
+              <article
+                key={job._id}
+                onClick={() => navigate(`/my-jobs/${job._id}`)}
+                className="flex min-h-[104px] cursor-pointer items-center justify-between rounded-2xl bg-white px-5 py-5 shadow-[0_2px_8px_rgba(0,0,0,0.06)] transition hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)]"
+              >
+                {/* Job Information */}
+                <div>
+                  <h2 className="text-[16px] font-semibold text-[#172033]">
+                    {job.title}
+                  </h2>
 
-              <p className="mt-2 text-[12px] text-[#8A9AB5]">
-                Your jobs will appear here when you have jobs assigned to you.
-              </p>
-            </div>
-          )}
+                  <div className="mt-2 flex items-center gap-3 text-[13px] text-[#8A9AB5]">
+                    <span>{getCategory(job)}</span>
 
-          {/* Jobs */}
-          {!loading && !error && jobs.length > 0 && (
-            <div className="space-y-4">
-              {jobs.map((job) => (
-                <article
-                  key={job._id}
-                  onClick={() => navigate(`/my-jobs/${job._id}`)}
-                  className="flex min-h-[104px] cursor-pointer items-center justify-between rounded-2xl bg-white px-5 py-5 shadow-[0_2px_8px_rgba(0,0,0,0.06)] transition hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)]"
-                >
-                  {/* Job Information */}
-                  <div>
-                    <h2 className="text-[16px] font-semibold text-[#172033]">
-                      {job.title}
-                    </h2>
+                    <span className="h-1 w-1 rounded-full bg-[#B8C1CC]" />
 
-                    <div className="mt-2 flex items-center gap-3 text-[13px] text-[#8A9AB5]">
-                      <span>{getCategory(job)}</span>
-
-                      <span className="h-1 w-1 rounded-full bg-[#B8C1CC]" />
-
-                      <span>{job.jobLocation || "Location unavailable"}</span>
-                    </div>
-
-                    <p className="mt-2 text-[16px] font-semibold text-[#185A7D]">
-                      {getPrice(job)}
-                    </p>
+                    <span>{job.jobLocation || "Location unavailable"}</span>
                   </div>
 
-                  {/* Status */}
-                  <StatusBadge status={job.status} />
-                </article>
-              ))}
-            </div>
-          )}
-        </div>
-      </main>
+                  <p className="mt-2 text-[16px] font-semibold text-[#185A7D]">
+                    {getPrice(job)}
+                  </p>
+                </div>
+
+                {/* Status */}
+                <StatusBadge status={job.status} />
+              </article>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
