@@ -4,7 +4,7 @@ import { ShieldCheck } from "lucide-react";
 import JobProgressModal from "./JobProgressModal";
 import { getMyJobs, type ClientJob } from "../../services/userDashboard";
 
-type JobStatus = "Pending" | "Progress" | "Completed" | "Cancelled";
+type JobStatus = "Open" | "Progress" | "Completed" | "Cancelled";
 
 interface Job {
   id: number;
@@ -27,6 +27,7 @@ interface Job {
 
 const filters: Array<"All" | JobStatus> = [
   "All",
+  "Open",
   "Progress",
   "Completed",
   "Cancelled",
@@ -49,7 +50,9 @@ function getJobStatus(status: string): JobStatus {
     return "Progress";
   }
 
-  return "Pending";
+  if (normalized === "open") return "Open";
+
+  return "Open";
 }
 
 function getCategory(job: ClientJob): string {
@@ -137,7 +140,7 @@ function getProviderId(job: ClientJob): Job["providerId"] {
 
 function getStatusClasses(status: JobStatus) {
   switch (status) {
-    case "Pending":
+    case "Open":
       return "bg-[#FFA0421C] text-[#C78315]";
     case "Progress":
       return "bg-[#52FF421C] text-[#3D9A32]";
