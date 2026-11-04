@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import * as XLSX from "xlsx";
 import {
@@ -170,20 +171,20 @@ export default function AgentEarningsReportPage() {
     );
   };
 
-
   return (
-    <section className="space-y-8">
-      <h1 className="text-[42px] font-bold text-[#22324A]">
+    <section className="min-w-0 space-y-6 md:space-y-8">
+      <h1 className="text-2xl font-bold text-[#22324A] sm:text-3xl lg:text-[42px]">
         Agent Earnings Report
       </h1>
 
+      {/* Filters and Export */}
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <div className="flex flex-col gap-4 md:flex-row">
-          <div className="relative">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
+          <div className="relative w-full">
             <select
               value={month}
               onChange={(e) => setMonth(e.target.value)}
-              className="appearance-none rounded-full border border-slate-200 bg-white px-6 py-3 pr-10 text-sm font-medium text-[#22324A] shadow-sm focus:outline-none"
+              className="w-full appearance-none rounded-full border border-slate-200 bg-white px-5 py-3 pr-10 text-sm font-medium text-[#22324A] shadow-sm focus:outline-none"
             >
               <option value="May">May</option>
               <option value="April">April</option>
@@ -191,14 +192,14 @@ export default function AgentEarningsReportPage() {
               <option value="February">February</option>
             </select>
 
-            <FiChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400" />
+            <FiChevronDown className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-400" />
           </div>
 
-          <div className="relative">
+          <div className="relative w-full">
             <select
               value={agent}
               onChange={(e) => setAgent(e.target.value)}
-              className="appearance-none rounded-full border border-slate-200 bg-white px-6 py-3 pr-10 text-sm font-medium text-[#22324A] shadow-sm focus:outline-none"
+              className="w-full appearance-none rounded-full border border-slate-200 bg-white px-5 py-3 pr-10 text-sm font-medium text-[#22324A] shadow-sm focus:outline-none"
             >
               <option value="All Agent">All Agent</option>
               <option value="Agent Ola">Agent Ola</option>
@@ -206,20 +207,21 @@ export default function AgentEarningsReportPage() {
               <option value="Agent Kate">Agent Kate</option>
             </select>
 
-            <FiChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400" />
+            <FiChevronDown className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-400" />
           </div>
         </div>
 
-       <button
-  onClick={handleExport}
-  className="flex h-11 items-center gap-2 rounded-full bg-[#0D3553] px-6 text-sm font-semibold text-white shadow-sm transition hover:bg-[#0B2C45]"
->
-  <FiDownload />
-  Export
-</button>
+        <button
+          onClick={handleExport}
+          className="flex h-11 w-full items-center justify-center gap-2 rounded-full bg-[#0D3553] px-6 text-sm font-semibold text-white shadow-sm transition hover:bg-[#0B2C45] sm:w-fit"
+        >
+          <FiDownload />
+          Export
+        </button>
       </div>
 
-      <div className="grid max-w-3xl gap-5 md:grid-cols-2">
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5">
         {stats.map((item) => (
           <StatCard
             key={item.title}
@@ -231,30 +233,37 @@ export default function AgentEarningsReportPage() {
         ))}
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-[1.8fr_0.9fr]">
-        <div className="rounded-[28px] border border-slate-200 bg-white p-8 shadow-sm">
-          <h2 className="text-3xl font-bold text-[#22324A]">
+      {/* Earnings Charts */}
+      <div className="grid min-w-0 gap-5 xl:grid-cols-[1.8fr_0.9fr]">
+        {/* Earnings Overview */}
+        <div className="min-w-0 rounded-[28px] border border-slate-200 bg-white p-4 shadow-sm sm:p-6 lg:p-8">
+          <h2 className="text-xl font-bold text-[#22324A] sm:text-2xl lg:text-3xl">
             Earnings Overview
           </h2>
 
-          <p className="mt-2 text-slate-400">This Month</p>
+          <p className="mt-2 text-sm text-slate-400">This Month</p>
 
-          <div className="mt-6 h-[280px]">
+          <div className="mt-5 h-[240px] w-full min-w-0 sm:h-[280px]">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={earningsData}>
+              <LineChart
+                data={earningsData}
+                margin={{ top: 5, right: 10, left: 0, bottom: 5 }}
+              >
                 <CartesianGrid stroke="#E5E7EB" vertical={false} />
 
                 <XAxis
                   dataKey="day"
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fill: "#94A3B8", fontSize: 12 }}
+                  interval="preserveStartEnd"
+                  tick={{ fill: "#94A3B8", fontSize: 11 }}
                 />
 
                 <YAxis
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fill: "#94A3B8", fontSize: 12 }}
+                  width={48}
+                  tick={{ fill: "#94A3B8", fontSize: 11 }}
                   tickFormatter={(value) => `₦${value}k`}
                 />
 
@@ -279,21 +288,22 @@ export default function AgentEarningsReportPage() {
           </div>
         </div>
 
-        <div className="h-[380px] rounded-[28px] border border-slate-200 bg-white p-8 shadow-sm">
-          <h2 className="text-3xl font-bold text-[#22324A]">
+        {/* Earnings by Source */}
+        <div className="min-w-0 rounded-[28px] border border-slate-200 bg-white p-4 shadow-sm sm:p-6 lg:p-8">
+          <h2 className="text-xl font-bold text-[#22324A] sm:text-2xl lg:text-3xl">
             Earnings by Source
           </h2>
 
-          <p className="mt-2 text-slate-400">Last 30 days</p>
+          <p className="mt-2 text-sm text-slate-400">Last 30 days</p>
 
-          <div className="mt-6 h-[240px]">
+          <div className="mt-5 h-[260px] w-full min-w-0 sm:h-[280px]">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
                   data={sourceData}
                   dataKey="value"
-                  innerRadius={65}
-                  outerRadius={90}
+                  innerRadius="45%"
+                  outerRadius="68%"
                   paddingAngle={2}
                 >
                   {sourceData.map((entry) => (
@@ -308,7 +318,9 @@ export default function AgentEarningsReportPage() {
                   verticalAlign="bottom"
                   iconType="circle"
                   formatter={(value) => (
-                    <span className="text-sm text-slate-600">{value}</span>
+                    <span className="text-xs text-slate-600 sm:text-sm">
+                      {value}
+                    </span>
                   )}
                 />
               </PieChart>
@@ -317,15 +329,57 @@ export default function AgentEarningsReportPage() {
         </div>
       </div>
 
-          
-
-           {/* Top Performing Agents */}
-      <div className="rounded-[28px] border border-slate-200 bg-white p-8 shadow-sm">
-        <h2 className="text-[34px] font-bold text-[#22324A]">
+      {/* Top Performing Agents */}
+      <div className="min-w-0 rounded-[28px] border border-slate-200 bg-white p-4 shadow-sm sm:p-6 lg:p-8">
+        <h2 className="text-2xl font-bold text-[#22324A] sm:text-3xl lg:text-[34px]">
           Top Performing Agents
         </h2>
 
-        <div className="mt-8 overflow-x-auto">
+        {/* Mobile Cards */}
+        <div className="mt-6 space-y-4 md:hidden">
+          {recentActivities.map((item) => (
+            <div
+              key={item.rank}
+              className="rounded-2xl border border-slate-100 p-4"
+            >
+              <div className="flex items-center gap-3">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-sm font-semibold text-[#22324A]">
+                  {item.rank}
+                </span>
+
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#17324D] text-sm font-semibold text-white">
+                  {item.name
+                    .split(" ")
+                    .map((n) => n[0])
+                    .join("")}
+                </div>
+
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-semibold text-[#22324A]">
+                    {item.name}
+                  </p>
+                  <p className="text-xs text-slate-400">
+                    {item.workers} Workers
+                  </p>
+                </div>
+
+                <span className="shrink-0 text-sm font-semibold text-[#22C55E]">
+                  ▲ {item.growth}
+                </span>
+              </div>
+
+              <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3">
+                <span className="text-sm text-slate-400">Earnings</span>
+                <span className="font-semibold text-[#22324A]">
+                  {item.earnings}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Desktop Table */}
+        <div className="mt-8 hidden overflow-x-auto md:block">
           <table className="w-full">
             <thead>
               <tr className="border-b border-slate-100 text-left text-sm text-slate-400">
@@ -333,7 +387,7 @@ export default function AgentEarningsReportPage() {
                 <th className="pb-5 font-medium">Agent</th>
                 <th className="pb-5 font-medium">Earnings</th>
                 <th className="pb-5 font-medium">Workers</th>
-                <th className="pb-5 font-medium text-right">Growth</th>
+                <th className="pb-5 text-right font-medium">Growth</th>
               </tr>
             </thead>
 

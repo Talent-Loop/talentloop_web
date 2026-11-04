@@ -2,24 +2,19 @@
 import { useEffect, useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 
-import UserSidebar from "../components/user/UserSidebar";
-import UserTopbar from "../components/user/UserTopbar";
+import Sidebar from "../components/Sidebar";
+import Topbar from "../components/Topbar";
 
-export default function UserDashboardLayout() {
+export default function DashboardLayout() {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const hideSearch =
-    location.pathname === "/dashboard/profile" ||
-    location.pathname === "/dashboard/profile/security" ||
-    location.pathname === "/dashboard/notifications" ||
-    location.pathname === "/dashboard/messages" ||
-    location.pathname === "/dashboard/profile/edit";
-
+  // Close the mobile menu whenever the route changes.
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [location.pathname]);
 
+  // Prevent background scrolling while the mobile menu is open.
   useEffect(() => {
     if (!mobileMenuOpen) return;
 
@@ -32,7 +27,7 @@ export default function UserDashboardLayout() {
   }, [mobileMenuOpen]);
 
   return (
-    <div className="min-h-screen w-full overflow-x-clip bg-[#F7FAF9]">
+   <div className="relative flex min-h-screen w-full bg-[#F8FAFC]">
       {/* Mobile backdrop */}
       {mobileMenuOpen && (
         <button
@@ -43,30 +38,23 @@ export default function UserDashboardLayout() {
         />
       )}
 
-      {/* Sidebar */}
-      <aside
-        className={`fixed left-0 top-0 z-[70] h-dvh w-[261px] max-w-[85vw] transition-transform duration-300 ease-in-out md:translate-x-0 ${
-          mobileMenuOpen
-            ? "translate-x-0"
-            : "-translate-x-full md:translate-x-0"
-        }`}
-      >
-        <UserSidebar />
-      </aside>
+      {/* Admin Sidebar */}
+      <Sidebar
+        isOpen={mobileMenuOpen}
+        onClose={() => setMobileMenuOpen(false)}
+      />
 
-      {/* Main content */}
-      <div className="min-h-screen min-w-0 md:ml-[261px]">
-        <UserTopbar
-          showSearch={!hideSearch}
-          onMenuClick={() => setMobileMenuOpen((open) => !open)}
-          mobileMenuOpen={mobileMenuOpen}
-        />
+      {/* Main Content */}
+      <div className="min-h-screen min-w-0 flex-1">
+        <div className="p-3 sm:p-5 md:p-6">
+          <Topbar
+            onMenuClick={() => setMobileMenuOpen((open) => !open)}
+          />
 
-        <main className="min-w-0 px-3 pt-[80px] sm:px-5 md:px-6">
-          <div className="mx-auto w-full max-w-[1000px] pb-8 sm:pb-10">
+          <main className="w-full">
             <Outlet />
-          </div>
-        </main>
+          </main>
+        </div>
       </div>
     </div>
   );

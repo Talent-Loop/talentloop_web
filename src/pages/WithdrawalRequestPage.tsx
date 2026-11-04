@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+
+import { useState } from "react";
 import * as XLSX from "xlsx";
 import type { IconType } from "react-icons";
 import {
@@ -129,47 +130,48 @@ export default function WithdrawalRequestPage() {
   ];
 
   const handleExport = () => {
-  const exportData = requests.map((item) => ({
-    Agent: item.agent,
-    Amount: item.amount,
-    "Request Date": item.date,
-    "Payment Method": item.method,
-    Status: item.status,
-  }));
+    const exportData = requests.map((item) => ({
+      Agent: item.agent,
+      Amount: item.amount,
+      "Request Date": item.date,
+      "Payment Method": item.method,
+      Status: item.status,
+    }));
 
-  const worksheet = XLSX.utils.json_to_sheet(exportData);
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
 
-  // Make columns wider
-  worksheet["!cols"] = [
-    { wch: 20 },
-    { wch: 15 },
-    { wch: 28 },
-    { wch: 20 },
-    { wch: 15 },
-  ];
+    worksheet["!cols"] = [
+      { wch: 20 },
+      { wch: 15 },
+      { wch: 28 },
+      { wch: 20 },
+      { wch: 15 },
+    ];
 
-  const workbook = XLSX.utils.book_new();
+    const workbook = XLSX.utils.book_new();
 
-  XLSX.utils.book_append_sheet(
-    workbook,
-    worksheet,
-    "Withdrawal Requests"
-  );
+    XLSX.utils.book_append_sheet(
+      workbook,
+      worksheet,
+      "Withdrawal Requests"
+    );
 
-  const fileName = `Withdrawal_Requests_${
-    new Date().toISOString().split("T")[0]
-  }.xlsx`;
+    const fileName = `Withdrawal_Requests_${
+      new Date().toISOString().split("T")[0]
+    }.xlsx`;
 
-  XLSX.writeFile(workbook, fileName);
-};
+    XLSX.writeFile(workbook, fileName);
+  };
 
   return (
-    <section className="space-y-7">
-      <h1 className="text-[42px] font-bold text-[#22324A]">
+    <section className="min-w-0 space-y-6 sm:space-y-7">
+      {/* PAGE HEADER */}
+      <h1 className="text-2xl font-bold text-[#22324A] sm:text-3xl lg:text-[42px]">
         Withdrawal Request
       </h1>
 
-      <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+      {/* SUMMARY CARDS */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 xl:grid-cols-4">
         {stats.map((item) => (
           <StatCard
             key={item.title}
@@ -181,15 +183,16 @@ export default function WithdrawalRequestPage() {
         ))}
       </div>
 
+      {/* FILTERS AND EXPORT */}
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <div className="flex flex-col gap-4 md:flex-row">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
           <div className="relative">
             <select
               value={agent}
               onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
                 setAgent(e.target.value)
               }
-              className="appearance-none rounded-full border border-slate-200 bg-white px-5 py-3 pr-10 text-sm text-black shadow-sm focus:outline-none"
+              className="h-12 w-full appearance-none rounded-full border border-slate-200 bg-white px-5 pr-10 text-sm text-black shadow-sm focus:outline-none"
             >
               <option>All Agents</option>
               <option>Agent Ola</option>
@@ -197,7 +200,7 @@ export default function WithdrawalRequestPage() {
               <option>Agent Kelvin</option>
             </select>
 
-            <FiChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400" />
+            <FiChevronDown className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-400" />
           </div>
 
           <div className="relative">
@@ -206,87 +209,131 @@ export default function WithdrawalRequestPage() {
               onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
                 setMethod(e.target.value)
               }
-              className="appearance-none rounded-full border border-slate-200 bg-white px-5 py-3 pr-10 text-sm text-black shadow-sm focus:outline-none"
+              className="h-12 w-full appearance-none rounded-full border border-slate-200 bg-white px-5 pr-10 text-sm text-black shadow-sm focus:outline-none"
             >
               <option>All Payment Method</option>
               <option>Bank Transfer</option>
               <option>Wallet</option>
             </select>
 
-            <FiChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400" />
+            <FiChevronDown className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-400" />
           </div>
         </div>
 
-        <div className="flex gap-3">
+        <div className="grid grid-cols-2 gap-3 sm:flex">
           <button
-  onClick={() => setShowFilters(!showFilters)}
-  className="flex h-11 items-center gap-2 rounded-full border border-[#D9E2EC] bg-white px-6 text-sm font-semibold text-[#22324A] shadow-sm transition hover:bg-slate-50"
->
-  <FiFilter />
-  Filter
-</button>
+            onClick={() => setShowFilters(!showFilters)}
+            className="flex h-11 items-center justify-center gap-2 rounded-full border border-[#D9E2EC] bg-white px-4 text-sm font-semibold text-[#22324A] shadow-sm transition hover:bg-slate-50 sm:px-6"
+          >
+            <FiFilter />
+            Filter
+          </button>
 
           <button
-  onClick={handleExport}
-  className="flex h-11 items-center gap-2 rounded-full bg-[#0D3553] px-6 text-sm font-semibold text-white shadow-sm transition hover:bg-[#0B2C45]"
->
+            onClick={handleExport}
+            className="flex h-11 items-center justify-center gap-2 rounded-full bg-[#0D3553] px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-[#0B2C45] sm:px-6"
+          >
             <FiDownload className="text-base" />
             Export
           </button>
         </div>
       </div>
 
+      {/* FILTER PANEL */}
       {showFilters && (
-  <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-lg">
-    <h3 className="mb-5 text-lg font-semibold text-[#22324A]">
-      Filter Requests
-    </h3>
+        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-lg sm:p-6">
+          <h3 className="mb-5 text-lg font-semibold text-[#22324A]">
+            Filter Requests
+          </h3>
 
-    <div className="grid gap-5 md:grid-cols-2">
-      <div>
-        <label className="mb-2 block text-sm font-medium">
-          Status
-        </label>
+          <div className="grid gap-5 sm:grid-cols-2">
+            <div>
+              <label className="mb-2 block text-sm font-medium">
+                Status
+              </label>
 
-        <select className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-black">
-          <option className="text-black">All</option>
-<option className="text-black">Pending</option>
-<option className="text-black">Approved</option>
-<option className="text-black">Rejected</option>
-        </select>
-      </div>
+              <select className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-black">
+                <option className="text-black">All</option>
+                <option className="text-black">Pending</option>
+                <option className="text-black">Approved</option>
+                <option className="text-black">Rejected</option>
+              </select>
+            </div>
 
-      <div>
-        <label className="mb-2 block text-sm font-medium">
-          Date
-        </label>
+            <div>
+              <label className="mb-2 block text-sm font-medium">
+                Date
+              </label>
 
-        <input
-  type="date"
-  className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-black"
-/>
-      </div>
-    </div>
+              <input
+                type="date"
+                className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-black"
+              />
+            </div>
+          </div>
 
-    <div className="mt-6 flex justify-end gap-3">
-      <button
-        onClick={() => setShowFilters(false)}
-        className="rounded-xl border px-5 py-2"
-      >
-        Cancel
-      </button>
+          <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+            <button
+              onClick={() => setShowFilters(false)}
+              className="rounded-xl border px-5 py-2.5 text-sm"
+            >
+              Cancel
+            </button>
 
-      <button
-        className="rounded-xl bg-[#0D3553] px-5 py-2 text-white"
-      >
-        Apply Filter
-      </button>
-    </div>
-  </div>
-)}
+            <button className="rounded-xl bg-[#0D3553] px-5 py-2.5 text-sm text-white">
+              Apply Filter
+            </button>
+          </div>
+        </div>
+      )}
 
-      <div className="overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-sm">
-        <div className="overflow-x-auto">
+      {/* WITHDRAWAL REQUESTS */}
+      <div className="min-w-0 overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-sm sm:rounded-[32px]">
+        {/* MOBILE CARDS */}
+        <div className="space-y-4 p-4 md:hidden">
+          {requests.map((item) => (
+            <article
+              key={item.id}
+              className="rounded-2xl border border-slate-200 p-4"
+            >
+              <div className="flex items-center justify-between gap-3">
+                <p className="font-semibold text-[#22324A]">
+                  {item.agent}
+                </p>
+
+                <span className="shrink-0 rounded-full bg-yellow-100 px-3 py-1.5 text-xs font-medium text-yellow-700">
+                  {item.status}
+                </span>
+              </div>
+
+              <div className="mt-4 grid grid-cols-2 gap-4 border-t border-slate-100 pt-4">
+                <div>
+                  <p className="text-xs text-slate-400">Amount</p>
+                  <p className="mt-1 font-semibold text-[#22324A]">
+                    {item.amount}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-xs text-slate-400">Payment Method</p>
+                  <p className="mt-1 text-sm text-slate-600">
+                    {item.method}
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-4 border-t border-slate-100 pt-3">
+                <p className="text-xs text-slate-400">Request Date</p>
+                <p className="mt-1 text-sm text-slate-600">
+                  {item.date}
+                </p>
+              </div>
+            </article>
+          ))}
+        </div>
+
+        {/* DESKTOP TABLE */}
+        <div className="hidden overflow-x-auto md:block">
           <table className="min-w-full">
             <thead className="border-b border-slate-200 bg-slate-50">
               <tr className="text-left text-sm font-semibold text-slate-500">
@@ -331,29 +378,30 @@ export default function WithdrawalRequestPage() {
           </table>
         </div>
 
-        <div className="flex items-center justify-between border-t border-slate-200 px-8 py-5">
-          <p className="text-sm text-slate-500">
+        {/* PAGINATION */}
+        <div className="flex flex-col gap-4 border-t border-slate-200 px-4 py-5 sm:px-6 md:flex-row md:items-center md:justify-between lg:px-8">
+          <p className="text-center text-sm text-slate-500 md:text-left">
             Showing 1–8 of 24 Requests
           </p>
 
-          <div className="flex gap-2">
-            <button className="rounded-lg border border-slate-200 px-4 py-2 text-sm hover:bg-slate-50">
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            <button className="rounded-lg border border-slate-200 px-3 py-2 text-xs hover:bg-slate-50 sm:px-4 sm:text-sm">
               Previous
             </button>
 
-            <button className="rounded-lg bg-[#0F4C75] px-4 py-2 text-sm text-white">
+            <button className="rounded-lg bg-[#0F4C75] px-3 py-2 text-xs text-white sm:px-4 sm:text-sm">
               1
             </button>
 
-            <button className="rounded-lg border border-slate-200 px-4 py-2 text-sm hover:bg-slate-50">
+            <button className="rounded-lg border border-slate-200 px-3 py-2 text-xs hover:bg-slate-50 sm:px-4 sm:text-sm">
               2
             </button>
 
-            <button className="rounded-lg border border-slate-200 px-4 py-2 text-sm hover:bg-slate-50">
+            <button className="rounded-lg border border-slate-200 px-3 py-2 text-xs hover:bg-slate-50 sm:px-4 sm:text-sm">
               3
             </button>
 
-            <button className="rounded-lg border border-slate-200 px-4 py-2 text-sm hover:bg-slate-50">
+            <button className="rounded-lg border border-slate-200 px-3 py-2 text-xs hover:bg-slate-50 sm:px-4 sm:text-sm">
               Next
             </button>
           </div>

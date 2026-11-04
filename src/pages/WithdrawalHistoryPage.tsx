@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import * as XLSX from "xlsx";
 import {
@@ -130,34 +131,39 @@ export default function WithdrawalHistoryPage() {
     );
   };
 
- const handleFilter = () => {
-  let filtered = history;
+  const handleFilter = () => {
+    let filtered = history;
 
-  // Agent filter
-  if (agent !== "All Agents") {
-    filtered = filtered.filter(
-      (item) => item.agent === agent
-    );
-  }
+    // Agent filter
+    if (agent !== "All Agents") {
+      filtered = filtered.filter(
+        (item) => item.agent === agent
+      );
+    }
 
-  // Date filter
-  if (dateRange !== "1 May - 31 May 2026") {
-    filtered = filtered.filter((item) =>
-      item.date.startsWith(dateRange)
-    );
-  }
+    // Date filter
+    if (dateRange !== "1 May - 31 May 2026") {
+      filtered = filtered.filter((item) =>
+        item.date.startsWith(dateRange)
+      );
+    }
 
-  setFilteredHistory(filtered);
-};
+    setFilteredHistory(filtered);
+  };
 
-    return (
-    <section className="space-y-8">
-      <h1 className="text-[42px] font-bold text-[#22324A]">
+  return (
+    <section className="min-w-0 space-y-6 sm:space-y-8">
+
+      {/* PAGE HEADER */}
+      <h1 className="text-2xl font-bold text-[#22324A] sm:text-3xl lg:text-[42px]">
         Withdrawal History
       </h1>
 
+      {/* FILTERS AND EXPORT */}
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <div className="flex flex-col gap-4 md:flex-row">
+
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
+
           {/* Date Filter */}
           <div className="relative">
             <select
@@ -165,14 +171,14 @@ export default function WithdrawalHistoryPage() {
               onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
                 setDateRange(e.target.value)
               }
-              className="appearance-none rounded-full border border-[#DCE3EA] bg-white px-6 py-3 pr-12 text-sm font-medium text-black shadow-sm"
+              className="h-12 w-full appearance-none rounded-full border border-[#DCE3EA] bg-white px-5 pr-12 text-sm font-medium text-black shadow-sm focus:outline-none sm:px-6"
             >
               <option>1 May - 31 May 2026</option>
               <option>17 May 2026</option>
               <option>18 May 2026</option>
             </select>
 
-            <FiChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-500" />
+            <FiChevronDown className="pointer-events-none absolute right-5 top-1/2 -translate-y-1/2 text-slate-500" />
           </div>
 
           {/* Agent Filter */}
@@ -182,7 +188,7 @@ export default function WithdrawalHistoryPage() {
               onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
                 setAgent(e.target.value)
               }
-              className="appearance-none rounded-full border border-[#DCE3EA] bg-white px-6 py-3 pr-12 text-sm font-medium text-black shadow-sm"
+              className="h-12 w-full appearance-none rounded-full border border-[#DCE3EA] bg-white px-5 pr-12 text-sm font-medium text-black shadow-sm focus:outline-none sm:px-6"
             >
               <option>All Agents</option>
               <option>Agent Ola</option>
@@ -195,14 +201,16 @@ export default function WithdrawalHistoryPage() {
               <option>Agent Chinda</option>
             </select>
 
-            <FiChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-500" />
+            <FiChevronDown className="pointer-events-none absolute right-5 top-1/2 -translate-y-1/2 text-slate-500" />
           </div>
         </div>
 
-        <div className="flex gap-3">
+        {/* ACTION BUTTONS */}
+        <div className="grid grid-cols-2 gap-3 sm:flex">
+
           <button
             onClick={handleFilter}
-            className="flex items-center gap-2 rounded-full border border-[#DCE3EA] bg-white px-6 py-3 text-sm font-semibold text-[#22324A] shadow-sm hover:bg-slate-50"
+            className="flex h-12 items-center justify-center gap-2 rounded-full border border-[#DCE3EA] bg-white px-4 text-sm font-semibold text-[#22324A] shadow-sm hover:bg-slate-50 sm:px-6"
           >
             <FiFilter />
             Apply Filters
@@ -210,7 +218,7 @@ export default function WithdrawalHistoryPage() {
 
           <button
             onClick={handleExport}
-            className="flex items-center gap-2 rounded-full bg-[#0D3553] px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#0B2C45]"
+            className="flex h-12 items-center justify-center gap-2 rounded-full bg-[#0D3553] px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-[#0B2C45] sm:px-6"
           >
             <FiDownload />
             Export
@@ -218,15 +226,73 @@ export default function WithdrawalHistoryPage() {
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-3xl border border-[#E5EAF0] bg-white shadow-sm">
-        <div className="px-7 pt-7">
-          <h2 className="text-3xl font-semibold text-[#22324A]">
+      {/* RECENT ACTIVITIES */}
+      <div className="min-w-0 overflow-hidden rounded-2xl border border-[#E5EAF0] bg-white shadow-sm sm:rounded-3xl">
+
+        <div className="px-4 pt-5 sm:px-7 sm:pt-7">
+          <h2 className="text-xl font-semibold text-[#22324A] sm:text-2xl lg:text-3xl">
             Recent Activities
           </h2>
         </div>
 
-        <div className="p-6">
-          <table className="w-full border-separate border-spacing-0">
+        {/* MOBILE CARDS */}
+        <div className="space-y-4 p-4 md:hidden">
+          {filteredHistory.map((item) => (
+            <article
+              key={item.id}
+              className="rounded-2xl border border-[#E5EAF0] p-4"
+            >
+              <div className="flex items-center justify-between gap-3">
+                <p className="font-semibold text-[#22324A]">
+                  {item.agent}
+                </p>
+
+                <span className="inline-flex shrink-0 rounded-full bg-[#DCFCE7] px-3 py-1 text-xs font-medium text-[#16A34A]">
+                  {item.status}
+                </span>
+              </div>
+
+              <div className="mt-4 grid grid-cols-2 gap-4 border-t border-[#EEF2F6] pt-4">
+                <div>
+                  <p className="text-xs text-slate-400">
+                    Amount
+                  </p>
+                  <p className="mt-1 font-semibold text-[#22324A]">
+                    {item.amount}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-xs text-slate-400">
+                    Request Date
+                  </p>
+                  <p className="mt-1 text-sm text-[#4B5563]">
+                    {item.date}
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-4 border-t border-[#EEF2F6] pt-3">
+                <p className="text-xs text-slate-400">
+                  Reference
+                </p>
+                <p className="mt-1 break-all text-sm font-medium text-[#4B5563]">
+                  {item.reference}
+                </p>
+              </div>
+            </article>
+          ))}
+
+          {filteredHistory.length === 0 && (
+            <div className="py-10 text-center text-sm text-slate-500">
+              No records found.
+            </div>
+          )}
+        </div>
+
+        {/* DESKTOP TABLE */}
+        <div className="hidden overflow-x-auto p-6 md:block">
+          <table className="w-full min-w-[750px] border-separate border-spacing-0">
             <thead>
               <tr className="bg-[#EEF2F6] text-left text-sm font-semibold text-[#22324A]">
                 <th className="rounded-l-xl px-5 py-4">Agent</th>
@@ -282,13 +348,15 @@ export default function WithdrawalHistoryPage() {
         </div>
       </div>
 
-      <div className="flex flex-col gap-4 rounded-2xl border border-[#E5EAF0] bg-white px-6 py-4 md:flex-row md:items-center md:justify-between">
-        <p className="text-sm font-medium text-[#4B5563]">
+      {/* PAGINATION */}
+      <div className="flex flex-col gap-4 rounded-2xl border border-[#E5EAF0] bg-white px-4 py-4 sm:px-6 md:flex-row md:items-center md:justify-between">
+
+        <p className="text-center text-sm font-medium text-[#4B5563] md:text-left">
           Showing {filteredHistory.length} result
           {filteredHistory.length !== 1 && "s"}
         </p>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center justify-center gap-2">
           <button className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#DCE3EA] text-[#64748B] hover:bg-slate-100">
             <FiChevronLeft />
           </button>
