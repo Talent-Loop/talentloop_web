@@ -10,7 +10,7 @@ import {
   X,
 } from "lucide-react";
 
-type JobStatus = "Pending" | "Progress" | "Completed" | "Cancelled";
+type JobStatus = "Open" | "Progress" | "Completed" | "Cancelled";
 
 interface Job {
   id: number;
@@ -86,8 +86,6 @@ export default function JobProgressModal({
       });
 
       const body = response.data;
-
-    
       const data = body?.data;
 
       const conversation =
@@ -98,16 +96,12 @@ export default function JobProgressModal({
         body?.conversation ??
         body;
 
-      
-
       const conversationId =
         typeof conversation === "string"
           ? conversation
           : conversation?._id ??
             conversation?.id ??
             conversation?.conversationId;
-
-     
 
       if (
         typeof conversationId !== "string" ||
@@ -194,11 +188,11 @@ export default function JobProgressModal({
 
               <div className="flex w-[72px] flex-col items-center">
                 <div
-                  className={`flex h-[32px] w-[32px] items-center justify-center rounded-full ${
+                  className={`flex h-[32px] w-[32px] items-center justify-center ${
                     job.status === "Progress" ||
                     job.status === "Completed"
-                      ? "bg-[#22C55E]"
-                      : "bg-[#DCE4E9]"
+                      ? "rounded-full bg-[#22C55E]"
+                      : "rounded-full bg-[#DCE4E9]"
                   }`}
                 >
                   {job.status === "Progress" ||
@@ -219,10 +213,10 @@ export default function JobProgressModal({
 
               <div className="flex w-[72px] flex-col items-center">
                 <div
-                  className={`flex h-[32px] w-[32px] items-center justify-center rounded-full ${
+                  className={`flex h-[32px] w-[32px] items-center justify-center ${
                     job.status === "Completed"
-                      ? "bg-[#22C55E]"
-                      : "bg-[#DCE4E9]"
+                      ? "rounded-full bg-[#22C55E]"
+                      : "rounded-full bg-[#DCE4E9]"
                   }`}
                 >
                   {job.status === "Completed" ? (
