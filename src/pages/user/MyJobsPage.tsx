@@ -27,7 +27,6 @@ interface Job {
 
 const filters: Array<"All" | JobStatus> = [
   "All",
-  "Pending",
   "Progress",
   "Completed",
   "Cancelled",

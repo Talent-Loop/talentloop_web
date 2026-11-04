@@ -27,6 +27,15 @@ export interface ClientJob {
 interface MyJobsResponse {
   success?: boolean;
   data?: {
+    jobs?: {
+      data?: ClientJob[];
+      meta?: {
+        total: number;
+        page: number;
+        limit: number;
+        totalPages: number;
+      };
+    };
     data?: ClientJob[];
     meta?: {
       total: number;
@@ -48,11 +57,19 @@ export async function getMyJobs(): Promise<ClientJob[]> {
 
   const payload = response.data?.data;
 
-  // Handle either a direct array or a paginated response.
+  // Handle a direct array response.
   if (Array.isArray(payload)) {
     return payload;
   }
 
+  // Handle the current backend response:
+  // response.data.data.jobs.data
+  if (payload?.jobs && Array.isArray(payload.jobs.data)) {
+    return payload.jobs.data;
+  }
+
+  // Handle the previous paginated response:
+  // response.data.data.data
   if (payload && Array.isArray(payload.data)) {
     return payload.data;
   }
