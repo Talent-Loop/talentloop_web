@@ -1,9 +1,9 @@
 
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import {
   FiBell,
   FiSearch,
-  FiMenu,
 } from "react-icons/fi";
 import { getCurrentUser } from "../services/auth";
 import type { User } from "../types/users";
@@ -11,9 +11,13 @@ import axios from "axios";
 
 interface TopbarProps {
   onMenuClick: () => void;
+  isMenuOpen: boolean;
 }
 
-export default function Topbar({ onMenuClick }: TopbarProps) {
+export default function Topbar({
+  onMenuClick,
+  isMenuOpen,
+}: TopbarProps) {
   const [user, setUser] = useState<User | null>(null);
   const [search, setSearch] = useState("");
 
@@ -59,15 +63,44 @@ export default function Topbar({ onMenuClick }: TopbarProps) {
   return (
     <div className="mb-5 sm:mb-6">
       <div className="flex items-center justify-between gap-3 sm:gap-6">
-        {/* Mobile Hamburger */}
-        <button
+        {/* Animated Mobile Hamburger */}
+        <motion.button
           type="button"
           onClick={onMenuClick}
-          aria-label="Open navigation menu"
-          className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-[#17364C] shadow-sm transition hover:bg-slate-50 md:hidden"
+          aria-label={isMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+          aria-expanded={isMenuOpen}
+          whileTap={{ scale: 0.9 }}
+          className="relative flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-[#17364C] shadow-sm transition-colors hover:bg-slate-50 md:hidden"
         >
-          <FiMenu className="h-6 w-6" />
-        </button>
+          <span className="relative flex h-5 w-6 flex-col items-center justify-center">
+            <motion.span
+              animate={{
+                rotate: isMenuOpen ? 45 : 0,
+                y: isMenuOpen ? 0 : -7,
+              }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+              className="absolute h-[2px] w-6 rounded-full bg-current"
+            />
+
+            <motion.span
+              animate={{
+                opacity: isMenuOpen ? 0 : 1,
+                scaleX: isMenuOpen ? 0 : 1,
+              }}
+              transition={{ duration: 0.2 }}
+              className="absolute h-[2px] w-6 rounded-full bg-current"
+            />
+
+            <motion.span
+              animate={{
+                rotate: isMenuOpen ? -45 : 0,
+                y: isMenuOpen ? 0 : 7,
+              }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+              className="absolute h-[2px] w-6 rounded-full bg-current"
+            />
+          </span>
+        </motion.button>
 
         {/* Search */}
         <div className="hidden flex-1 sm:block">
