@@ -1,6 +1,7 @@
 
 import { useRef, useState, type ChangeEvent } from "react";
 import { useNavigate } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
 import defaultAvatar from "../../assets/userHero.png";
 import clientApi from "../../services/clientApi";
 import {
@@ -85,24 +86,54 @@ export default function UserProfilePage() {
     }
   };
 
+  const settingsAnimation = {
+    hidden: { opacity: 0, y: 18 },
+    visible: { opacity: 1, y: 0 },
+  };
+
   return (
-    <div className="min-h-[1117px] bg-[#F7FAF9] px-0 pt-[22px]">
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.45, ease: "easeOut" }}
+      className="min-h-[1117px] bg-[#F7FAF9] px-0 pt-[22px]"
+    >
       {/* Title */}
-      <h1 className="font-['Inter'] text-[24px] font-bold leading-8 text-[#24364B]">
+      <motion.h1
+        initial={{ opacity: 0, x: -15 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.45, delay: 0.1 }}
+        className="font-['Inter'] text-[24px] font-bold leading-8 text-[#24364B]"
+      >
         Profile
-      </h1>
+      </motion.h1>
 
       {/* Profile header */}
-      <div className="mt-[38px] flex h-[161px] w-[1000px] items-center gap-[240px] rounded-[10px] border border-[#D8E0DE] bg-[#F7FAF9]">
+      <motion.div
+        initial={{ opacity: 0, y: 25 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.15, ease: "easeOut" }}
+        whileHover={{
+          boxShadow: "0px 8px 24px rgba(22, 77, 111, 0.07)",
+        }}
+        className="mt-[38px] flex h-[161px] w-[1000px] items-center gap-[240px] rounded-[10px] border border-[#D8E0DE] bg-[#F7FAF9]"
+      >
         <div className="ml-[48px] flex h-[128px] w-[427px] items-center gap-[40px]">
           {/* Avatar */}
-          <div className="relative flex-shrink-0">
+          <motion.div
+            whileHover={{ scale: 1.04 }}
+            transition={{ duration: 0.25 }}
+            className="relative flex-shrink-0"
+          >
             <div className="h-[128px] w-[128px] overflow-hidden rounded-full border-[4px] border-white shadow-md">
-              <img
+              <motion.img
                 src={avatar}
                 alt="Emeka Johnson"
                 className="h-full w-full object-cover"
                 onError={() => setAvatar(defaultAvatar)}
+                initial={{ scale: 1.08 }}
+                animate={{ scale: 1 }}
+                transition={{ duration: 0.5 }}
               />
             </div>
 
@@ -114,19 +145,25 @@ export default function UserProfilePage() {
               onChange={handlePhotoChange}
             />
 
-            <button
+            <motion.button
               type="button"
               disabled={uploading}
               onClick={() => fileInputRef.current?.click()}
               title="Change profile picture"
+              whileHover={{ scale: 1.12 }}
+              whileTap={{ scale: 0.9 }}
               className="absolute bottom-3 right-[-1px] flex h-[27px] w-[27px] items-center justify-center rounded-full border-2 border-white bg-[#164D6F] text-white disabled:cursor-not-allowed disabled:opacity-60"
             >
               <FiCamera className="h-3.5 w-3.5" />
-            </button>
-          </div>
+            </motion.button>
+          </motion.div>
 
           {/* Name */}
-          <div>
+          <motion.div
+            initial={{ opacity: 0, x: 12 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.4, delay: 0.3 }}
+          >
             <h2 className="font-['Inter'] text-[20px] font-bold text-[#182536]">
               Emeka Johnson
             </h2>
@@ -135,34 +172,65 @@ export default function UserProfilePage() {
               emekajohnson@gmail.com
             </p>
 
-            {uploading && (
-              <p className="mt-1 text-xs text-[#164D6F]">
-                Uploading picture...
-              </p>
-            )}
-          </div>
+            <AnimatePresence>
+              {uploading && (
+                <motion.p
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -5 }}
+                  className="mt-1 text-xs text-[#164D6F]"
+                >
+                  Uploading picture...
+                </motion.p>
+              )}
+            </AnimatePresence>
+          </motion.div>
         </div>
 
         {/* Edit profile */}
-        <button
+        <motion.button
           type="button"
           onClick={() => navigate("edit")}
+          whileHover={{
+            scale: 1.03,
+            backgroundColor: "#164D6F",
+            color: "#FFFFFF",
+          }}
+          whileTap={{ scale: 0.97 }}
+          transition={{ duration: 0.2 }}
           className="mr-[40px] h-[48px] w-[337px] rounded-[12px] border border-[#164D6F] bg-transparent font-['Inter'] text-[16px] font-semibold text-[#164D6F]"
         >
           Edit profile
-        </button>
-      </div>
+        </motion.button>
+      </motion.div>
 
       {/* Settings */}
-      <div className="mt-[32px] w-[1000px] space-y-[18px]">
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        transition={{
+          staggerChildren: 0.12,
+          delayChildren: 0.3,
+        }}
+        className="mt-[32px] w-[1000px] space-y-[18px]"
+      >
         {/* Notifications */}
-        <button
+        <motion.button
+          variants={settingsAnimation}
+          transition={{ duration: 0.4, ease: "easeOut" }}
           type="button"
-          className="flex h-[58px] w-full items-center justify-between rounded-[16px] border border-[#F9FAFB] bg-white px-4 shadow-sm"
+          className="flex h-[58px] w-full items-center justify-between rounded-[16px] border border-[#F9FAFB] bg-white px-4 shadow-sm transition-shadow duration-300 hover:shadow-md"
+          whileHover={{ y: -3 }}
+          whileTap={{ scale: 0.99 }}
           onClick={() => navigate("/dashboard/notifications")}
         >
           <div className="flex items-center gap-4">
-            <FiBell className="h-[22px] w-[22px] text-[#164D6F]" />
+            <motion.span
+              whileHover={{ rotate: 12, scale: 1.1 }}
+              transition={{ duration: 0.2 }}
+            >
+              <FiBell className="h-[22px] w-[22px] text-[#164D6F]" />
+            </motion.span>
 
             <span className="font-['Inter'] text-[14px] text-[#182536]">
               Notifications
@@ -170,56 +238,95 @@ export default function UserProfilePage() {
           </div>
 
           <div className="flex items-center gap-4">
-            <span className="flex h-[22px] min-w-[22px] items-center justify-center rounded-full bg-[#EF4444] px-1 text-[10px] font-semibold text-white">
+            <motion.span
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", stiffness: 300, delay: 0.55 }}
+              className="flex h-[22px] min-w-[22px] items-center justify-center rounded-full bg-[#EF4444] px-1 text-[10px] font-semibold text-white"
+            >
               3
-            </span>
+            </motion.span>
 
-            <FiChevronRight className="h-5 w-5 text-[#9BA8B2]" />
+            <motion.span
+              whileHover={{ x: 4 }}
+              transition={{ duration: 0.2 }}
+            >
+              <FiChevronRight className="h-5 w-5 text-[#9BA8B2]" />
+            </motion.span>
           </div>
-        </button>
+        </motion.button>
 
         {/* Privacy */}
-        <button
+        <motion.button
+          variants={settingsAnimation}
+          transition={{ duration: 0.4, ease: "easeOut" }}
           type="button"
           onClick={() => navigate("security")}
-          className="flex h-[58px] w-full items-center justify-between rounded-[16px] border border-[#F9FAFB] bg-white px-4 shadow-sm"
+          className="flex h-[58px] w-full items-center justify-between rounded-[16px] border border-[#F9FAFB] bg-white px-4 shadow-sm transition-shadow duration-300 hover:shadow-md"
+          whileHover={{ y: -3 }}
+          whileTap={{ scale: 0.99 }}
         >
           <div className="flex items-center gap-4">
-            <FiShield className="h-[22px] w-[22px] text-[#164D6F]" />
+            <motion.span
+              whileHover={{ rotate: -12, scale: 1.1 }}
+              transition={{ duration: 0.2 }}
+            >
+              <FiShield className="h-[22px] w-[22px] text-[#164D6F]" />
+            </motion.span>
 
             <span className="font-['Inter'] text-[14px] text-[#182536]">
               Privacy & Security
             </span>
           </div>
 
-          <FiChevronRight className="h-5 w-5 text-[#9BA8B2]" />
-        </button>
+          <motion.span
+            whileHover={{ x: 4 }}
+            transition={{ duration: 0.2 }}
+          >
+            <FiChevronRight className="h-5 w-5 text-[#9BA8B2]" />
+          </motion.span>
+        </motion.button>
 
         {/* Logout */}
-        <button
+        <motion.button
+          variants={settingsAnimation}
+          transition={{ duration: 0.4, ease: "easeOut" }}
           type="button"
-          className="flex h-[58px] w-full items-center gap-4 rounded-[16px] border border-[#FEE2E2] bg-white px-4 shadow-sm"
+          className="flex h-[58px] w-full items-center gap-4 rounded-[16px] border border-[#FEE2E2] bg-white px-4 shadow-sm transition-shadow duration-300 hover:shadow-md"
+          whileHover={{ y: -3 }}
+          whileTap={{ scale: 0.99 }}
           onClick={() => {
             localStorage.removeItem("token");
             navigate("/login");
           }}
         >
-          <FiLogOut className="h-[22px] w-[22px] text-[#EF4444]" />
+          <motion.span
+            whileHover={{ x: 3 }}
+            transition={{ duration: 0.2 }}
+          >
+            <FiLogOut className="h-[22px] w-[22px] text-[#EF4444]" />
+          </motion.span>
 
           <span className="font-['Montserrat'] text-[14px] font-semibold text-[#EF4444]">
             Log Out
           </span>
-        </button>
-      </div>
+        </motion.button>
+      </motion.div>
 
       {/* Back */}
-      <button
+      <motion.button
         type="button"
         onClick={() => navigate(-1)}
+        whileHover={{
+          scale: 1.04,
+          backgroundColor: "#164D6F",
+        }}
+        whileTap={{ scale: 0.96 }}
+        transition={{ duration: 0.2 }}
         className="mt-[427px] flex h-12 w-[90px] items-center justify-center rounded-lg border border-[#0D2E431F] bg-[#0D2E43] font-['Inter'] text-[14px] font-medium text-white"
       >
         Back
-      </button>
-    </div>
+      </motion.button>
+    </motion.div>
   );
 }

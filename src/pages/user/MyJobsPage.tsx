@@ -1,5 +1,6 @@
 
 import { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { ShieldCheck } from "lucide-react";
 import JobProgressModal from "./JobProgressModal";
 import { getMyJobs, type ClientJob } from "../../services/userDashboard";
@@ -32,6 +33,12 @@ const filters: Array<"All" | JobStatus> = [
   "Completed",
   "Cancelled",
 ];
+
+const jobVariants = {
+  hidden: { opacity: 0, y: 18 },
+  visible: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -10 },
+};
 
 function getJobStatus(status: string): JobStatus {
   const normalized = status.toLowerCase().replace(/[_-]/g, " ").trim();
@@ -94,7 +101,6 @@ function getWorkerName(job: ClientJob): string | undefined {
 
   for (const candidate of candidates) {
     if (typeof candidate === "string" && candidate.trim()) {
-      // A MongoDB ID is not a display name.
       if (!/^[a-f\d]{24}$/i.test(candidate)) {
         return candidate;
       }
@@ -234,11 +240,19 @@ export default function MyJobsPage() {
       : jobs.filter((job) => job.status === activeFilter);
 
   return (
-    <main className="relative min-h-[1117px] w-full overflow-x-hidden bg-[#F0F4F2]">
+    <motion.main
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.45, ease: "easeOut" }}
+      className="relative min-h-[1117px] w-full overflow-x-hidden bg-[#F0F4F2]"
+    >
       <div className="relative min-h-[1117px] w-full max-w-[1179px] bg-[#F7FAF9]">
 
         {/* PAGE TITLE */}
-        <h1
+        <motion.h1
+          initial={{ opacity: 0, x: -15 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.45, delay: 0.1 }}
           className="
             absolute left-[10px] top-[16px] h-[32px] w-[99px]
             whitespace-nowrap font-['Inter'] text-[24px] font-bold
@@ -246,10 +260,13 @@ export default function MyJobsPage() {
           "
         >
           My Jobs
-        </h1>
+        </motion.h1>
 
         {/* FILTER BUTTONS */}
-        <div
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45, delay: 0.18 }}
           className="
             absolute left-[10px] right-[10px] top-[100px]
             flex min-h-[40px] w-auto flex-wrap items-center
@@ -262,26 +279,29 @@ export default function MyJobsPage() {
             const active = activeFilter === filter;
 
             return (
-              <button
+              <motion.button
                 key={filter}
                 type="button"
                 onClick={() => setActiveFilter(filter)}
+                whileHover={{ y: -2, scale: 1.02 }}
+                whileTap={{ scale: 0.96 }}
+                transition={{ duration: 0.2 }}
                 className={`
                   flex h-[40px] shrink-0 items-center justify-center rounded-[10px]
                   border px-[16px] font-['Montserrat'] text-[11px]
-                  font-semibold transition lg:px-[34px] lg:text-[12px]
+                  font-semibold transition-colors duration-200 lg:px-[34px] lg:text-[12px]
                   ${
                     active
                       ? "border-[#DCE4E9] bg-[#DCE4E9] text-[#1E293B]"
-                      : "border-[#DCE4E9] bg-transparent text-[#1E293B]"
+                      : "border-[#DCE4E9] bg-transparent text-[#1E293B] hover:bg-white"
                   }
                 `}
               >
                 {filter === "Progress" ? "In Progress" : filter}
-              </button>
+              </motion.button>
             );
           })}
-        </div>
+        </motion.div>
 
         {/* JOB LIST */}
         <div
@@ -291,116 +311,175 @@ export default function MyJobsPage() {
             lg:left-[10px] lg:right-auto lg:top-[220px] lg:w-screen
           "
         >
-          {loading ? (
-            <p className="py-6 text-sm text-[#737373]">
-              Loading your jobs...
-            </p>
-          ) : error ? (
-            <div className="py-6">
-              <p className="text-sm text-red-600">{error}</p>
-
-              <button
-                type="button"
-                onClick={loadJobs}
-                className="mt-3 rounded-lg bg-[#164D6F] px-4 py-2 text-sm text-white"
+          <AnimatePresence mode="wait">
+            {loading ? (
+              <motion.p
+                key="loading"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                className="py-6 text-sm text-[#737373]"
               >
-                Try again
-              </button>
-            </div>
-          ) : filteredJobs.length === 0 ? (
-            <p className="py-6 text-sm text-[#737373]">
-              {activeFilter === "All"
-                ? "You haven't posted any jobs yet."
-                : `No ${
-                    activeFilter === "Progress"
-                      ? "in-progress"
-                      : activeFilter.toLowerCase()
-                  } jobs found.`}
-            </p>
-          ) : (
-            filteredJobs.map((job) => (
-              <button
-                key={job._id || job.id}
-                type="button"
-                onClick={() => setSelectedJob(job)}
-                className="
-                  relative flex h-[86px] w-full flex-shrink-0
-                  cursor-pointer flex-col items-start rounded-[10px]
-                  bg-white px-[16px] pt-[12px] text-left
-                  shadow-[0px_4px_6px_-5px_#0000001F]
-                  transition hover:shadow-[0px_5px_12px_-5px_#00000030]
-                  lg:w-[1000px]
-                "
+                Loading your jobs...
+              </motion.p>
+            ) : error ? (
+              <motion.div
+                key="error"
+                initial={{ opacity: 0, scale: 0.98 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0 }}
+                className="py-6"
               >
-                <span
-                  className="
-                    font-['Montserrat'] text-[16px] font-semibold
-                    leading-[20px] text-[#111827]
-                  "
+                <p className="text-sm text-red-600">{error}</p>
+
+                <motion.button
+                  type="button"
+                  onClick={loadJobs}
+                  whileHover={{ scale: 1.04 }}
+                  whileTap={{ scale: 0.96 }}
+                  className="mt-3 rounded-lg bg-[#164D6F] px-4 py-2 text-sm text-white"
                 >
-                  {job.title}
-                </span>
+                  Try again
+                </motion.button>
+              </motion.div>
+            ) : filteredJobs.length === 0 ? (
+              <motion.p
+                key="empty"
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                className="py-6 text-sm text-[#737373]"
+              >
+                {activeFilter === "All"
+                  ? "You haven't posted any jobs yet."
+                  : `No ${
+                      activeFilter === "Progress"
+                        ? "in-progress"
+                        : activeFilter.toLowerCase()
+                    } jobs found.`}
+              </motion.p>
+            ) : (
+              <motion.div
+                key={activeFilter}
+                initial="hidden"
+                animate="visible"
+                className="flex flex-col gap-[10px]"
+                transition={{
+                  staggerChildren: 0.08,
+                  delayChildren: 0.05,
+                }}
+              >
+                <AnimatePresence mode="popLayout">
+                  {filteredJobs.map((job) => (
+                    <motion.button
+                      key={job._id || job.id}
+                      layout
+                      variants={jobVariants}
+                      initial="hidden"
+                      animate="visible"
+                      exit="exit"
+                      transition={{
+                        duration: 0.35,
+                        ease: "easeOut",
+                        layout: { duration: 0.25 },
+                      }}
+                      type="button"
+                      onClick={() => setSelectedJob(job)}
+                      whileHover={{
+                        y: -3,
+                        boxShadow: "0px 7px 16px rgba(0, 0, 0, 0.10)",
+                      }}
+                      whileTap={{ scale: 0.995 }}
+                      className="
+                        relative flex h-[86px] w-full flex-shrink-0
+                        cursor-pointer flex-col items-start rounded-[10px]
+                        bg-white px-[16px] pt-[12px] text-left
+                        shadow-[0px_4px_6px_-5px_#0000001F]
+                        lg:w-[1000px]
+                      "
+                    >
+                      <span
+                        className="
+                          font-['Montserrat'] text-[16px] font-semibold
+                          leading-[20px] text-[#111827]
+                        "
+                      >
+                        {job.title}
+                      </span>
 
-                <span
-                  className="
-                    mt-[5px] font-['Montserrat'] text-[12px]
-                    font-normal leading-[17px] text-[#737373]
-                  "
-                >
-                  Category : {job.category}
-                </span>
+                      <span
+                        className="
+                          mt-[5px] font-['Montserrat'] text-[12px]
+                          font-normal leading-[17px] text-[#737373]
+                        "
+                      >
+                        Category : {job.category}
+                      </span>
 
-                {job.worker ? (
-                  <div className="mt-[3px] flex items-center gap-[7px]">
-                    <div className="flex h-[16px] w-[16px] items-center justify-center rounded-full bg-[#164D6F] text-[7px] font-semibold text-white">
-                      {job.worker
-                        .split(" ")
-                        .map((part) => part[0])
-                        .slice(0, 2)
-                        .join("")
-                        .toUpperCase()}
-                    </div>
+                      {job.worker ? (
+                        <div className="mt-[3px] flex items-center gap-[7px]">
+                          <div className="flex h-[16px] w-[16px] items-center justify-center rounded-full bg-[#164D6F] text-[7px] font-semibold text-white">
+                            {job.worker
+                              .split(" ")
+                              .map((part) => part[0])
+                              .slice(0, 2)
+                              .join("")
+                              .toUpperCase()}
+                          </div>
 
-                    <span className="font-['Montserrat'] text-[11px] font-medium text-[#5F6368]">
-                      {job.worker}
-                    </span>
+                          <span className="font-['Montserrat'] text-[11px] font-medium text-[#5F6368]">
+                            {job.worker}
+                          </span>
 
-                    <ShieldCheck className="h-[13px] w-[13px] fill-[#1267D6] text-[#1267D6]" />
-                  </div>
-                ) : (
-                  <span
-                    className="
-                      mt-[3px] font-['Montserrat'] text-[11px]
-                      font-normal leading-[17px] text-[#737373]
-                    "
-                  >
-                    Biddings : {job.biddings}
-                  </span>
-                )}
+                          <ShieldCheck className="h-[13px] w-[13px] fill-[#1267D6] text-[#1267D6]" />
+                        </div>
+                      ) : (
+                        <span
+                          className="
+                            mt-[3px] font-['Montserrat'] text-[11px]
+                            font-normal leading-[17px] text-[#737373]
+                          "
+                        >
+                          Biddings : {job.biddings}
+                        </span>
+                      )}
 
-                <span
-                  className={`
-                    absolute right-[12px] top-[31px] flex h-[23px]
-                    w-[93px] items-center justify-center rounded-[22px]
-                    px-[10px] font-['Montserrat'] text-[10px]
-                    font-normal lg:right-[50px] ${getStatusClasses(job.status)}
-                  `}
-                >
-                  {job.status === "Progress" ? "In Progress" : job.status}
-                </span>
-              </button>
-            ))
-          )}
+                      <span
+                        className={`
+                          absolute right-[12px] top-[31px] flex h-[23px]
+                          w-[93px] items-center justify-center rounded-[22px]
+                          px-[10px] font-['Montserrat'] text-[10px]
+                          font-normal lg:right-[50px] ${getStatusClasses(job.status)}
+                        `}
+                      >
+                        {job.status === "Progress" ? "In Progress" : job.status}
+                      </span>
+                    </motion.button>
+                  ))}
+                </AnimatePresence>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         {/* JOB PROGRESS MODAL */}
-        {selectedJob && (
-          <JobProgressModal
-            job={selectedJob}
-            onClose={() => setSelectedJob(null)}
-          />
-        )}
+        <AnimatePresence>
+          {selectedJob && (
+            <motion.div
+              key="job-progress-modal"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              <JobProgressModal
+                job={selectedJob}
+                onClose={() => setSelectedJob(null)}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
-    </main>
+    </motion.main>
   );
 }

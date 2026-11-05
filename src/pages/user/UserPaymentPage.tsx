@@ -1,6 +1,8 @@
 
+import { AnimatePresence, motion } from "framer-motion";
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+
 import ConfirmProfessionalModal from "../../components/user/ConfirmProfessionalModal";
 import VerificationInProgressModal from "../../components/user/VerificationInProgressModal";
 import BankTransferVerificationModal from "../../components/user/BankTransferVerificationModal";
@@ -72,6 +74,39 @@ const categories = [
 
 const currency = (amount: number) =>
   `₦${amount.toLocaleString("en-NG")}`;
+
+const pageVariants = {
+  hidden: { opacity: 0, y: 15 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.5,
+      ease: "easeOut" as const,
+    },
+  },
+};
+
+const cardContainerVariants = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.09,
+    },
+  },
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 18 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.4,
+      ease: "easeOut" as const,
+    },
+  },
+};
 
 export default function UserPaymentPage() {
   const navigate = useNavigate();
@@ -194,15 +229,24 @@ export default function UserPaymentPage() {
   return (
     <main className="min-h-full w-full min-w-0 bg-[#F6F9F9] font-['Montserrat'] text-[#202C40]">
       <div className="mx-auto w-full max-w-[1200px] px-4 pb-10 pt-5 sm:px-6 lg:px-7 lg:pt-7">
+
         {/* Page heading */}
-        <header className="mb-8">
-          <button
+        <motion.header
+          variants={pageVariants}
+          initial="hidden"
+          animate="visible"
+          className="mb-8"
+        >
+          <motion.button
             type="button"
             onClick={() => navigate("/dashboard")}
+            whileHover={{ x: -4 }}
+            whileTap={{ scale: 0.96 }}
+            transition={{ duration: 0.2 }}
             className="mb-4 text-[13px] font-medium text-[#23658B] transition-colors hover:text-[#10344A]"
           >
             Back
-          </button>
+          </motion.button>
 
           <h1 className="text-[23px] font-bold leading-tight tracking-[-0.5px] text-[#202C40] sm:text-[25px]">
             Payment
@@ -211,10 +255,13 @@ export default function UserPaymentPage() {
           <p className="mt-2 text-[13px] leading-5 text-[#344155] sm:text-[15px]">
             Manage your payments and transaction history
           </p>
-        </header>
+        </motion.header>
 
         {/* Payment summary cards */}
-        <section
+        <motion.section
+          variants={cardContainerVariants}
+          initial="hidden"
+          animate="visible"
           aria-label="Payment summary"
           className="mb-10 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 xl:gap-6"
         >
@@ -222,10 +269,13 @@ export default function UserPaymentPage() {
           <SummaryCard title="Pending" value="₦4,000" />
           <SummaryCard title="Completed" value="12" />
           <SummaryCard title="Failed" value="0" />
-        </section>
+        </motion.section>
 
         {/* Status tabs */}
-        <nav
+        <motion.nav
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45, delay: 0.2 }}
           aria-label="Filter payments by status"
           className="mb-7 grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-5 xl:max-w-[770px] xl:gap-8"
         >
@@ -233,155 +283,216 @@ export default function UserPaymentPage() {
             const selected = activeTab === tab;
 
             return (
-              <button
+              <motion.button
                 key={tab}
                 type="button"
                 onClick={() => setActiveTab(tab)}
                 aria-pressed={selected}
-                className={`flex h-[42px] items-center justify-center rounded-full border px-4 text-[12px] font-medium transition-colors sm:text-[13px] ${
+                whileHover={{ y: -2 }}
+                whileTap={{ scale: 0.96 }}
+                transition={{ duration: 0.2 }}
+                className={`flex h-[42px] items-center justify-center rounded-full border px-4 text-[12px] font-medium transition-all duration-300 sm:text-[13px] ${
                   selected
-                    ? "border-[#DFE6E8] bg-[#DFE6E8] text-[#163B51]"
-                    : "border-[#DFE5E8] bg-white text-[#171717] hover:bg-[#F0F4F5]"
+                    ? "border-[#DFE6E8] bg-[#DFE6E8] text-[#163B51] shadow-sm"
+                    : "border-[#DFE5E8] bg-white text-[#171717] hover:border-[#B9CCD4] hover:bg-[#F0F4F5]"
                 }`}
               >
                 {tab}
-              </button>
+              </motion.button>
             );
           })}
-        </nav>
+        </motion.nav>
 
         {/* Search and filter */}
-        <div className="relative mb-7 flex w-full items-center gap-3 sm:gap-6">
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45, delay: 0.3 }}
+          className="relative mb-7 flex w-full items-center gap-3 sm:gap-6"
+        >
           <input
             type="search"
             value={search}
             onChange={(event) => setSearch(event.target.value)}
             placeholder="Search Payments"
             aria-label="Search payments"
-            className="h-[47px] min-w-0 flex-1 rounded-full border border-[#DDE3E3] bg-white px-5 text-[12px] text-[#253447] outline-none placeholder:text-[#929CA8] focus:border-[#185779] sm:text-[13px]"
+            className="h-[47px] min-w-0 flex-1 rounded-full border border-[#DDE3E3] bg-white px-5 text-[12px] text-[#253447] outline-none transition-all duration-300 placeholder:text-[#929CA8] focus:border-[#185779] focus:shadow-[0_0_0_3px_rgba(24,87,121,0.08)] sm:text-[13px]"
           />
 
-          <button
+          <motion.button
             type="button"
             onClick={() => setFilterOpen((open) => !open)}
             aria-expanded={filterOpen}
-            className="flex h-[47px] shrink-0 items-center justify-center rounded-full bg-[#185779] px-6 text-[12px] font-medium text-white transition-colors hover:bg-[#104661] sm:min-w-[100px] sm:text-[13px]"
+            whileHover={{ y: -2, scale: 1.02 }}
+            whileTap={{ scale: 0.96 }}
+            transition={{ duration: 0.2 }}
+            className="flex h-[47px] shrink-0 items-center justify-center rounded-full bg-[#185779] px-6 text-[12px] font-medium text-white shadow-sm transition-colors duration-300 hover:bg-[#104661] hover:shadow-md sm:min-w-[100px] sm:text-[13px]"
           >
             Filter
-          </button>
+          </motion.button>
 
-          {filterOpen && (
-            <div className="absolute right-0 top-[55px] z-30 w-[230px] rounded-xl border border-[#E0E6E8] bg-white p-4 shadow-lg">
-              <label
-                htmlFor="payment-category"
-                className="mb-2 block text-[12px] font-medium text-[#344155]"
+          {/* Animated filter dropdown */}
+          <AnimatePresence>
+            {filterOpen && (
+              <motion.div
+                key="payment-filter"
+                initial={{ opacity: 0, y: -8, scale: 0.97 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -8, scale: 0.97 }}
+                transition={{ duration: 0.2, ease: "easeOut" }}
+                className="absolute right-0 top-[55px] z-30 w-[230px] origin-top-right rounded-xl border border-[#E0E6E8] bg-white p-4 shadow-xl"
               >
-                Category
-              </label>
+                <label
+                  htmlFor="payment-category"
+                  className="mb-2 block text-[12px] font-medium text-[#344155]"
+                >
+                  Category
+                </label>
 
-              <select
-                id="payment-category"
-                value={category}
-                onChange={(event) => setCategory(event.target.value)}
-                className="h-[40px] w-full rounded-lg border border-[#DFE5E8] bg-white px-3 text-[12px] text-[#344155] outline-none focus:border-[#185779]"
-              >
-                {categories.map((item) => (
-                  <option key={item} value={item}>
-                    {item}
-                  </option>
-                ))}
-              </select>
+                <select
+                  id="payment-category"
+                  value={category}
+                  onChange={(event) => setCategory(event.target.value)}
+                  className="h-[40px] w-full rounded-lg border border-[#DFE5E8] bg-white px-3 text-[12px] text-[#344155] outline-none transition-colors focus:border-[#185779]"
+                >
+                  {categories.map((item) => (
+                    <option key={item} value={item}>
+                      {item}
+                    </option>
+                  ))}
+                </select>
 
-              <button
-                type="button"
-                onClick={resetFilters}
-                className="mt-3 w-full rounded-lg border border-[#DFE5E8] px-3 py-2.5 text-[12px] font-medium text-[#185779] hover:bg-[#F3F7F8]"
-              >
-                Reset filters
-              </button>
-            </div>
-          )}
-        </div>
+                <motion.button
+                  type="button"
+                  onClick={resetFilters}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.97 }}
+                  className="mt-3 w-full rounded-lg border border-[#DFE5E8] px-3 py-2.5 text-[12px] font-medium text-[#185779] transition-colors hover:bg-[#F3F7F8]"
+                >
+                  Reset filters
+                </motion.button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
 
         {/* Transaction history */}
-        <section
+        <motion.section
+          initial="hidden"
+          animate="visible"
+          variants={cardContainerVariants}
           aria-label="Payment transactions"
           className="flex flex-col gap-4"
         >
-          {filteredPayments.map((payment) => (
-            <article
-              key={payment.id}
-              role="button"
-              tabIndex={0}
-              aria-label={`Select ${payment.professional} for ${payment.title}`}
-              onClick={() => setSelectedPayment(payment)}
-              onKeyDown={(event) => {
-                if (event.key === "Enter" || event.key === " ") {
-                  event.preventDefault();
-                  setSelectedPayment(payment);
-                }
-              }}
-              className="flex min-h-[108px] w-full cursor-pointer items-center justify-between gap-3 rounded-[15px] border border-[#DCE5E9] bg-white px-4 py-5 transition-colors hover:border-[#185779] hover:bg-[#FBFDFD] focus:outline-none focus:ring-2 focus:ring-[#185779] sm:min-h-[138px] sm:gap-5 sm:px-8"
-            >
-              <div className="flex min-w-0 flex-1 items-center gap-3 sm:gap-4">
-                <div className="flex h-[48px] w-[48px] shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#E8EEF0] text-[12px] font-semibold text-[#17364A] sm:h-[66px] sm:w-[66px]">
-                  <img
-                    src={payment.avatar}
-                    alt={payment.professional}
-                    loading="lazy"
-                    className="h-full w-full rounded-full object-cover"
-                    onError={(event) => {
-                      event.currentTarget.style.display = "none";
-                    }}
-                  />
-                  <span className="sr-only">{payment.initials}</span>
+          <AnimatePresence mode="popLayout">
+            {filteredPayments.map((payment) => (
+              <motion.article
+                key={payment.id}
+                layout
+                variants={cardVariants}
+                initial="hidden"
+                animate="visible"
+                exit={{
+                  opacity: 0,
+                  x: -15,
+                  scale: 0.98,
+                  transition: { duration: 0.2 },
+                }}
+                whileHover={{
+                  y: -5,
+                  boxShadow: "0px 10px 25px rgba(22, 59, 81, 0.09)",
+                  borderColor: "#185779",
+                  transition: { duration: 0.25 },
+                }}
+                whileTap={{ scale: 0.995 }}
+                role="button"
+                tabIndex={0}
+                aria-label={`Select ${payment.professional} for ${payment.title}`}
+                onClick={() => setSelectedPayment(payment)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    setSelectedPayment(payment);
+                  }
+                }}
+                className="flex min-h-[108px] w-full cursor-pointer items-center justify-between gap-3 rounded-[15px] border border-[#DCE5E9] bg-white px-4 py-5 transition-colors focus:outline-none focus:ring-2 focus:ring-[#185779] sm:min-h-[138px] sm:gap-5 sm:px-8"
+              >
+                <div className="flex min-w-0 flex-1 items-center gap-3 sm:gap-4">
+                  <motion.div
+                    whileHover={{ scale: 1.08 }}
+                    transition={{ duration: 0.25 }}
+                    className="flex h-[48px] w-[48px] shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#E8EEF0] text-[12px] font-semibold text-[#17364A] sm:h-[66px] sm:w-[66px]"
+                  >
+                    <img
+                      src={payment.avatar}
+                      alt={payment.professional}
+                      loading="lazy"
+                      className="h-full w-full rounded-full object-cover"
+                      onError={(event) => {
+                        event.currentTarget.style.display = "none";
+                      }}
+                    />
+                    <span className="sr-only">{payment.initials}</span>
+                  </motion.div>
+
+                  <div className="min-w-0">
+                    <h2 className="break-words text-[12px] font-medium leading-5 text-[#344155] sm:text-[13px]">
+                      {payment.title}
+                    </h2>
+
+                    <p className="mt-1 break-words text-[11px] leading-5 text-[#46546B] sm:text-[13px]">
+                      {payment.professional} ({payment.category})
+                    </p>
+
+                    <p className="mt-1 text-[10px] leading-5 text-[#46546B] sm:text-[12px]">
+                      {payment.date}
+                    </p>
+                  </div>
                 </div>
 
-                <div className="min-w-0">
-                  <h2 className="break-words text-[12px] font-medium leading-5 text-[#344155] sm:text-[13px]">
-                    {payment.title}
-                  </h2>
-
-                  <p className="mt-1 break-words text-[11px] leading-5 text-[#46546B] sm:text-[13px]">
-                    {payment.professional} ({payment.category})
+                <div className="flex shrink-0 flex-col items-end gap-3 sm:gap-4">
+                  <p className="whitespace-nowrap text-[12px] font-bold tabular-nums text-[#202C40] sm:text-[13px]">
+                    {currency(payment.amount)}
                   </p>
 
-                  <p className="mt-1 text-[10px] leading-5 text-[#46546B] sm:text-[12px]">
-                    {payment.date}
-                  </p>
+                  <StatusBadge status={payment.status} />
                 </div>
-              </div>
+              </motion.article>
+            ))}
+          </AnimatePresence>
 
-              <div className="flex shrink-0 flex-col items-end gap-3 sm:gap-4">
-                <p className="whitespace-nowrap text-[12px] font-bold tabular-nums text-[#202C40] sm:text-[13px]">
-                  {currency(payment.amount)}
+          {/* Empty state */}
+          <AnimatePresence>
+            {filteredPayments.length === 0 && (
+              <motion.div
+                key="empty-state"
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.25 }}
+                className="rounded-[15px] border border-[#DCE5E9] bg-white px-4 py-12 text-center"
+              >
+                <p className="text-[14px] font-semibold text-[#202C40]">
+                  No payments found
                 </p>
 
-                <StatusBadge status={payment.status} />
-              </div>
-            </article>
-          ))}
+                <p className="mt-2 text-[12px] text-[#849197]">
+                  Try another search or change your filters.
+                </p>
 
-          {filteredPayments.length === 0 && (
-            <div className="rounded-[15px] border border-[#DCE5E9] bg-white px-4 py-12 text-center">
-              <p className="text-[14px] font-semibold text-[#202C40]">
-                No payments found
-              </p>
-
-              <p className="mt-2 text-[12px] text-[#849197]">
-                Try another search or change your filters.
-              </p>
-
-              <button
-                type="button"
-                onClick={resetFilters}
-                className="mt-4 text-[12px] font-semibold text-[#185779] underline underline-offset-4 hover:text-[#104661]"
-              >
-                Reset filters
-              </button>
-            </div>
-          )}
-        </section>
+                <motion.button
+                  type="button"
+                  onClick={resetFilters}
+                  whileHover={{ y: -2 }}
+                  whileTap={{ scale: 0.97 }}
+                  className="mt-4 text-[12px] font-semibold text-[#185779] underline underline-offset-4 transition-colors hover:text-[#104661]"
+                >
+                  Reset filters
+                </motion.button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.section>
       </div>
 
       {/* Confirm selected professional */}
@@ -461,15 +572,29 @@ function SummaryCard({
   value: string;
 }) {
   return (
-    <article className="flex min-h-[112px] flex-col items-center justify-center gap-5 rounded-[9px] border border-[#DCE5E9] bg-white px-4 py-5 sm:min-h-[130px]">
+    <motion.article
+      variants={cardVariants}
+      whileHover={{
+        y: -6,
+        boxShadow: "0px 10px 25px rgba(22, 59, 81, 0.09)",
+        borderColor: "#B9CCD4",
+        transition: { duration: 0.25 },
+      }}
+      className="flex min-h-[112px] flex-col items-center justify-center gap-5 rounded-[9px] border border-[#DCE5E9] bg-white px-4 py-5 transition-colors sm:min-h-[130px]"
+    >
       <p className="text-center text-[13px] font-normal leading-5 text-[#344155] sm:text-[15px]">
         {title}
       </p>
 
-      <p className="text-center text-[22px] font-bold leading-tight tracking-[-0.4px] text-[#202C40] sm:text-[24px]">
+      <motion.p
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.2 }}
+        className="text-center text-[22px] font-bold leading-tight tracking-[-0.4px] text-[#202C40] sm:text-[24px]"
+      >
         {value}
-      </p>
-    </article>
+      </motion.p>
+    </motion.article>
   );
 }
 
@@ -481,10 +606,12 @@ function StatusBadge({ status }: { status: PaymentStatus }) {
   };
 
   return (
-    <span
+    <motion.span
+      whileHover={{ scale: 1.06 }}
+      transition={{ duration: 0.2 }}
       className={`inline-flex min-h-[24px] items-center justify-center rounded-full px-3 py-1 text-[9px] font-medium leading-none ${styles[status]}`}
     >
       {status}
-    </span>
+    </motion.span>
   );
 }
