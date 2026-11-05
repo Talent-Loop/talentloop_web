@@ -1,5 +1,6 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   FiArrowLeft,
   FiCheckCircle,
@@ -28,6 +29,25 @@ type ChatDetails = {
 };
 
 const DEFAULT_AVATAR = "/src/assets/userHero.png";
+
+const pageVariants = {
+  hidden: { opacity: 0, y: 15 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.45, ease: "easeOut" as const },
+  },
+};
+
+const messageVariants = {
+  hidden: { opacity: 0, y: 12, scale: 0.98 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { duration: 0.3, ease: "easeOut" as const },
+  },
+};
 
 function asObject(value: unknown): ApiObject {
   return value && typeof value === "object" && !Array.isArray(value)
@@ -119,17 +139,15 @@ function mapMessage(value: unknown): ChatMessage | null {
 
   if (!id || !content) return null;
 
-  
-const createdAt = getText(item.createdAt, item.sentAt);
+  const createdAt = getText(item.createdAt, item.sentAt);
 
-return {
-  id,
-  content,
-  senderId,
-  ...(createdAt ? { createdAt } : {}),
-};
+  return {
+    id,
+    content,
+    senderId,
+    ...(createdAt ? { createdAt } : {}),
+  };
 }
-
 
 function extractMessages(value: unknown): unknown[] {
   const body = asObject(value);
@@ -188,8 +206,7 @@ function mapChatDetails(value: unknown): ChatDetails {
     avatar: getAvatar(user),
     verified: Boolean(user.isVerified ?? user.verified),
     online: Boolean(user.online),
-    jobTitle:
-      getText(job.title, item.jobTitle) || "Conversation",
+    jobTitle: getText(job.title, item.jobTitle) || "Conversation",
     agreedPrice: getText(
       job.agreedPrice,
       item.agreedPrice,
@@ -327,25 +344,41 @@ export default function UserChatPage() {
   };
 
   return (
-    <div className="min-h-[1117px] bg-[#F7FAF9] pt-[5px]">
-      <div className="pt-[22px]">
-        <h1 className="font-['Inter'] text-[24px] font-bold leading-8 text-[#24364B]">
+    <motion.div
+      variants={pageVariants}
+      initial="hidden"
+      animate="visible"
+      className="min-h-screen w-full min-w-0 overflow-x-hidden bg-[#F7FAF9] pb-8 pt-[5px]"
+    >
+      {/* Page heading */}
+      <motion.div
+        variants={pageVariants}
+        className="pt-4 sm:pt-[22px]"
+      >
+        <h1 className="font-['Inter'] text-[21px] font-bold leading-8 text-[#24364B] sm:text-[24px]">
           Messages
         </h1>
-      </div>
+      </motion.div>
 
       {/* Conversation header */}
-      <div className="mt-[30px] flex h-[75px] w-full max-w-[1000px] items-center gap-[27px] rounded-[10px] border border-[#D8E0DE] bg-[#F7FAF9] px-5">
-        <button
+      <motion.div
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.1 }}
+        className="mt-5 flex min-h-[75px] w-full max-w-[1000px] items-center gap-3 rounded-[10px] border border-[#D8E0DE] bg-[#F7FAF9] px-3 py-3 sm:mt-[30px] sm:gap-[27px] sm:px-5 sm:py-0"
+      >
+        <motion.button
           type="button"
           onClick={() => navigate("/dashboard/messages")}
+          whileHover={{ x: -3 }}
+          whileTap={{ scale: 0.9 }}
           className="flex flex-shrink-0 items-center justify-center"
           aria-label="Back to conversations"
         >
           <FiArrowLeft className="h-5 w-5 text-[#182536]" />
-        </button>
+        </motion.button>
 
-        <div className="flex min-w-0 items-center gap-[17px]">
+        <div className="flex min-w-0 items-center gap-3 sm:gap-[17px]">
           <div className="relative flex-shrink-0">
             <img
               src={details.avatar}
@@ -354,7 +387,7 @@ export default function UserChatPage() {
                 event.currentTarget.onerror = null;
                 event.currentTarget.src = DEFAULT_AVATAR;
               }}
-              className="h-[54px] w-[54px] rounded-full object-cover"
+              className="h-11 w-11 rounded-full object-cover sm:h-[54px] sm:w-[54px]"
             />
 
             {details.online && (
@@ -364,7 +397,7 @@ export default function UserChatPage() {
 
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <h1 className="truncate font-['Inter'] text-[15px] font-semibold text-[#182536]">
+              <h1 className="truncate font-['Inter'] text-[14px] font-semibold text-[#182536] sm:text-[15px]">
                 {details.name}
               </h1>
 
@@ -378,12 +411,17 @@ export default function UserChatPage() {
             </p>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Related job */}
-      <div className="mt-[50px] flex min-h-[64px] w-full max-w-[1000px] items-center justify-between gap-3 rounded-[14px] border border-black/10 bg-[#E8EDF1] px-4 py-3">
+      <motion.div
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.18 }}
+        className="mt-6 flex min-h-[64px] w-full max-w-[1000px] items-center justify-between gap-3 rounded-[14px] border border-black/10 bg-[#E8EDF1] px-3 py-3 sm:mt-[50px] sm:px-4"
+      >
         <div className="min-w-0">
-          <h2 className="truncate font-['Inter'] text-[15px] font-semibold text-[#182536]">
+          <h2 className="truncate font-['Inter'] text-[14px] font-semibold text-[#182536] sm:text-[15px]">
             {details.jobTitle}
           </h2>
 
@@ -394,104 +432,148 @@ export default function UserChatPage() {
           )}
         </div>
 
-        <button
+        <motion.button
           type="button"
           onClick={viewJobDetails}
           disabled={!details.jobId}
-          className="flex-shrink-0 rounded-full bg-[#D5E2EA] px-5 py-2 font-['Inter'] text-[11px] font-medium text-[#245C7E] disabled:cursor-not-allowed disabled:opacity-50"
+          whileHover={{ scale: 1.04 }}
+          whileTap={{ scale: 0.96 }}
+          className="flex-shrink-0 rounded-full bg-[#D5E2EA] px-3 py-2 font-['Inter'] text-[10px] font-medium text-[#245C7E] disabled:cursor-not-allowed disabled:opacity-50 sm:px-5 sm:text-[11px]"
         >
           View details
-        </button>
-      </div>
+        </motion.button>
+      </motion.div>
 
       {/* Messages */}
-      <div className="mt-4 h-[382px] w-full max-w-[1000px] space-y-6 overflow-y-auto rounded-lg">
-        {loading ? (
-          <p className="py-10 text-center font-['Inter'] text-[13px] text-[#7B858D]">
-            Loading messages...
-          </p>
-        ) : error ? (
-          <div className="px-4 py-10 text-center">
-            <p className="font-['Inter'] text-[13px] text-red-600">
-              {error}
-            </p>
-
-            <button
-              type="button"
-              onClick={() => void loadMessages()}
-              className="mt-3 rounded-lg bg-[#164D6F] px-4 py-2 font-['Inter'] text-[12px] text-white"
+      <div className="mt-4 h-[min(52vh,382px)] min-h-[260px] w-full max-w-[1000px] space-y-6 overflow-y-auto overflow-x-hidden rounded-lg px-1 py-2 sm:h-[382px] sm:px-0">
+        <AnimatePresence mode="wait">
+          {loading ? (
+            <motion.p
+              key="loading"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="py-10 text-center font-['Inter'] text-[13px] text-[#7B858D]"
             >
-              Try again
-            </button>
-          </div>
-        ) : messages.length === 0 ? (
-          <p className="py-10 text-center font-['Inter'] text-[13px] text-[#7B858D]">
-            No messages yet. Send a message to start the conversation.
-          </p>
-        ) : (
-          messages.map((item) => {
-            const isMine =
-              Boolean(currentUserId) &&
-              item.senderId === currentUserId;
+              Loading messages...
+            </motion.p>
+          ) : error ? (
+            <motion.div
+              key="error"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              className="px-4 py-10 text-center"
+            >
+              <p className="font-['Inter'] text-[13px] text-red-600">
+                {error}
+              </p>
 
-            return (
-              <div
-                key={item.id}
-                className={
-                  isMine
-                    ? "flex justify-end"
-                    : "flex items-start gap-3"
-                }
+              <motion.button
+                type="button"
+                onClick={() => void loadMessages()}
+                whileHover={{ scale: 1.04 }}
+                whileTap={{ scale: 0.96 }}
+                className="mt-3 rounded-lg bg-[#164D6F] px-4 py-2 font-['Inter'] text-[12px] text-white"
               >
-                {!isMine && (
-                  <img
-                    src={details.avatar}
-                    alt=""
-                    onError={(event) => {
-                      event.currentTarget.onerror = null;
-                      event.currentTarget.src = DEFAULT_AVATAR;
-                    }}
-                    className="mt-[22px] h-[23px] w-[23px] flex-shrink-0 rounded-full object-cover"
-                  />
-                )}
+                Try again
+              </motion.button>
+            </motion.div>
+          ) : messages.length === 0 ? (
+            <motion.p
+              key="empty"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              className="py-10 text-center font-['Inter'] text-[13px] text-[#7B858D]"
+            >
+              No messages yet. Send a message to start the conversation.
+            </motion.p>
+          ) : (
+            <motion.div
+              key="messages"
+              initial="hidden"
+              animate="visible"
+              variants={{
+                hidden: {},
+                visible: {
+                  transition: { staggerChildren: 0.06 },
+                },
+              }}
+              className="space-y-6"
+            >
+              {messages.map((item) => {
+                const isMine =
+                  Boolean(currentUserId) &&
+                  item.senderId === currentUserId;
 
-                <div className="max-w-[75%]">
-                  <div
+                return (
+                  <motion.div
+                    key={item.id}
+                    variants={messageVariants}
+                    layout
                     className={
                       isMine
-                        ? "rounded-[16px] rounded-br-[4px] bg-[#164D6F] px-4 py-4 text-white shadow-sm"
-                        : "rounded-[16px] bg-[#F1F5F9] px-[17px] py-3"
+                        ? "flex justify-end"
+                        : "flex items-start gap-2 sm:gap-3"
                     }
                   >
-                    <p
-                      className={`whitespace-pre-wrap break-words font-['Inter'] text-[14px] leading-[20px] ${
-                        isMine ? "text-white" : "text-[#44515D]"
-                      }`}
-                    >
-                      {item.content}
-                    </p>
-                  </div>
+                    {!isMine && (
+                      <img
+                        src={details.avatar}
+                        alt=""
+                        onError={(event) => {
+                          event.currentTarget.onerror = null;
+                          event.currentTarget.src = DEFAULT_AVATAR;
+                        }}
+                        className="mt-[22px] h-[23px] w-[23px] flex-shrink-0 rounded-full object-cover"
+                      />
+                    )}
 
-                  {item.createdAt && (
-                    <p
-                      className={`mt-1 font-['Inter'] text-[10px] text-[#9BA8B2] ${
-                        isMine ? "text-right" : ""
-                      }`}
-                    >
-                      {getTime(item.createdAt)}
-                    </p>
-                  )}
-                </div>
-              </div>
-            );
-          })
-        )}
+                    <div className="min-w-0 max-w-[85%] sm:max-w-[75%]">
+                      <div
+                        className={
+                          isMine
+                            ? "rounded-[16px] rounded-br-[4px] bg-[#164D6F] px-3 py-3 text-white shadow-sm sm:px-4 sm:py-4"
+                            : "rounded-[16px] bg-[#F1F5F9] px-3 py-3 sm:px-[17px]"
+                        }
+                      >
+                        <p
+                          className={`whitespace-pre-wrap break-words font-['Inter'] text-[13px] leading-[20px] sm:text-[14px] ${
+                            isMine ? "text-white" : "text-[#44515D]"
+                          }`}
+                        >
+                          {item.content}
+                        </p>
+                      </div>
+
+                      {item.createdAt && (
+                        <p
+                          className={`mt-1 font-['Inter'] text-[10px] text-[#9BA8B2] ${
+                            isMine ? "text-right" : ""
+                          }`}
+                        >
+                          {getTime(item.createdAt)}
+                        </p>
+                      )}
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <div ref={messagesEndRef} />
       </div>
 
       {/* Message input */}
-      <div className="mt-[163px] flex h-[44px] w-full max-w-[1000px] items-center rounded-full border border-[#D8E0E4] bg-[#F3F6F7] px-4">
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.25 }}
+        className="mt-5 flex h-[46px] w-full max-w-[1000px] items-center rounded-full border border-[#D8E0E4] bg-[#F3F6F7] px-3 sm:mt-[163px] sm:h-[44px] sm:px-4"
+      >
         <input
           value={message}
           onChange={(event) => setMessage(event.target.value)}
@@ -503,34 +585,51 @@ export default function UserChatPage() {
           }}
           placeholder="Type a message..."
           disabled={loading || Boolean(error) || sending || !id}
-          className="flex-1 bg-transparent font-['Inter'] text-[13px] outline-none placeholder:text-[#9EACB7] disabled:cursor-not-allowed"
+          className="min-w-0 flex-1 bg-transparent font-['Inter'] text-[13px] outline-none placeholder:text-[#9EACB7] disabled:cursor-not-allowed"
         />
 
-        <button
+        <motion.button
           type="button"
           onClick={() => void sendMessage()}
           disabled={!message.trim() || loading || Boolean(error) || sending || !id}
+          whileHover={{ scale: 1.08 }}
+          whileTap={{ scale: 0.9 }}
           aria-label="Send message"
           className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-[#164D6F] text-white disabled:cursor-not-allowed disabled:opacity-50"
         >
-          <FiSend className="h-4 w-4" />
-        </button>
-      </div>
+          <motion.span
+            animate={sending ? { x: [0, 3, 0] } : { x: 0 }}
+            transition={
+              sending
+                ? { repeat: Infinity, duration: 0.6 }
+                : { duration: 0.2 }
+            }
+          >
+            <FiSend className="h-4 w-4" />
+          </motion.span>
+        </motion.button>
+      </motion.div>
 
       {sendError && (
-        <p className="mt-2 max-w-[1000px] font-['Inter'] text-[12px] text-red-600">
+        <motion.p
+          initial={{ opacity: 0, y: 5 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mt-2 max-w-[1000px] font-['Inter'] text-[12px] text-red-600"
+        >
           {sendError}
-        </p>
+        </motion.p>
       )}
 
       {/* Back */}
-      <button
+      <motion.button
         type="button"
         onClick={() => navigate("/dashboard/messages")}
-        className="mt-[51px] flex h-12 w-[90px] items-center justify-center rounded-lg border border-[#0D2E431F] bg-[#0D2E43] font-['Inter'] text-[14px] font-medium text-white"
+        whileHover={{ y: -2, scale: 1.03 }}
+        whileTap={{ scale: 0.96 }}
+        className="mt-8 flex h-12 w-[90px] items-center justify-center rounded-lg border border-[#0D2E431F] bg-[#0D2E43] font-['Inter'] text-[14px] font-medium text-white sm:mt-[51px]"
       >
         Back
-      </button>
-    </div>
+      </motion.button>
+    </motion.div>
   );
 }
