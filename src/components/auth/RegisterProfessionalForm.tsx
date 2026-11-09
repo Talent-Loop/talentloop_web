@@ -17,20 +17,18 @@ import { FaFacebook } from "react-icons/fa";
 
 export default function RegisterProfessionalForm() {
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] =
-    useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Form values
-  const [fullName, setFullName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-
   const [selectedSkill, setSelectedSkill] = useState("");
   const [experience, setExperience] = useState("");
   const [location, setLocation] = useState("");
-
   const [termsAccepted, setTermsAccepted] = useState(false);
 
   // UI state
@@ -79,7 +77,8 @@ export default function RegisterProfessionalForm() {
 
     // Basic validation
     if (
-      !fullName.trim() ||
+      !firstName.trim() ||
+      !lastName.trim() ||
       !email.trim() ||
       !phone.trim() ||
       !password ||
@@ -110,22 +109,7 @@ export default function RegisterProfessionalForm() {
     }
 
     if (!termsAccepted) {
-      setError(
-        "Please agree to the Terms of Service and Privacy Policy."
-      );
-      return;
-    }
-
-    // Split full name into first name and last name
-    const nameParts = fullName.trim().split(/\s+/);
-
-    const firstName = nameParts[0];
-    const lastName = nameParts.slice(1).join(" ");
-
-    if (!lastName) {
-      setError(
-        "Please enter your full name, including your last name."
-      );
+      setError("Please agree to the Terms of Service and Privacy Policy.");
       return;
     }
 
@@ -134,14 +118,12 @@ export default function RegisterProfessionalForm() {
       .trim()
       .replace(/\s+/g, "")
       .replace(/^0/, "")
-      .replace(/^\+234/, "");
+      .replace(/^\+?234/, "");
 
     const fullPhone = `+234${cleanedPhone}`;
 
-    // Save the profile information that the registration endpoint
-    // does NOT currently support.
-    //
-    // We will use this later after login when /profile is called.
+    // Save profile information not currently supported
+    // by the registration endpoint.
     const pendingProfessionalProfile = {
       skills: [selectedSkill],
       experience,
@@ -172,8 +154,8 @@ export default function RegisterProfessionalForm() {
             Accept: "*/*",
           },
           body: JSON.stringify({
-            firstName,
-            lastName,
+            firstName: firstName.trim(),
+            lastName: lastName.trim(),
             email: email.trim(),
             phone: fullPhone,
             password,
@@ -185,25 +167,17 @@ export default function RegisterProfessionalForm() {
 
       clearTimeout(timeoutId);
 
-      const data = await response.json();
+      const data = await response.json().catch(() => null);
 
       if (!response.ok) {
         setError(
-          data?.message ||
-            "Registration failed. Please try again."
+          data?.message || "Registration failed. Please try again."
         );
         return;
       }
 
-      console.log(
-        "Professional registration successful:",
-        data
-      );
-
-      console.log(
-        "Pending professional profile:",
-        pendingProfessionalProfile
-      );
+      console.log("Professional registration successful:", data);
+      console.log("Pending professional profile:", pendingProfessionalProfile);
 
       setSuccess(
         "Account created successfully! Please check your email to verify your account."
@@ -217,17 +191,12 @@ export default function RegisterProfessionalForm() {
 
       console.error("Registration error:", err);
 
-      if (
-        err instanceof DOMException &&
-        err.name === "AbortError"
-      ) {
+      if (err instanceof DOMException && err.name === "AbortError") {
         setError(
           "The server is taking too long to respond. Your account may have been created. Please check your email or use the resend verification option below."
         );
       } else {
-        setError(
-          "Unable to connect to the server. Please try again."
-        );
+        setError("Unable to connect to the server. Please try again.");
       }
     } finally {
       setLoading(false);
@@ -236,9 +205,7 @@ export default function RegisterProfessionalForm() {
 
   const handleResendVerification = async () => {
     if (!email.trim()) {
-      setError(
-        "Please enter the email address you used to register."
-      );
+      setError("Please enter the email address you used to register.");
       return;
     }
 
@@ -279,9 +246,7 @@ export default function RegisterProfessionalForm() {
     } catch (err) {
       console.error("Resend verification error:", err);
 
-      setError(
-        "Unable to connect to the server. Please try again."
-      );
+      setError("Unable to connect to the server. Please try again.");
     } finally {
       setResending(false);
     }
@@ -290,7 +255,6 @@ export default function RegisterProfessionalForm() {
   return (
     <section className="flex items-center justify-center bg-white px-6 py-8 lg:px-10">
       <div className="w-full max-w-[760px] rounded-[20px] border border-[#D9DEE5] bg-white px-8 py-8 lg:px-10">
-
         {/* Professional Icon */}
         <div className="mb-4 flex justify-center">
           <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-[#DDFBE3]">
@@ -307,37 +271,52 @@ export default function RegisterProfessionalForm() {
         </h2>
 
         {/* Form */}
-        <form
-          onSubmit={handleRegister}
-          className="mt-8 space-y-6"
-        >
-          {/* Full Name */}
-          <div>
-            <label className="mb-2 block text-base font-medium text-[#111827]">
-              Full Name
-            </label>
+        <form onSubmit={handleRegister} className="mt-8 space-y-6">
+          {/* First Name + Last Name */}
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+            {/* First Name */}
+            <div>
+              <label className="mb-2 block text-base font-medium text-[#111827]">
+                First Name
+              </label>
 
-            <div className="flex h-12 items-center rounded-xl border border-[#D9DEE5] px-4">
-              <User
-                size={20}
-                className="shrink-0 text-gray-400"
-              />
+              <div className="flex h-12 items-center rounded-xl border border-[#D9DEE5] px-4">
+                <User size={20} className="shrink-0 text-gray-400" />
 
-              <input
-                type="text"
-                placeholder="Enter your full name"
-                value={fullName}
-                onChange={(e) =>
-                  setFullName(e.target.value)
-                }
-                className="ml-3 w-full bg-transparent text-sm text-[#111827] outline-none placeholder:text-gray-400"
-              />
+                <input
+                  type="text"
+                  placeholder="Enter your first name"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  autoComplete="given-name"
+                  className="ml-3 w-full bg-transparent text-sm text-[#111827] outline-none placeholder:text-gray-400"
+                />
+              </div>
+            </div>
+
+            {/* Last Name */}
+            <div>
+              <label className="mb-2 block text-base font-medium text-[#111827]">
+                Last Name
+              </label>
+
+              <div className="flex h-12 items-center rounded-xl border border-[#D9DEE5] px-4">
+                <User size={20} className="shrink-0 text-gray-400" />
+
+                <input
+                  type="text"
+                  placeholder="Enter your last name"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  autoComplete="family-name"
+                  className="ml-3 w-full bg-transparent text-sm text-[#111827] outline-none placeholder:text-gray-400"
+                />
+              </div>
             </div>
           </div>
 
           {/* Email + Phone */}
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-
             {/* Email */}
             <div>
               <label className="mb-2 block text-base font-medium text-[#111827]">
@@ -345,18 +324,14 @@ export default function RegisterProfessionalForm() {
               </label>
 
               <div className="flex h-12 items-center rounded-xl border border-[#D9DEE5] px-4">
-                <Mail
-                  size={20}
-                  className="shrink-0 text-gray-400"
-                />
+                <Mail size={20} className="shrink-0 text-gray-400" />
 
                 <input
                   type="email"
                   placeholder="Enter your email address"
                   value={email}
-                  onChange={(e) =>
-                    setEmail(e.target.value)
-                  }
+                  onChange={(e) => setEmail(e.target.value)}
+                  autoComplete="email"
                   className="ml-3 w-full bg-transparent text-sm text-[#111827] outline-none placeholder:text-gray-400"
                 />
               </div>
@@ -369,9 +344,7 @@ export default function RegisterProfessionalForm() {
               </label>
 
               <div className="flex h-12 items-center rounded-xl border border-[#D9DEE5] px-3">
-                <span className="mr-2 text-lg">
-                  🇳🇬
-                </span>
+                <span className="mr-2 text-lg">🇳🇬</span>
 
                 <span className="text-sm font-medium text-[#111827]">
                   +234
@@ -386,9 +359,8 @@ export default function RegisterProfessionalForm() {
                   type="tel"
                   placeholder="Enter phone number"
                   value={phone}
-                  onChange={(e) =>
-                    setPhone(e.target.value)
-                  }
+                  onChange={(e) => setPhone(e.target.value)}
+                  autoComplete="tel-national"
                   className="ml-1 w-full bg-transparent text-sm text-[#111827] outline-none placeholder:text-gray-400"
                 />
               </div>
@@ -397,7 +369,6 @@ export default function RegisterProfessionalForm() {
 
           {/* Password + Confirm Password */}
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-
             {/* Password */}
             <div>
               <label className="mb-2 block text-base font-medium text-[#111827]">
@@ -405,40 +376,26 @@ export default function RegisterProfessionalForm() {
               </label>
 
               <div className="flex h-12 items-center rounded-xl border border-[#D9DEE5] px-4">
-                <Lock
-                  size={20}
-                  className="shrink-0 text-gray-400"
-                />
+                <Lock size={20} className="shrink-0 text-gray-400" />
 
                 <input
-                  type={
-                    showPassword ? "text" : "password"
-                  }
+                  type={showPassword ? "text" : "password"}
                   placeholder="Enter password"
                   value={password}
-                  onChange={(e) =>
-                    setPassword(e.target.value)
-                  }
+                  onChange={(e) => setPassword(e.target.value)}
+                  autoComplete="new-password"
                   className="ml-3 w-full bg-transparent text-sm text-[#111827] outline-none placeholder:text-gray-400"
                 />
 
                 <button
                   type="button"
-                  onClick={() =>
-                    setShowPassword((prev) => !prev)
-                  }
+                  onClick={() => setShowPassword((prev) => !prev)}
                   className="ml-2 shrink-0"
                 >
                   {showPassword ? (
-                    <EyeOff
-                      size={19}
-                      className="text-gray-400"
-                    />
+                    <EyeOff size={19} className="text-gray-400" />
                   ) : (
-                    <Eye
-                      size={19}
-                      className="text-gray-400"
-                    />
+                    <Eye size={19} className="text-gray-400" />
                   )}
                 </button>
               </div>
@@ -451,44 +408,28 @@ export default function RegisterProfessionalForm() {
               </label>
 
               <div className="flex h-12 items-center rounded-xl border border-[#D9DEE5] px-4">
-                <Lock
-                  size={20}
-                  className="shrink-0 text-gray-400"
-                />
+                <Lock size={20} className="shrink-0 text-gray-400" />
 
                 <input
-                  type={
-                    showConfirmPassword
-                      ? "text"
-                      : "password"
-                  }
+                  type={showConfirmPassword ? "text" : "password"}
                   placeholder="Confirm your password"
                   value={confirmPassword}
-                  onChange={(e) =>
-                    setConfirmPassword(e.target.value)
-                  }
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  autoComplete="new-password"
                   className="ml-3 w-full bg-transparent text-sm text-[#111827] outline-none placeholder:text-gray-400"
                 />
 
                 <button
                   type="button"
                   onClick={() =>
-                    setShowConfirmPassword(
-                      (prev) => !prev
-                    )
+                    setShowConfirmPassword((prev) => !prev)
                   }
                   className="ml-2 shrink-0"
                 >
                   {showConfirmPassword ? (
-                    <EyeOff
-                      size={19}
-                      className="text-gray-400"
-                    />
+                    <EyeOff size={19} className="text-gray-400" />
                   ) : (
-                    <Eye
-                      size={19}
-                      className="text-gray-400"
-                    />
+                    <Eye size={19} className="text-gray-400" />
                   )}
                 </button>
               </div>
@@ -497,7 +438,6 @@ export default function RegisterProfessionalForm() {
 
           {/* Trade + Experience */}
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-
             {/* Trade / Skill */}
             <div>
               <label className="mb-2 block text-base font-medium text-[#111827]">
@@ -507,13 +447,9 @@ export default function RegisterProfessionalForm() {
               <div className="relative">
                 <select
                   value={selectedSkill}
-                  onChange={(e) =>
-                    setSelectedSkill(e.target.value)
-                  }
+                  onChange={(e) => setSelectedSkill(e.target.value)}
                   className={`h-12 w-full appearance-none rounded-xl border border-[#D9DEE5] bg-white px-4 pr-10 text-sm outline-none ${
-                    selectedSkill
-                      ? "text-[#111827]"
-                      : "text-gray-400"
+                    selectedSkill ? "text-[#111827]" : "text-gray-400"
                   }`}
                 >
                   <option value="" disabled>
@@ -521,10 +457,7 @@ export default function RegisterProfessionalForm() {
                   </option>
 
                   {skillOptions.map((skill) => (
-                    <option
-                      key={skill}
-                      value={skill}
-                    >
+                    <option key={skill} value={skill}>
                       {skill}
                     </option>
                   ))}
@@ -546,29 +479,20 @@ export default function RegisterProfessionalForm() {
               <div className="relative">
                 <select
                   value={experience}
-                  onChange={(e) =>
-                    setExperience(e.target.value)
-                  }
+                  onChange={(e) => setExperience(e.target.value)}
                   className={`h-12 w-full appearance-none rounded-xl border border-[#D9DEE5] bg-white px-4 pr-10 text-sm outline-none ${
-                    experience
-                      ? "text-[#111827]"
-                      : "text-gray-400"
+                    experience ? "text-[#111827]" : "text-gray-400"
                   }`}
                 >
                   <option value="" disabled>
                     Select your experience level
                   </option>
 
-                  {experienceOptions.map(
-                    (level) => (
-                      <option
-                        key={level}
-                        value={level}
-                      >
-                        {level}
-                      </option>
-                    )
-                  )}
+                  {experienceOptions.map((level) => (
+                    <option key={level} value={level}>
+                      {level}
+                    </option>
+                  ))}
                 </select>
 
                 <ChevronDown
@@ -586,18 +510,14 @@ export default function RegisterProfessionalForm() {
             </label>
 
             <div className="flex h-12 items-center rounded-xl border border-[#D9DEE5] px-4">
-              <MapPin
-                size={20}
-                className="shrink-0 text-gray-400"
-              />
+              <MapPin size={20} className="shrink-0 text-gray-400" />
 
               <input
                 type="text"
                 placeholder="Enter your city"
                 value={location}
-                onChange={(e) =>
-                  setLocation(e.target.value)
-                }
+                onChange={(e) => setLocation(e.target.value)}
+                autoComplete="address-level2"
                 className="ml-3 w-full bg-transparent text-sm text-[#111827] outline-none placeholder:text-gray-400"
               />
             </div>
@@ -642,9 +562,7 @@ export default function RegisterProfessionalForm() {
             <input
               type="checkbox"
               checked={termsAccepted}
-              onChange={(e) =>
-                setTermsAccepted(e.target.checked)
-              }
+              onChange={(e) => setTermsAccepted(e.target.checked)}
               className="mt-0.5 h-4 w-4 rounded border-gray-300"
             />
 
@@ -703,10 +621,7 @@ export default function RegisterProfessionalForm() {
             type="button"
             className="flex h-12 items-center justify-center gap-3 rounded-xl border border-[#D9DEE5] text-sm font-medium text-[#111827] transition hover:bg-gray-50"
           >
-            <FaFacebook
-              size={21}
-              className="text-[#1877F2]"
-            />
+            <FaFacebook size={21} className="text-[#1877F2]" />
             Facebook
           </button>
         </div>

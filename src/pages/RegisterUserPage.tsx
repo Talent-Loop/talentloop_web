@@ -18,11 +18,11 @@ import RegisterUserLeftPanel from "../components/auth/RegisterUserLeftPanel";
 
 export default function RegisterUserPage() {
   const [showPassword, setShowPassword] = useState(false);
-
   const [password, setPassword] = useState("");
 
   const [formData, setFormData] = useState({
-    fullName: "",
+    firstName: "",
+    lastName: "",
     email: "",
     phone: "",
   });
@@ -75,7 +75,8 @@ export default function RegisterUserPage() {
     setShowResend(false);
 
     if (
-      !formData.fullName.trim() ||
+      !formData.firstName.trim() ||
+      !formData.lastName.trim() ||
       !formData.email.trim() ||
       !formData.phone.trim() ||
       !password
@@ -99,17 +100,6 @@ export default function RegisterUserPage() {
     if (!agreeToTerms) {
       setError(
         "Please agree to the Terms of Service and Privacy Policy."
-      );
-      return;
-    }
-
-    const nameParts = formData.fullName.trim().split(/\s+/);
-    const firstName = nameParts[0];
-    const lastName = nameParts.slice(1).join(" ");
-
-    if (!lastName) {
-      setError(
-        "Please enter your full name, including your last name."
       );
       return;
     }
@@ -139,8 +129,8 @@ export default function RegisterUserPage() {
             Accept: "*/*",
           },
           body: JSON.stringify({
-            firstName,
-            lastName,
+            firstName: formData.firstName.trim(),
+            lastName: formData.lastName.trim(),
             email: formData.email.trim(),
             phone: fullPhone,
             password,
@@ -169,7 +159,6 @@ export default function RegisterUserPage() {
       );
 
       setShowResend(true);
-
       setPassword("");
     } catch (err) {
       clearTimeout(timeoutId);
@@ -283,26 +272,54 @@ export default function RegisterUserPage() {
               onSubmit={handleRegister}
               className="mt-8 space-y-5"
             >
-              {/* Full Name */}
-              <div>
-                <label className="mb-2 block text-sm font-medium text-[#252525]">
-                  Full Name
-                </label>
+              {/* First Name and Last Name */}
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                {/* First Name */}
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-[#252525]">
+                    First Name
+                  </label>
 
-                <div className="relative">
-                  <UserRound
-                    size={20}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 text-[#667085]"
-                  />
+                  <div className="relative">
+                    <UserRound
+                      size={20}
+                      className="absolute left-4 top-1/2 -translate-y-1/2 text-[#667085]"
+                    />
 
-                  <input
-                    type="text"
-                    name="fullName"
-                    value={formData.fullName}
-                    onChange={handleChange}
-                    placeholder="Enter your full name"
-                    className="h-14 w-full rounded-xl border border-[#D0D5DD] bg-white pl-12 pr-4 text-base outline-none transition focus:border-[#173D57] focus:ring-1 focus:ring-[#173D57]"
-                  />
+                    <input
+                      type="text"
+                      name="firstName"
+                      value={formData.firstName}
+                      onChange={handleChange}
+                      placeholder="First name"
+                      autoComplete="given-name"
+                      className="h-14 w-full rounded-xl border border-[#D0D5DD] bg-white pl-12 pr-4 text-base outline-none transition focus:border-[#173D57] focus:ring-1 focus:ring-[#173D57]"
+                    />
+                  </div>
+                </div>
+
+                {/* Last Name */}
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-[#252525]">
+                    Last Name
+                  </label>
+
+                  <div className="relative">
+                    <UserRound
+                      size={20}
+                      className="absolute left-4 top-1/2 -translate-y-1/2 text-[#667085]"
+                    />
+
+                    <input
+                      type="text"
+                      name="lastName"
+                      value={formData.lastName}
+                      onChange={handleChange}
+                      placeholder="Last name"
+                      autoComplete="family-name"
+                      className="h-14 w-full rounded-xl border border-[#D0D5DD] bg-white pl-12 pr-4 text-base outline-none transition focus:border-[#173D57] focus:ring-1 focus:ring-[#173D57]"
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -324,6 +341,7 @@ export default function RegisterUserPage() {
                     value={formData.email}
                     onChange={handleChange}
                     placeholder="Enter your email address"
+                    autoComplete="email"
                     className="h-14 w-full rounded-xl border border-[#D0D5DD] bg-white pl-12 pr-4 text-base outline-none transition focus:border-[#173D57] focus:ring-1 focus:ring-[#173D57]"
                   />
                 </div>
@@ -347,6 +365,7 @@ export default function RegisterUserPage() {
                     value={formData.phone}
                     onChange={handleChange}
                     placeholder="Enter your phone number"
+                    autoComplete="tel"
                     className="h-14 w-full rounded-xl border border-[#D0D5DD] bg-white pl-12 pr-4 text-base outline-none transition focus:border-[#173D57] focus:ring-1 focus:ring-[#173D57]"
                   />
                 </div>
@@ -369,6 +388,7 @@ export default function RegisterUserPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Create a password"
+                    autoComplete="new-password"
                     className="h-14 w-full rounded-xl border border-[#D0D5DD] bg-white pl-12 pr-12 text-base outline-none transition focus:border-[#173D57] focus:ring-1 focus:ring-[#173D57]"
                   />
 
@@ -525,4 +545,3 @@ export default function RegisterUserPage() {
     </div>
   );
 }
-
